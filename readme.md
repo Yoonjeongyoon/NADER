@@ -10,7 +10,7 @@ This is official implementation for "NADER: Neural Architecture Design via Multi
 
 ## 🎉 News
 
-April. 26, 2025: NADER is now open source.
+The code is coming soon!
 
 ## 💻️ Get Started
 
