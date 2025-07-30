@@ -1,0 +1,62 @@
+{
+	"dartsv2": {
+		"base": "dartsv2_base",
+		"stem": "dartsv2_stem",
+		"downsample": "dartsv2_downsample"
+	},
+	"dartsv2_craft1": {
+		"base": "dartsv2_craft1_base",
+		"stem": "dartsv2_stem",
+		"downsample": "dartsv2_craft1_downsample"
+	},
+	"nasbench201_cifar100_optimal_forRes50": {
+		"base": "nasbench201_cifar100_optimal_forRes50_base",
+		"stem": "nasbench201_cifar100_optimal_forRes50_stem",
+		"downsample": "nasbench201_cifar100_optimal_forRes50_downsample"
+	},
+	"nasbench201_cifar100_acc76_forRes50": {
+		"base": "nasbench201_cifar100_acc76_forRes50_base",
+		"stem": "nasbench201_cifar100_optimal_forRes50_stem",
+		"downsample": "nasbench201_cifar100_optimal_forRes50_downsample"
+	},
+	"dartsv2_seed777_dartsv2_p2930": {
+		"base": "dartsv2_seed777_dartsv2_p2930_base",
+		"stem": "dartsv2_stem",
+		"downsample": "dartsv2_downsample"
+	},
+	"darts_beta": {
+		"base": "darts_beta_base",
+		"stem": "darts_beta_stem",
+		"downsample": "darts_beta_downsample"
+	},
+	"darts_beta_layers8_width36": {
+		"base": "darts_beta_layers8_width36_base",
+		"stem": "darts_beta_layers8_width36_stem",
+		"downsample": "darts_beta_layers8_width36_downsample"
+	},
+	"dartsv2_layers8_width36": {
+		"base": "dartsv2_layers8_width36_base",
+		"stem": "dartsv2_layers8_width36_stem",
+		"downsample": "dartsv2_layers8_width36_downsample"
+	},
+	"darts_beta_v2_dp3": {
+		"base": "darts_beta_v2_dp3_base",
+		"stem": "darts_beta_v2_dp3_stem",
+		"downsample": "darts_beta_v2_dp3_downsample"
+	},
+	"darts_beta_v2": {
+		"base": "darts_beta_v2_base",
+		"stem": "darts_beta_v2_stem",
+		"downsample": "darts_beta_v2_downsample"
+	},
+	"nasbench201_cifar100_acc76": {
+		"base": "nasbench201_cifar100_acc76_base",
+		"stem": "nasbench201_cifar100_acc76_stem",
+		"downsample": "nasbench201_cifar100_acc76_downsample"
+	},
+	"nasbench201_cifar100_optimal": {
+		"base": "nasbench201_cifar100_optimal_base",
+		"stem": "nasbench201_cifar100_optimal_stem",
+		"downsample": "nasbench201_cifar100_optimal_downsample"
+	}
+}

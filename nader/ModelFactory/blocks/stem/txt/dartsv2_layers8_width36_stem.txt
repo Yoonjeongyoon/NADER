@@ -1,0 +1,8 @@
+##DARTSv2_stem##
+0:input
+1:output
+3:Conv2d(out_channels=dim,kernel_size=1,stride=1)
+4:BN
+0->3
+3->4
+4->1

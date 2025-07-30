@@ -1,0 +1,62 @@
+{
+	"dartsv2_base": {
+		"name": "DARTSv2_base",
+		"params": 1086976.0,
+		"flops": 4457496576.0
+	},
+	"dartsv2_craft1_base": {
+		"name": "DARTSv2_base",
+		"params": 890368.0,
+		"flops": 3652190208.0
+	},
+	"nasbench201_cifar100_optimal_forRes50_base": {
+		"name": "NASBench201Seed777",
+		"params": 83840.0,
+		"flops": 346030080.0
+	},
+	"nasbench201_cifar100_acc76_forRes50_base": {
+		"name": "NASBench201Seed777",
+		"params": 496384.0,
+		"flops": 1904869888.0
+	},
+	"dartsv2_seed777_dartsv2_p2930_base": {
+		"name": "DARTSv2_base",
+		"params": 1086976.0,
+		"flops": 4457496576.0
+	},
+	"nasbench201_cifar100_acc76_base": {
+		"name": "ResNetBasicBlock",
+		"params": 496384.0,
+		"flops": 1904869888.0
+	},
+	"darts_beta_base": {
+		"name": "Beta_DARTS_base",
+		"params": 957440.0,
+		"flops": 3926917120.0
+	},
+	"darts_beta_v2_base": {
+		"name": "Beta_DARTS_base",
+		"params": 957440.0,
+		"flops": 3926917120.0
+	},
+	"darts_beta_layers8_width36_base": {
+		"name": "Beta_DARTS_base",
+		"params": 957440.0,
+		"flops": 3926917120.0
+	},
+	"dartsv2_layers8_width36_base": {
+		"name": "DARTSv2_base",
+		"params": 1086976.0,
+		"flops": 4457496576.0
+	},
+	"darts_beta_v2_dp3_base": {
+		"name": "Beta_DARTS_base",
+		"params": 957440.0,
+		"flops": 3926917120.0
+	},
+	"nasbench201_cifar100_optimal_base": {
+		"name": "NASBench201Seed777",
+		"params": 739200.0,
+		"flops": 3030384640.0
+	}
+}

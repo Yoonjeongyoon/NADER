@@ -1,0 +1,1877 @@
+[
+	{
+		"raw": {
+			"name": "resnet_basic",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n7->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 91.16
+		},
+		"inspiration": {
+			"id": "1380",
+			"content": "Decoupling the training strategies for different tasks (natural vs adversarial) to design specialized subnetworks within the backbone that focus on specific tasks."
+		},
+		"new": {
+			"name": "resnet_basic_p1380",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,group=C)\n10:BN\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=3,stride=1,group=C)\n13:BN\n14:Add\n15:ReLU\n16:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n11->12\n12->13\n13->14\n0->14\n14->15\n7->16\n15->16\n16->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 10.09
+		},
+		"experience": "Introduce changes incrementally and verify each modification improves or preserves accuracy before making further alterations."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n7->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 91.16
+		},
+		"inspiration": {
+			"id": "4763",
+			"content": "Adopting a distinct queries selection mechanism across different architectures including FCN, R-CNN, and DETR to ensure the distinctness of input queries, which aids in optimization and reduces the necessity for long iterative refinement stages."
+		},
+		"new": {
+			"name": "resnet_basic_p4763",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n7->9\n9->1",
+				"##input_block_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_block_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 10.09
+		},
+		"experience": "Ensure that any added skip connections or operations do not disrupt the learning process by excessively altering the network's expected data flow."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n7->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 91.16
+		},
+		"inspiration": {
+			"id": "2405",
+			"content": "Design a kernel prediction mechanism instead of direct color prediction to enhance the ability of the model to generalize across different unseen data types, like normals or depth, which could be crucial for applications in CGI or 3D modeling."
+		},
+		"new": {
+			"name": "resnet_basic_p2405",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:multiply\n0->9\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->10\n9->11\n10->11\n11->7\n7->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:MaxPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 10.09
+		},
+		"experience": "Ensure modifications preserve the simplicity of the residual path and avoid operations that can significantly alter gradient flow."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n7->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 70.86
+		},
+		"inspiration": {
+			"id": "1412",
+			"content": "Employ progressive attention masking in the transformer encoders to manage local interactions effectively, suggesting the use of hierarchical or multi-level attention mechanisms within the visual backbone to better capture local feature dependencies."
+		},
+		"new": {
+			"name": "resnet_basic_p1412",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:AdaptiveAvgPool2d(output_size=1)\n10:reshape(B,C)\n11:Linear(out_channels=C)\n12:softmax(dim=1)\n13:reshape(B,C,1,1)\n14:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n11->12\n12->13\n13->14\n7->14\n14->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=dim,kernel_size=1,stride=2)\n9:BN\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 5.22
+		},
+		"experience": "Ensure that any additional operations maintain the integrity of the residual connections and avoid operations that normalize or scale the output inappropriately."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n7->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 70.86
+		},
+		"inspiration": {
+			"id": "4670",
+			"content": "Utilize an attention masking strategy to unify individual attention operations into a single one, facilitating parallel computation and improving model efficiency."
+		},
+		"new": {
+			"name": "resnet_basic_p4670",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:AdaptiveAvgPool2d(output_size=1)\n10:reshape(B,C)\n11:Linear(out_channels=C)\n12:reshape(B,C,1,1)\n13:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n7->9\n9->10\n10->11\n11->12\n12->13\n8->13\n13->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 1.0
+		},
+		"experience": "Ensure modifications retain the original block's dimensional consistency and spatial information to maintain performance."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n7->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 70.86
+		},
+		"inspiration": {
+			"id": "2405",
+			"content": "Design a kernel prediction mechanism instead of direct color prediction to enhance the ability of the model to generalize across different unseen data types, like normals or depth, which could be crucial for applications in CGI or 3D modeling."
+		},
+		"new": {
+			"name": "resnet_basic_p2405",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:multiply\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n0->9\n9->10\n10->11\n8->11\n11->7\n7->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 1.0
+		},
+		"experience": "Ensure modifications preserve the original residual connections and avoid operations that can disproportionately scale feature maps, such as element-wise multiplication without proper normalization."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p877",
+			"blocks": [
+				"##ResNetBasicBlockWithAttention##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n9:ReLU\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n14:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n0->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n12->13\n0->13\n13->14\n14->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 73.82
+		},
+		"inspiration": {
+			"id": "1554",
+			"content": "Implement optimization-based methods for precise 3D reconstruction, which are beneficial particularly when dealing with limited training data and complex models like SMPL-X."
+		},
+		"new": {
+			"name": "resnet_basic_p877_p1554",
+			"blocks": [
+				"##ResNetBasicBlockWithAttention##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n9:ReLU\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n14:ReLU\n15:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n12->13\n0->13\n13->14\n0->15\n14->15\n15->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=dim,kernel_size=1,stride=2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n0->8\n8->9\n7->9\n9->1"
+			],
+			"acc": 1.0
+		},
+		"experience": "Ensure the newly added paths or operations do not interfere destructively with existing paths, and validate their impact on gradient flow."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p877",
+			"blocks": [
+				"##ResNetBasicBlockWithAttention##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n9:ReLU\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n14:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n0->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n12->13\n0->13\n13->14\n14->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 73.82
+		},
+		"inspiration": {
+			"id": "1529",
+			"content": "Designing a Cross Resolution Feature Fusion (CReFF) module that uses motion vectors to warp and align high-resolution features to low-resolution frames, enhancing feature aggregation."
+		},
+		"new": {
+			"name": "resnet_basic_p877_p1529",
+			"blocks": [
+				"##ResNetBasicBlockWithAttention##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n9:ReLU\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n14:ReLU\n15:Conv2d(out_channels=C,kernel_size=1,stride=1)\n16:Conv2d(out_channels=C,kernel_size=1,stride=1)\n17:concat(dim=1)\n18:Conv2d(out_channels=C,kernel_size=1,stride=1)\n0->2\n2->3\n3->4\n4->5\n5->6\n0->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n12->13\n0->13\n13->14\n0->15\n14->16\n15->17\n16->17\n17->18\n18->1\n```",
+				"##block_name_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##block_name_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 54.26
+		},
+		"experience": "Ensure that added layers and operations contribute to meaningful feature extraction and avoid unnecessary complexity."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p877",
+			"blocks": [
+				"##ResNetBasicBlockWithAttention##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n9:ReLU\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n14:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n0->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n12->13\n0->13\n13->14\n14->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 73.82
+		},
+		"inspiration": {
+			"id": "2848",
+			"content": "Utilize a Temporal-Motion Memory (TMM) module to synchronize hand motions with the overall body dynamics temporally, ensuring temporal consistency."
+		},
+		"new": {
+			"name": "resnet_basic_p877_p2848",
+			"blocks": [
+				"##ResNetBasicBlockWithAttention##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n9:ReLU\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n14:ReLU\n15:Conv2d(out_channels=C,kernel_size=3,stride=1)\n16:BN\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=3,stride=1)\n19:BN\n20:AdaptiveAvgPool2d(output_size=1)\n21:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n22:ReLU\n23:Conv2d(out_channels=C,kernel_size=1,stride=1)\n24:Sigmoid\n25:Mul\n26:Add\n27:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n0->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n12->13\n0->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n15->20\n20->21\n21->22\n22->23\n23->24\n24->25\n19->25\n25->26\n15->26\n26->27\n27->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 1.0
+		},
+		"experience": "Ensure the added complexity in the network is necessary and consider adding regularization techniques like dropout or batch normalization to avoid overfitting."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p877_p1137",
+			"blocks": [
+				"##ResNetBasicBlockWithAttention##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n9:ReLU\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n14:ReLU\n15:Conv2d(out_channels=C,kernel_size=3,stride=1)\n16:BN\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=3,stride=1)\n19:BN\n20:AdaptiveAvgPool2d(output_size=1)\n21:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n22:ReLU\n23:Conv2d(out_channels=C,kernel_size=1,stride=1)\n24:Sigmoid\n25:Mul\n26:Add\n27:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n0->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n12->13\n0->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n14->20\n20->21\n21->22\n22->23\n23->24\n24->25\n19->25\n25->26\n14->26\n26->27\n27->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 74.25
+		},
+		"inspiration": {
+			"id": "329",
+			"content": "Deploy submodular optimization to select the most discriminative and diverse concepts, ensuring effective and efficient concept selection."
+		},
+		"new": {
+			"name": "resnet_basic_p877_p1137_p329",
+			"blocks": [
+				"##ResNetBasicBlockWithAttention##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n9:ReLU\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n14:ReLU\n15:Conv2d(out_channels=C,kernel_size=3,stride=1)\n16:BN\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=3,stride=1)\n19:BN\n20:AdaptiveAvgPool2d(output_size=1)\n21:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n22:ReLU\n23:Conv2d(out_channels=C,kernel_size=1,stride=1)\n24:Sigmoid\n25:Mul\n26:Add\n27:ReLU\n28:Conv2d(out_channels=C//4,kernel_size=1,stride=1)\n29:ReLU\n30:Conv2d(out_channels=C,kernel_size=1,stride=1)\n31:Sigmoid\n32:Mul\n33:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n12->13\n0->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n14->20\n20->21\n21->22\n22->23\n23->24\n24->25\n19->25\n25->26\n14->26\n26->27\n27->28\n28->29\n29->30\n30->31\n31->32\n27->32\n32->33\n0->33\n33->1",
+				"##input_block_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_block_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 1.0
+		},
+		"experience": "Carefully evaluate the complexity added by new layers and ensure proper initialization and regularization to maintain model performance."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p877_p1137",
+			"blocks": [
+				"##ResNetBasicBlockWithAttention##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n9:ReLU\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n14:ReLU\n15:Conv2d(out_channels=C,kernel_size=3,stride=1)\n16:BN\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=3,stride=1)\n19:BN\n20:AdaptiveAvgPool2d(output_size=1)\n21:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n22:ReLU\n23:Conv2d(out_channels=C,kernel_size=1,stride=1)\n24:Sigmoid\n25:Mul\n26:Add\n27:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n0->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n12->13\n0->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n14->20\n20->21\n21->22\n22->23\n23->24\n24->25\n19->25\n25->26\n14->26\n26->27\n27->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 74.25
+		},
+		"inspiration": {
+			"id": "1386",
+			"content": "Development of a Mask Switch Module (MSM) that dynamically selects the optimal mask resolution for each instance to balance segmentation accuracy and computational efficiency."
+		},
+		"new": {
+			"name": "resnet_basic_p877_p1137_p1386",
+			"blocks": [
+				"##ResNetBasicBlockWithAttention##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n9:ReLU\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n14:ReLU\n15:Conv2d(out_channels=C,kernel_size=3,stride=1)\n16:BN\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=3,stride=1)\n19:BN\n20:AdaptiveAvgPool2d(output_size=1)\n21:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n22:ReLU\n23:Conv2d(out_channels=C,kernel_size=1,stride=1)\n24:Sigmoid\n25:Mul\n26:Add\n27:ReLU\n28:Conv2d(out_channels=C,kernel_size=1,stride=1,group=C)\n29:AdaptiveAvgPool2d(output_size=1)\n30:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n31:ReLU\n32:Conv2d(out_channels=C,kernel_size=1,stride=1)\n33:Sigmoid\n34:Mul\n35:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n12->13\n0->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n14->20\n20->21\n21->22\n22->23\n23->24\n24->25\n19->25\n25->26\n14->26\n26->27\n27->28\n28->29\n29->30\n30->31\n31->32\n32->33\n33->34\n27->34\n34->35\n0->35\n35->1",
+				"##built_in_function_input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##built_in_function_input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 1.0
+		},
+		"experience": "Ensure the added complexity is justified by validation performance and consider using dropout or other regularization techniques to prevent overfitting."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p877_p1137",
+			"blocks": [
+				"##ResNetBasicBlockWithAttention##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n9:ReLU\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n14:ReLU\n15:Conv2d(out_channels=C,kernel_size=3,stride=1)\n16:BN\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=3,stride=1)\n19:BN\n20:AdaptiveAvgPool2d(output_size=1)\n21:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n22:ReLU\n23:Conv2d(out_channels=C,kernel_size=1,stride=1)\n24:Sigmoid\n25:Mul\n26:Add\n27:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n0->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n12->13\n0->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n14->20\n20->21\n21->22\n22->23\n23->24\n24->25\n19->25\n25->26\n14->26\n26->27\n27->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 74.25
+		},
+		"inspiration": {
+			"id": "1368",
+			"content": "Employ a fusion block that combines monocular and stereo network outputs to produce a final depth map, optimizing for both local detail and overall consistency."
+		},
+		"new": {
+			"name": "resnet_basic_p877_p1137_p1368",
+			"blocks": [
+				"##ResNetBasicBlockWithAttention##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n9:ReLU\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n14:ReLU\n15:Conv2d(out_channels=C,kernel_size=3,stride=1)\n16:BN\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=3,stride=1)\n19:BN\n20:AdaptiveAvgPool2d(output_size=1)\n21:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n22:ReLU\n23:Conv2d(out_channels=C,kernel_size=1,stride=1)\n24:Sigmoid\n25:Mul\n26:Add\n27:ReLU\n28:Conv2d(out_channels=C,kernel_size=1,stride=1)\n29:Conv2d(out_channels=C,kernel_size=1,stride=1)\n30:concat(dim=1)\n31:Conv2d(out_channels=C,kernel_size=1,stride=1)\n0->2\n2->3\n3->4\n4->5\n5->6\n0->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n12->13\n0->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n14->20\n20->21\n21->22\n22->23\n23->24\n24->25\n19->25\n25->26\n14->26\n26->27\n0->28\n27->29\n28->30\n29->30\n30->31\n31->1",
+				"##built-in function input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##built-in function input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 61.45
+		},
+		"experience": "Ensure that additional layers or operations do not disrupt the learned features from earlier layers and maintain a balance between model complexity and performance."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p877_p1137",
+			"blocks": [
+				"##ResNetBasicBlockWithAttention##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n9:ReLU\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n14:ReLU\n15:Conv2d(out_channels=C,kernel_size=3,stride=1)\n16:BN\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=3,stride=1)\n19:BN\n20:AdaptiveAvgPool2d(output_size=1)\n21:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n22:ReLU\n23:Conv2d(out_channels=C,kernel_size=1,stride=1)\n24:Sigmoid\n25:Mul\n26:Add\n27:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n0->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n12->13\n0->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n14->20\n20->21\n21->22\n22->23\n23->24\n24->25\n19->25\n25->26\n14->26\n26->27\n27->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 74.25
+		},
+		"inspiration": {
+			"id": "2286",
+			"content": "Design a switchable neural network architecture that can dynamically adjust its capacity based on resource limitations of the deployment platform."
+		},
+		"new": {
+			"name": "resnet_basic_p877_p1137_p2286",
+			"blocks": [
+				"##ResNetBasicBlockWithAttention##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n9:ReLU\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n14:ReLU\n15:Conv2d(out_channels=C,kernel_size=3,stride=1)\n16:BN\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=3,stride=1)\n19:BN\n20:AdaptiveAvgPool2d(output_size=1)\n21:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n22:ReLU\n23:Conv2d(out_channels=C,kernel_size=1,stride=1)\n24:Sigmoid\n25:Mul\n26:Add\n27:ReLU\n28:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n12->13\n0->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n14->20\n20->21\n21->22\n22->23\n23->24\n24->25\n19->25\n25->26\n14->26\n26->27\n0->28\n27->28\n28->1",
+				"##input_block_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_block_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 1.0
+		},
+		"experience": "Ensure that any added skip connections or element-wise operations are properly aligned and transformed to maintain feature integrity."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p877_p1137",
+			"blocks": [
+				"##ResNetBasicBlockWithAttention##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n9:ReLU\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n14:ReLU\n15:Conv2d(out_channels=C,kernel_size=3,stride=1)\n16:BN\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=3,stride=1)\n19:BN\n20:AdaptiveAvgPool2d(output_size=1)\n21:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n22:ReLU\n23:Conv2d(out_channels=C,kernel_size=1,stride=1)\n24:Sigmoid\n25:Mul\n26:Add\n27:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n0->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n12->13\n0->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n14->20\n20->21\n21->22\n22->23\n23->24\n24->25\n19->25\n25->26\n14->26\n26->27\n27->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 74.25
+		},
+		"inspiration": {
+			"id": "4017",
+			"content": "Utilizing a 2D projection of 3D point clouds onto multiple orthogonal planes to capture different views, enhancing feature extraction and robustness."
+		},
+		"new": {
+			"name": "resnet_basic_p877_p1137_p4017",
+			"blocks": [
+				"##ResNetBasicBlockWithAttention##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n9:ReLU\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n14:ReLU\n15:Conv2d(out_channels=C,kernel_size=3,stride=1)\n16:BN\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=3,stride=1)\n19:BN\n20:AdaptiveAvgPool2d(output_size=1)\n21:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n22:ReLU\n23:Conv2d(out_channels=C,kernel_size=1,stride=1)\n24:Sigmoid\n25:Mul\n26:Add\n27:ReLU\n28:Conv2d(out_channels=C,kernel_size=1,stride=1,group=C)\n29:Conv2d(out_channels=C,kernel_size=1,stride=1,group=C)\n30:Conv2d(out_channels=C,kernel_size=1,stride=1,group=C)\n31:concat(dim=1)\n32:Conv2d(out_channels=C,kernel_size=1,stride=1)\n0->2\n2->3\n3->4\n4->5\n5->6\n0->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n12->13\n0->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n14->20\n20->21\n21->22\n22->23\n23->24\n24->25\n19->25\n25->26\n14->26\n26->27\n27->28\n27->29\n27->30\n28->31\n29->31\n30->31\n31->32\n32->1",
+				"##built-in function input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##built-in function input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 53.96
+		},
+		"experience": "Ensure changes to the network structure maintain a balance between complexity and performance and avoid overly increasing the number of parameters."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n7->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 47.58
+		},
+		"inspiration": {
+			"id": "5315",
+			"content": "Employment of spatial-temporal self-attention encoders for local and global feature extraction, suggesting a modular design for visual backbone architectures to handle different scales and dimensions of data effectively."
+		},
+		"new": {
+			"name": "resnet_basic_p5315",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:reshape(B, C, H*W)\n10:permute(0, 2, 1)\n11:Linear(out_channels=C)\n12:permute(0, 2, 1)\n13:reshape(B, C, H, W)\n14:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n7->9\n9->10\n10->11\n11->12\n12->13\n13->14\n0->14\n14->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 0.47
+		},
+		"experience": "Avoid adding operations that disrupt the spatial structure of feature maps in convolutional networks. Ensure modifications preserve the spatial and channel consistency of the feature maps."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n7->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 47.58
+		},
+		"inspiration": {
+			"id": "1380",
+			"content": "Decoupling the training strategies for different tasks (natural vs adversarial) to design specialized subnetworks within the backbone that focus on specific tasks."
+		},
+		"new": {
+			"name": "resnet_basic_p1380",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,group=C)\n10:BN\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=3,stride=1,group=C)\n13:BN\n14:ReLU\n15:Add\n16:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n11->12\n12->13\n13->15\n0->15\n15->14\n7->16\n14->16\n16->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1,padding=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=dim,kernel_size=1,stride=2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n0->8\n8->9\n7->9\n9->1"
+			],
+			"acc": 0.83
+		},
+		"experience": "When adding new paths or layers, ensure they are effectively contributing to feature learning and consider using normalization or alignment techniques to stabilize training."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n7->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 47.58
+		},
+		"inspiration": {
+			"id": "1412",
+			"content": "Employ progressive attention masking in the transformer encoders to manage local interactions effectively, suggesting the use of hierarchical or multi-level attention mechanisms within the visual backbone to better capture local feature dependencies."
+		},
+		"new": {
+			"name": "resnet_basic_p1412",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:AdaptiveAvgPool2d(output_size=1)\n10:reshape(B, C)\n11:Linear(out_channels=C)\n12:softmax(dim=1)\n13:reshape(B, C, 1, 1)\n14:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n7->9\n9->10\n10->11\n11->12\n12->13\n13->14\n0->14\n14->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 0.83
+		},
+		"experience": "Avoid drastic changes in the feature map's structure and maintain the integrity of spatial information in the next modification."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n7->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 47.58
+		},
+		"inspiration": {
+			"id": "3712",
+			"content": "Implementation of diverse image transformations on exemplars while keeping the context stable to force the model to learn invariant and robust representations under varying conditions."
+		},
+		"new": {
+			"name": "resnet_basic_p3712",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Conv2d(out_channels=C,kernel_size=1,stride=1)\n12:concat(dim=1)\n13:Conv2d(out_channels=C,kernel_size=1,stride=1)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->9\n0->10\n0->11\n9->12\n10->12\n11->12\n12->13\n13->8\n8->7\n7->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=dim,kernel_size=1,stride=2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n6->9\n9->7\n7->1"
+			],
+			"acc": 39.98
+		},
+		"experience": "When modifying the neural network structure, ensure that added complexity is justified and beneficial for feature learning rather than leading to overfitting or disrupted feature representation."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n7->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 47.58
+		},
+		"inspiration": {
+			"id": "2405",
+			"content": "Design a kernel prediction mechanism instead of direct color prediction to enhance the ability of the model to generalize across different unseen data types, like normals or depth, which could be crucial for applications in CGI or 3D modeling."
+		},
+		"new": {
+			"name": "resnet_basic_p2405",
+			"blocks": [
+				"###ResNetBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:multiply\n11:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n0->9\n8->10\n9->10\n10->11\n0->11\n11->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=dim,kernel_size=1,stride=2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n6->9\n9->7\n7->1"
+			],
+			"acc": 0.83
+		},
+		"experience": "When modifying the model, ensure new operations maintain stable gradient flow and do not introduce drastic changes in feature scales."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n7->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 47.58
+		},
+		"inspiration": {
+			"id": "933",
+			"content": "Utilizing random features to dilute the auxiliary role of skip-connections in the supernet, focusing the search more on operation selection fairness."
+		},
+		"new": {
+			"name": "resnet_basic_p933",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:BN\n11:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n11->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 0.83
+		},
+		"experience": "Ensure that any modifications to residual connections maintain the stability of feature distributions, avoiding operations that can drastically change feature scales."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p4670",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n11->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->10\n0->8\n8->9\n9->10\n10->7\n7->1"
+			],
+			"acc": 48.77
+		},
+		"inspiration": {
+			"id": "1558",
+			"content": "Combination of local frame features learning with global temporal context and motion cues for robust few-shot matching."
+		},
+		"new": {
+			"name": "resnet_basic_p4670_p1558",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n12:AdaptiveAvgPool2d(output_size=1)\n13:Conv2d(out_channels=C,kernel_size=1,stride=1)\n14:Sigmoid\n15:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n11->12\n12->13\n13->14\n14->15\n0->15\n15->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 38.73
+		},
+		"experience": "When adding new layers, ensure they preserve the important spatial information and do not overly complicate the network structure."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p4670",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n11->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->10\n0->8\n8->9\n9->10\n10->7\n7->1"
+			],
+			"acc": 48.77
+		},
+		"inspiration": {
+			"id": "4939",
+			"content": "Leverage category-agnostic and large-scale training to enhance the model's generalization capabilities across different objects and scenes, avoiding the limitations of category-specific training."
+		},
+		"new": {
+			"name": "resnet_basic_p4670_p4939",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n12:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n0->12\n11->12\n12->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 0.83
+		},
+		"experience": "Avoid adding operations that combine raw input and intermediate results without thorough validation of their necessity and impact."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p4670",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n11->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->10\n0->8\n8->9\n9->10\n10->7\n7->1"
+			],
+			"acc": 48.77
+		},
+		"inspiration": {
+			"id": "4241",
+			"content": "Enhance the modeling of secondary effects such as shadows and indirect lighting by using a tensor-factorized representation allowing for online computation of ray integrals."
+		},
+		"new": {
+			"name": "resnet_basic_p4670_p4241",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n12:reshape(-1,C,H*W)\n13:permute(0,2,1)\n14:Linear(out_channels=C)\n15:permute(0,2,1)\n16:reshape(-1,C,H,W)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->1",
+				"##built-in function input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##built-in function input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 38.43
+		},
+		"experience": "Avoid adding operations that significantly alter the spatial or channel dimensions without proper re-training or alignment with the learned features."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p4670",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n11->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->10\n0->8\n8->9\n9->10\n10->7\n7->1"
+			],
+			"acc": 48.77
+		},
+		"inspiration": {
+			"id": "1382",
+			"content": "Task-specific optimization and parameter updating methods for different subnetworks could be adopted to improve specialization in handling distinct tasks like classification and robustness against adversarial attacks."
+		},
+		"new": {
+			"name": "resnet_basic_p4670_p1382",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n12:Conv2d(out_channels=C,kernel_size=1,stride=1)\n13:Sigmoid\n14:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n0->12\n12->13\n13->14\n11->14\n14->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 37.12
+		},
+		"experience": "Ensure modifications simplify the network structure and avoid redundant paths with similar operations to maintain effective learning."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p4670",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n11->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->10\n0->8\n8->9\n9->10\n10->7\n7->1"
+			],
+			"acc": 48.77
+		},
+		"inspiration": {
+			"id": "1224",
+			"content": "Utilize object locations to guide token sampling, enabling selective focus on relevant video segments and reducing input size."
+		},
+		"new": {
+			"name": "resnet_basic_p4670_p1224",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n12:AdaptiveAvgPool2d(output_size=1)\n13:reshape(B,C)\n14:Linear(out_channels=C)\n15:reshape(B,C,1,1)\n16:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n7->16\n16->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:BN\n11:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n0->8\n8->9\n9->10\n10->11\n7->11\n11->1"
+			],
+			"acc": 0.83
+		},
+		"experience": "Ensure modifications do not overly complicate the model and maintain consistent tensor dimensions to preserve learned feature representations."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p4670",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n11->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->10\n0->8\n8->9\n9->10\n10->7\n7->1"
+			],
+			"acc": 48.77
+		},
+		"inspiration": {
+			"id": "4156",
+			"content": "Employing a multi-task approach integrating feature compactness and anomalous signal suppression tasks to improve the anomaly detection system."
+		},
+		"new": {
+			"name": "resnet_basic_p4670_p4156",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n12:Conv2d(out_channels=C,kernel_size=1,stride=1)\n13:Sigmoid\n14:Mul\n15:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n0->12\n12->13\n13->14\n7->14\n11->15\n14->15\n15->1",
+				"##stem_block##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##downsample_block##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 0.83
+		},
+		"experience": "Ensure that modifications do not excessively increase the model's complexity and monitor gradient flow to avoid vanishing/exploding gradients."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p4670",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n11->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->10\n0->8\n8->9\n9->10\n10->7\n7->1"
+			],
+			"acc": 48.77
+		},
+		"inspiration": {
+			"id": "1449",
+			"content": "Use of Channel-Attention Transformer feature extractor to handle long-range pixel dependencies while preserving high-frequency information through techniques like Pixel Unshuffle."
+		},
+		"new": {
+			"name": "resnet_basic_p4670_p1449",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n12:reshape(B,C,H//2,2,W//2,2)\n13:permute(0,1,3,5,2,4)\n14:reshape(B,C*4,H//2,W//2)\n15:Conv2d(out_channels=C,kernel_size=1,stride=1)\n16:permute(0,2,3,1)\n17:LN\n18:permute(0,3,1,2)\n19:ReLU\n20:Conv2d(out_channels=C,kernel_size=1,stride=1)\n21:permute(0,2,3,1)\n22:LN\n23:permute(0,3,1,2)\n24:ReLU\n25:AdaptiveAvgPool2d(output_size=1)\n26:reshape(B,C)\n27:Linear(out_channels=C)\n28:reshape(B,C,1,1)\n29:Mul\n0->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n19->20\n20->21\n21->22\n22->23\n23->24\n24->25\n25->26\n26->27\n27->28\n28->29\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n11->29\n29->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 41.05
+		},
+		"experience": "Introduce changes incrementally and validate each modification's impact on accuracy to isolate effective improvements."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p4670",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n11->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->10\n0->8\n8->9\n9->10\n10->7\n7->1"
+			],
+			"acc": 48.77
+		},
+		"inspiration": {
+			"id": "5392",
+			"content": "Incorporation of simple regression loss, specifically smooth-\u21131, to effectively train the model by focusing on the masked pixels, improving the precision in diverse vision tasks."
+		},
+		"new": {
+			"name": "resnet_basic_p4670_p5392",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n12:Conv2d(out_channels=C,kernel_size=1,stride=1)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n11->12\n12->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 37.6
+		},
+		"experience": "Be cautious when adding extra layers to the output path, as it can disrupt learned feature mappings and degrade performance."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p4670",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n11->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->10\n0->8\n8->9\n9->10\n10->7\n7->1"
+			],
+			"acc": 48.77
+		},
+		"inspiration": {
+			"id": "2395",
+			"content": "Utilizing dilation max pooling to achieve a large receptive field with reduced computational overhead compared to traditional large kernel convolutions."
+		},
+		"new": {
+			"name": "resnet_basic_p4670_p2395",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n12:MaxPool2d(kernel_size=3,stride=1)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->7\n0->9\n9->10\n10->11\n7->11\n11->12\n12->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=dim,kernel_size=1,stride=2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n6->9\n9->7\n7->1"
+			],
+			"acc": 34.62
+		},
+		"experience": "Consider the impact of adding pooling layers on the spatial information and experiment with their placement to avoid losing critical details."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p877",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->9\n9->10\n10->11\n11->12\n8->12\n12->7\n7->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 47.93
+		},
+		"inspiration": {
+			"id": "1209",
+			"content": "Designing a fully convolutional approach by replacing the transformer decoder with a single ConvNeXt block to simplify the model and reduce pre-training time."
+		},
+		"new": {
+			"name": "resnet_basic_p877_p1209",
+			"blocks": [
+				"##ConvNeXtBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,group=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=4*C,kernel_size=1,stride=1)\n6:ReLU\n7:Conv2d(out_channels=C,kernel_size=1,stride=1)\n8:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n0->8\n7->8\n8->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:AvgPool2d(kernel_size=2,stride=2)\n6:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n7:Add\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n4->7\n7->1"
+			],
+			"acc": 42.3
+		},
+		"experience": "Consider maintaining intermediate bottleneck layers and incorporating attention or pooling mechanisms to enhance feature extraction."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p877",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->9\n9->10\n10->11\n11->12\n8->12\n12->7\n7->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 47.93
+		},
+		"inspiration": {
+			"id": "4449",
+			"content": "Utilize depthwise convolutions to replace inefficient feature shifts, leveraging common convolution operations to preserve efficiency and generalizability."
+		},
+		"new": {
+			"name": "resnet_basic_p877_p4449",
+			"blocks": [
+				"###ResNetBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,group=C)  # Depthwise convolution\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1,group=C)  # Depthwise convolution\n6:BN\n7:ReLU\n8:Add\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->9\n9->10\n10->11\n11->12\n8->12\n12->7\n0->13  # Skip connection from input to final output\n7->13\n13->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:MaxPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 0.83
+		},
+		"experience": "Ensure modifications maintain the model's representational capacity and avoid skip connections that bypass significant network depth."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p877",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->9\n9->10\n10->11\n11->12\n8->12\n12->7\n7->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 47.93
+		},
+		"inspiration": {
+			"id": "3706",
+			"content": "Employ a dual-branch architecture for simultaneously predicting probability volume and signed distance volume, improving the final depth map estimations."
+		},
+		"new": {
+			"name": "resnet_basic_p877_p3706",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:Conv2d(out_channels=C,kernel_size=3,stride=1)\n14:BN\n15:ReLU\n16:Conv2d(out_channels=C,kernel_size=3,stride=1)\n17:BN\n18:ReLU\n19:Add\n20:AdaptiveAvgPool2d(output_size=1)\n21:Conv2d(out_channels=C,kernel_size=1,stride=1)\n22:Sigmoid\n23:Mul\n24:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->9\n9->10\n10->11\n11->12\n8->12\n0->13\n13->14\n14->15\n15->16\n16->17\n17->19\n0->19\n19->20\n20->21\n21->22\n22->23\n19->23\n12->24\n23->24\n24->18\n18->7\n7->1",
+				"##block_name_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##block_name_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 0.83
+		},
+		"experience": "Ensure that additional layers or blocks are carefully integrated with proper normalization and skip connections to maintain feature scaling and gradient flow."
+	},
+	{
+		"raw": {
+			"name": "resnet_basic_p877",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->9\n9->10\n10->11\n11->12\n8->12\n12->7\n7->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 47.93
+		},
+		"inspiration": {
+			"id": "1143",
+			"content": "Employ a transformer-based encoder for joint encoding of template and search region, utilizing the self-attention mechanism for capturing long-range dependencies and target-specific correspondences."
+		},
+		"new": {
+			"name": "resnet_basic_p877_p1143",
+			"blocks": [
+				"##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Sigmoid\n12:Mul\n13:concat(dim=1)\n14:Conv2d(out_channels=C,kernel_size=1,stride=1)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n0->8\n8->9\n9->10\n10->11\n11->12\n8->12\n12->7\n7->13\n0->13\n13->14\n14->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n0->8\n8->9\n9->10\n6->10\n10->7\n7->1"
+			],
+			"acc": 42.83
+		},
+		"experience": "Ensure any added layers or operations maintain appropriate dimensionality and do not excessively increase model complexity."
+	},
+	{
+		"raw": {
+			"name": "convnext",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.64
+		},
+		"inspiration": {
+			"id": "1380",
+			"content": "Decoupling the training strategies for different tasks (natural vs adversarial) to design specialized subnetworks within the backbone that focus on specific tasks."
+		},
+		"new": {
+			"name": "convnext_trail3_convnext_p1380",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n11:permute(0,2,3,1)\n12:LN\n13:Linear(out_channels=C*4)\n14:GELU\n15:Linear(out_channels=C)\n16:permute(0,3,1,2)\n17:Add\n18:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n0->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n0->17\n9->18\n17->18\n18->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 46.86
+		},
+		"experience": "Ensure additional paths or layers meaningfully contribute to learning by validating their necessity and impact through ablation studies."
+	},
+	{
+		"raw": {
+			"name": "convnext",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.64
+		},
+		"inspiration": {
+			"id": "2502",
+			"content": "Incorporate Local-Global Features Interaction (LGFI) module leveraging a cross-covariance attention mechanism calculated in the channel dimension to reduce computational complexity while encoding long-range global contexts."
+		},
+		"new": {
+			"name": "convnext_trail3_convnext_p2502",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:reshape(B,C)\n11:softmax(dim=1)\n12:reshape(B,C,1,1)\n13:Mul\n14:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n0->13\n13->14\n0->14\n14->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 45.19
+		},
+		"experience": "Ensure modifications preserve the spatial information and avoid unnecessary complexity unless it aligns with the original model design principles."
+	},
+	{
+		"raw": {
+			"name": "convnext",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.64
+		},
+		"inspiration": {
+			"id": "207",
+			"content": "Employ a softmax function in the final rendering step to blend contributions from multiple sub-spaces based on their relevance to the current view point."
+		},
+		"new": {
+			"name": "convnext_trail3_convnext_p207",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:softmax(dim=-1)\n9:permute(0,3,1,2)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->10\n10->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 65.43
+		},
+		"experience": "Avoid placing softmax operations before element-wise addition to preserve the original feature information and maintain gradient stability."
+	},
+	{
+		"raw": {
+			"name": "convnext_trail3_convnext_p3508",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n15->1\n```",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n0->2\n2->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->1"
+			],
+			"acc": 77.67
+		},
+		"inspiration": {
+			"id": "5022",
+			"content": "Incorporate contrastive learning for spatial feature extraction to enhance the model's capability in handling appearance variations, which suggests using augmentation techniques and specialized layers to cope with diverse transformations."
+		},
+		"new": {
+			"name": "convnext_trail3_convnext_p3508_p5022",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=3,stride=1)\n19:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n0->15\n14->15\n15->16\n16->17\n17->18\n18->19\n0->19\n19->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 68.2
+		},
+		"experience": "Ensure new layers are necessary and beneficial by validating their impact on a smaller scale before full integration and adjust training parameters accordingly."
+	},
+	{
+		"raw": {
+			"name": "convnext_trail3_convnext_p3508",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n15->1\n```",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n0->2\n2->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->1"
+			],
+			"acc": 77.67
+		},
+		"inspiration": {
+			"id": "1073",
+			"content": "Incorporating a self-attention module post feature concatenation (original and quantized features) to refine and emphasize more relevant, quality-independent features, improving model focus and accuracy on pertinent image attributes."
+		},
+		"new": {
+			"name": "convnext_trail3_convnext_p3508_p1073",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:concat(dim=1)\n16:Conv2d(out_channels=C,kernel_size=1)\n17:reshape(B,C,H*W)\n18:permute(0,2,1)\n19:softmax(dim=-1)\n20:permute(0,2,1)\n21:reshape(B,C,H,W)\n22:Mul\n23:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n0->15\n14->15\n15->16\n16->17\n17->18\n18->19\n19->20\n20->21\n21->22\n8->22\n22->23\n0->23\n23->1\n```",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 67.1
+		},
+		"experience": "Avoid adding complex transformations that significantly alter the feature dimensions or distributions, such as concatenation and softmax, without validating their impact on feature consistency."
+	},
+	{
+		"raw": {
+			"name": "convnext_trail3_convnext_p3508_p700",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1)\n19:Sigmoid\n20:Mul\n21:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n0->16\n16->17\n17->18\n18->19\n19->20\n0->20\n20->21\n15->21\n21->1\n```",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 78.0
+		},
+		"inspiration": {
+			"id": "1075",
+			"content": "Combining quantized and original features before feeding them into the self-attention module, which helps in preserving useful information that might be lost during the hard quantization step, thus maintaining a richer and more informative feature set for classification tasks."
+		},
+		"new": {
+			"name": "convnext_trail3_convnext_p3508_p700_p1075",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1)\n19:Sigmoid\n20:Mul\n21:concat(dim=1)\n22:Conv2d(out_channels=C,kernel_size=1)\n23:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n0->16\n16->17\n17->18\n18->19\n19->20\n0->20\n15->21\n20->21\n21->22\n22->23\n0->23\n23->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 31.55
+		},
+		"experience": "Ensure the combination of branches preserves dimensional integrity and spatial information, and avoid unnecessary complexity that might hinder model performance."
+	},
+	{
+		"raw": {
+			"name": "convnext_trail3_convnext_p3508_p700",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1)\n19:Sigmoid\n20:Mul\n21:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n0->16\n16->17\n17->18\n18->19\n19->20\n0->20\n20->21\n15->21\n21->1\n```",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 78.0
+		},
+		"inspiration": {
+			"id": "4170",
+			"content": "Using multi-size self-attention to enable variable-sized anomalous feature learning, thus improving the model's capability to detect and localize anomalies of various sizes."
+		},
+		"new": {
+			"name": "convnext_trail3_convnext_p3508_p700_p4170",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1)\n19:Sigmoid\n20:Mul\n21:Add\n22:Conv2d(out_channels=C,kernel_size=1)\n23:Sigmoid\n24:Mul\n25:Add\n26:Conv2d(out_channels=C,kernel_size=1)\n27:Sigmoid\n28:Mul\n29:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n0->16\n16->17\n17->18\n18->19\n19->20\n0->20\n20->21\n15->21\n21->22\n22->23\n23->24\n21->24\n24->25\n0->25\n25->26\n26->27\n27->28\n25->28\n28->29\n0->29\n29->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 0.1
+		},
+		"experience": "Reduce unnecessary layers and avoid repetitive use of activation functions prone to vanishing gradients like Sigmoid."
+	},
+	{
+		"raw": {
+			"name": "convnext_trail3_convnext_p3508_p700",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1)\n19:Sigmoid\n20:Mul\n21:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n0->16\n16->17\n17->18\n18->19\n19->20\n0->20\n20->21\n15->21\n21->1\n```",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 78.0
+		},
+		"inspiration": {
+			"id": "3601",
+			"content": "Design the DNCM with an encoder predicting a transformation matrix from a downscaled input image, facilitating adaptive and deterministic color mapping."
+		},
+		"new": {
+			"name": "convnext_trail3_convnext_p3508_p700_p3601",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1)\n19:Sigmoid\n20:Mul\n21:Conv2d(out_channels=3,kernel_size=1)\n22:reshape(B,3,H*W)\n23:mean(dim=2)\n24:reshape(B,3,1,1)\n25:Conv2d(out_channels=C,kernel_size=1)\n26:Mul\n27:Add\n28:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n0->16\n16->17\n17->18\n18->19\n19->20\n0->20\n20->21\n21->22\n22->23\n23->24\n24->25\n25->26\n15->26\n26->27\n0->27\n27->28\n15->28\n28->1\n```",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=2)\n3:ReLU\n4:Conv2d(out_channels=dim,kernel_size=4,stride=2)\n5:ReLU\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:ReLU\n0->2\n2->3\n3->1"
+			],
+			"acc": 0.1
+		},
+		"experience": "Ensure added layers preserve spatial information and avoid unnecessary complexity in model structure."
+	},
+	{
+		"raw": {
+			"name": "convnext_trail3_convnext_p3508_p700",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1)\n19:Sigmoid\n20:Mul\n21:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n0->16\n16->17\n17->18\n18->19\n19->20\n0->20\n20->21\n15->21\n21->1\n```",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 78.0
+		},
+		"inspiration": {
+			"id": "354",
+			"content": "Utilizing orthogonal subspaces to separate shape-related and shape-erased features helps in enforcing feature diversity and independence, which can be implemented in the backbone through distinct pathways or branches."
+		},
+		"new": {
+			"name": "convnext_trail3_convnext_p3508_p700_p354",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1)\n19:Sigmoid\n20:Mul\n21:Add\n22:Conv2d(out_channels=C,kernel_size=1)\n23:Conv2d(out_channels=C,kernel_size=1)\n24:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n0->16\n16->17\n17->18\n18->19\n19->20\n0->20\n20->21\n15->21\n21->22\n0->23\n22->24\n23->24\n24->1\n```",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 14.39
+		},
+		"experience": "Ensure any added layers or connections maintain proper dimensionality and alignment with existing features to avoid feature misalignment or degradation."
+	},
+	{
+		"raw": {
+			"name": "convnext_trail3_convnext_p3508_p700",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1)\n19:Sigmoid\n20:Mul\n21:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n0->16\n16->17\n17->18\n18->19\n19->20\n0->20\n20->21\n15->21\n21->1\n```",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 78.0
+		},
+		"inspiration": {
+			"id": "4230",
+			"content": "Incorporation of a conditional diffusion generator adapted from text-to-image models to handle image-based inputs using a content adaptor, improving the model's versatility in handling visual data."
+		},
+		"new": {
+			"name": "convnext_trail3_convnext_p3508_p700_p4230",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1)\n19:Sigmoid\n20:Mul\n21:Add\n22:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n23:ReLU\n24:Conv2d(out_channels=C,kernel_size=1)\n25:Sigmoid\n26:Mul\n27:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n0->16\n16->17\n17->18\n18->19\n19->20\n0->20\n20->21\n15->21\n21->22\n22->23\n23->24\n24->25\n25->26\n0->26\n26->27\n21->27\n27->1\n```",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 0.1
+		},
+		"experience": "Ensure modifications simplify or optimize the existing structure rather than add redundant complexity."
+	},
+	{
+		"raw": {
+			"name": "convnext_trail3_convnext_p3508_p700",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1)\n19:Sigmoid\n20:Mul\n21:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n0->16\n16->17\n17->18\n18->19\n19->20\n0->20\n20->21\n15->21\n21->1\n```",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 78.0
+		},
+		"inspiration": {
+			"id": "3019",
+			"content": "Adopting a transformer architecture that combines long- and short-term attention to retain both spatial and temporal contexts, which is crucial for decoding detailed foreground information."
+		},
+		"new": {
+			"name": "convnext_trail3_convnext_p3508_p700_p3019",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1)\n19:Sigmoid\n20:Mul\n21:Add\n22:reshape(B, C, H*W)\n23:permute(0, 2, 1)\n24:Linear(out_channels=C)\n25:softmax(dim=-1)\n26:permute(0, 2, 1)\n27:reshape(B, C, H, W)\n28:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n0->16\n16->17\n17->18\n18->19\n19->20\n0->20\n20->21\n15->21\n21->22\n22->23\n23->24\n24->25\n25->26\n26->27\n21->28\n27->28\n28->1\n```",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##input_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 0.1
+		},
+		"experience": "Avoid adding unnecessary transformations like reshape and softmax that can misalign tensor dimensions and destabilize training."
+	},
+	{
+		"raw": {
+			"name": "convnext_trail3_convnext_p3508_p700",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1)\n19:Sigmoid\n20:Mul\n21:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n0->16\n16->17\n17->18\n18->19\n19->20\n0->20\n20->21\n15->21\n21->1\n```",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 78.0
+		},
+		"inspiration": {
+			"id": "3844",
+			"content": "Use of anchor-free queries to generate trajectory inspirations, which adaptively responds to different scene contexts for enhanced multimodality in predictions."
+		},
+		"new": {
+			"name": "convnext_trail3_convnext_p3508_p700_p3844",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1)\n19:Sigmoid\n20:Mul\n21:Add\n22:Conv2d(out_channels=C,kernel_size=1)\n23:ReLU\n24:Conv2d(out_channels=C,kernel_size=1)\n25:Sigmoid\n26:Mul\n27:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n0->16\n16->17\n17->18\n18->19\n19->20\n0->20\n20->21\n15->21\n21->22\n22->23\n23->24\n24->25\n25->26\n0->26\n26->27\n21->27\n27->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 0.1
+		},
+		"experience": "When modifying neural networks, ensure added layers do not excessively increase complexity and monitor gradient flow to maintain stability."
+	},
+	{
+		"raw": {
+			"name": "convnext_trail3_convnext_p3508_p700",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1)\n19:Sigmoid\n20:Mul\n21:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n0->16\n16->17\n17->18\n18->19\n19->20\n0->20\n20->21\n15->21\n21->1\n```",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 78.0
+		},
+		"inspiration": {
+			"id": "248",
+			"content": "Adaptive prototype updating that considers label propagation can improve the estimation of class centers, leading to more accurate few-shot learning."
+		},
+		"new": {
+			"name": "convnext_trail3_convnext_p3508_p700_p248",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//16,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n16:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1)\n19:Sigmoid\n20:Mul\n21:Add\n22:AdaptiveAvgPool2d(output_size=1)\n23:Conv2d(out_channels=C,kernel_size=1)\n24:Sigmoid\n25:Mul\n26:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n0->16\n16->17\n17->18\n18->19\n19->20\n0->20\n20->21\n15->21\n21->22\n22->23\n23->24\n24->25\n0->25\n25->26\n21->26\n26->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 0.1
+		},
+		"experience": "Avoid adding redundant or overly complex layers that do not significantly contribute to feature representation and ensure smooth gradient flow throughout the network."
+	},
+	{
+		"raw": {
+			"name": "convnext",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.42
+		},
+		"inspiration": {
+			"id": "599",
+			"content": "Implement Spatial-Temporal Consistency Regularization by forcing consistency between temporally coherent point cloud features and corresponding image features, which might inspire a grid-based feature aggregation method in the backbone design."
+		},
+		"new": {
+			"name": "convnext_p599",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:concat(dim=1)\n11:Conv2d(out_channels=C,kernel_size=1,stride=1)\n12:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->10\n10->11\n0->12\n11->12\n12->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 39.0
+		},
+		"experience": "Ensure that any added layers or operations maintain the integrity of the original residual structure to avoid disrupting gradient flow."
+	},
+	{
+		"raw": {
+			"name": "convnext",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.42
+		},
+		"inspiration": {
+			"id": "4446",
+			"content": "Adapting the architecture flexibly for both global and local self-attention mechanisms, allowing for a broader application scope in different transformer models."
+		},
+		"new": {
+			"name": "convnext_p4446",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:AdaptiveMaxPool2d(output_size=1)\n11:concat(dim=1)\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n8->10\n9->11\n10->11\n11->12\n12->13\n0->13\n13->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 8.59
+		},
+		"experience": "When modifying network structures, ensure that significant changes to feature map dimensions (like pooling) do not overly simplify or lose crucial information."
+	},
+	{
+		"raw": {
+			"name": "convnext",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.42
+		},
+		"inspiration": {
+			"id": "85",
+			"content": "Modifying the transformation between the SDF field and the density field based on unbiased rendering conditions points towards the inclusion of adaptive layers that can adjust the transformation parameters dynamically during training."
+		},
+		"new": {
+			"name": "convnext_p85",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:AdaptiveAvgPool2d(output_size=1)\n9:permute(0,3,1,2)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->10\n10->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 39.0
+		},
+		"experience": "Ensure compatibility of dimensions and avoid unnecessary spatial information reduction in the network structure."
+	},
+	{
+		"raw": {
+			"name": "convnext",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.42
+		},
+		"inspiration": {
+			"id": "3555",
+			"content": "Leveraging ROI (Region of Interest) alignment for efficient correspondence mapping in RadarNet, reducing computational complexity by focusing on probable image regions for each radar point."
+		},
+		"new": {
+			"name": "convnext_p3555",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->10\n10->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->1"
+			],
+			"acc": 46.73
+		},
+		"experience": "Avoid adding pooling layers that reduce spatial dimensions drastically, ensuring essential spatial information is preserved."
+	},
+	{
+		"raw": {
+			"name": "convnext_p197",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->10\n10->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.95
+		},
+		"inspiration": {
+			"id": "2240",
+			"content": "Integrate both convolutional neural networks and vision transformers within the same framework, highlighting the potential for hybrid architectures that leverage the strengths of both types of networks."
+		},
+		"new": {
+			"name": "convnext_p197_p2240",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n10:AdaptiveAvgPool2d(output_size=1)\n11:reshape(B, C)\n12:Linear(out_channels=C)\n13:reshape(B, C, 1, 1)\n14:permute(0, 2, 3, 1)\n15:LN\n16:Linear(out_channels=C*4)\n17:GELU\n18:Linear(out_channels=C)\n19:permute(0, 3, 1, 2)\n20:Conv2d(out_channels=C,kernel_size=1,stride=1)\n21:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n19->20\n0->21\n20->21\n21->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 8.49
+		},
+		"experience": "Make incremental changes to the network architecture and validate performance at each step to understand the impact of each modification."
+	},
+	{
+		"raw": {
+			"name": "convnext_p197",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->10\n10->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.95
+		},
+		"inspiration": {
+			"id": "2920",
+			"content": "Utilize a U-connection schema between encoder and decoder to effectively integrate multi-level visual information for enhanced interaction and feature utilization."
+		},
+		"new": {
+			"name": "convnext_p197_p2920",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n10:Add\n11:Conv2d(out_channels=C,kernel_size=1,stride=1)\n12:Conv2d(out_channels=C,kernel_size=1,stride=1)\n13:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->10\n10->11\n0->12\n11->13\n12->13\n13->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 30.76
+		},
+		"experience": "Maintain the integrity of residual connections by avoiding additional transformations to the input before addition to the output."
+	},
+	{
+		"raw": {
+			"name": "convnext_p197",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->10\n10->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.95
+		},
+		"inspiration": {
+			"id": "4850",
+			"content": "Modify the position of the global average pooling (GAP) layer post the convolutional operation to facilitate the computation of logits from CAMs, suggesting a rearrangement of layer sequences in CNN structures for efficient classification tasks."
+		},
+		"new": {
+			"name": "convnext_p197_p4850",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n10:AdaptiveAvgPool2d(output_size=1)\n11:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n10->11\n11->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 67.01
+		},
+		"experience": "Ensure that the spatial dimensions are consistent when performing addition operations, and avoid unnecessary pooling that reduces spatial information."
+	},
+	{
+		"raw": {
+			"name": "convnext_p197",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->10\n10->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.95
+		},
+		"inspiration": {
+			"id": "3338",
+			"content": "Design the backbone to accommodate various perturbation ratios and progressive style attacks, ensuring flexibility and robustness in handling diverse and challenging styles."
+		},
+		"new": {
+			"name": "convnext_p197_p3338",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n10:AdaptiveAvgPool2d(output_size=1)\n11:Conv2d(out_channels=C,kernel_size=1,stride=1)\n12:Sigmoid\n13:Mul\n14:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n0->13\n13->14\n0->14\n14->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=2)\n3:ReLU\n4:Conv2d(out_channels=dim,kernel_size=4,stride=2)\n5:ReLU\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:ReLU\n0->2\n2->3\n3->1"
+			],
+			"acc": 62.38
+		},
+		"experience": "Minimize changes that significantly alter the spatial dimensions or scale activations without a clear benefit to feature representation."
+	},
+	{
+		"raw": {
+			"name": "convnext_p197_p1152",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n10:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n11:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->11\n10->11\n11->1",
+				"##built-in function input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##built-in function input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 78.1
+		},
+		"inspiration": {
+			"id": "3592",
+			"content": "Minimizing supervision needs by utilizing easily obtainable task labels, suggesting that backbone architectures can be designed to leverage sparse or high-level labels instead of dense annotations."
+		},
+		"new": {
+			"name": "convnext_p197_p1152_p3592",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n10:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n11:AdaptiveAvgPool2d(output_size=1)\n12:Conv2d(out_channels=C,kernel_size=1,stride=1)\n13:Mul\n14:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->11\n11->12\n12->13\n10->13\n13->14\n0->14\n14->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 67.13
+		},
+		"experience": "Ensure that the additional operations (e.g., pooling, multiplication) do not significantly alter the feature map characteristics or suppress critical information."
+	},
+	{
+		"raw": {
+			"name": "convnext_p197_p1152",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n10:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n11:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->11\n10->11\n11->1",
+				"##built-in function input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##built-in function input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 78.1
+		},
+		"inspiration": {
+			"id": "2188",
+			"content": "Utilizing a lightweight mask correction network to update segmentation masks iteratively, which reduces computational cost significantly from the second click."
+		},
+		"new": {
+			"name": "convnext_p197_p1152_p2188",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n10:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n11:AdaptiveAvgPool2d(output_size=1)\n12:Conv2d(out_channels=C,kernel_size=1,stride=1)\n13:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n10->11\n11->12\n12->13\n9->13\n13->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 0.1
+		},
+		"experience": "Ensure modifications preserve essential spatial information and maintain the balance of feature maps' dimensions."
+	},
+	{
+		"raw": {
+			"name": "convnext_p197_p1152",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n10:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n11:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->11\n10->11\n11->1",
+				"##built-in function input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##built-in function input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 78.1
+		},
+		"inspiration": {
+			"id": "536",
+			"content": "Implementing component-wise projected gradient descent (Comp-PGD) to optimize each individual perturbation within a composite attack, which ensures the most effective enhancement of the perturbation's impact on the model."
+		},
+		"new": {
+			"name": "convnext_p197_p1152_p536",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n10:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n11:Add\n12:Conv2d(out_channels=C,kernel_size=1,stride=1)\n13:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->11\n10->11\n11->12\n0->13\n12->13\n13->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n0->2\n2->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->1"
+			],
+			"acc": 0.1
+		},
+		"experience": "Ensure added operations like multiplication have compatible feature scales and distributions; consider normalizing intermediate outputs."
+	},
+	{
+		"raw": {
+			"name": "convnext_p197_p1152",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n10:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n11:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->11\n10->11\n11->1",
+				"##built-in function input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##built-in function input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 78.1
+		},
+		"inspiration": {
+			"id": "1199",
+			"content": "Utilize masked representation learning to encourage the learning of structural information in the feature extraction module, which can be pivotal for enhancing generalization capabilities in different domains."
+		},
+		"new": {
+			"name": "convnext_p197_p1152_p1199",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n10:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n11:Add\n12:AdaptiveAvgPool2d(output_size=1)\n13:reshape(B, C)\n14:Linear(out_channels=C)\n15:reshape(B, C, 1, 1)\n16:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->11\n10->11\n11->12\n12->13\n13->14\n14->15\n11->16\n15->16\n16->1",
+				"##ResNetBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ResNetBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 0.1
+		},
+		"experience": "Ensure modifications preserve the tensor's spatial dimensions and feature distributions, and avoid introducing operations that could cause numerical instability."
+	},
+	{
+		"raw": {
+			"name": "convnext",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.42
+		},
+		"inspiration": {
+			"id": 2302,
+			"content": "Incorporating a transformer architecture, specifically designed for both stages, can enhance feature representation and similarity measurement between query and support keypoints."
+		},
+		"new": {
+			"name": "convnext_trail1_convnext_p2302",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:reshape(B, H*W, C)\n11:Linear(out_channels=C)\n12:reshape(B, C, H, W)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->10\n10->11\n11->12\n12->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n0->2\n2->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->1"
+			],
+			"acc": 58.82
+		},
+		"experience": "Minimize changes to the fundamental structure, especially avoid unnecessary linear layers and reshaping operations that alter spatial information."
+	},
+	{
+		"raw": {
+			"name": "convnext",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.42
+		},
+		"inspiration": {
+			"id": 4564,
+			"content": "Incorporate orientation alignment loss and contrastive descriptor loss in a self-supervised manner to robustly train the network against various photometric and geometric transformations."
+		},
+		"new": {
+			"name": "convnext_trail1_convnext_p4564",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Conv2d(out_channels=C,kernel_size=1,stride=1)\n12:Mul\n13:Mul\n14:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n0->10\n0->11\n0->12\n10->12\n0->13\n11->13\n9->14\n12->14\n13->14\n14->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 0.1
+		},
+		"experience": "When modifying neural network structures, ensure added operations do not overly complicate residual connections and maintain effective gradient flow."
+	},
+	{
+		"raw": {
+			"name": "convnext",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.42
+		},
+		"inspiration": {
+			"id": 1397,
+			"content": "Incorporating shallow MLPs for mapping input coordinates to RGB and SDF values, optimizing the trade-off between model complexity and real-time performance."
+		},
+		"new": {
+			"name": "convnext_trail1_convnext_p1397",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:permute(0,2,3,1)\n11:Linear(out_channels=C)  # MLP for RGB values\n12:Linear(out_channels=C)  # MLP for SDF values\n13:permute(0,3,1,2)\n14:permute(0,3,1,2)\n15:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->10\n10->11\n10->12\n11->13\n12->14\n13->15\n14->15\n15->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 24.38
+		},
+		"experience": "Ensure modifications do not introduce redundant operations and maintain clean, direct gradient pathways to preserve effective training."
+	},
+	{
+		"raw": {
+			"name": "convnext_trail1_convnext_p4563",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=1,stride=1,groups=C)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->10\n10->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 78.04
+		},
+		"inspiration": {
+			"id": "2431",
+			"content": "Use a positional encoding scheme for the 3D query points to effectively map them to the feature space extracted from the image, ensuring that the network learns a robust representation of landmark locations."
+		},
+		"new": {
+			"name": "convnext_trail1_convnext_p4563_p2431",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=1,stride=1,groups=C)\n10:Add\n11:reshape(B, C, H*W)\n12:permute(0, 2, 1)\n13:Linear(out_channels=C)\n14:permute(0, 2, 1)\n15:reshape(B, C, H, W)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 17.65
+		},
+		"experience": "Avoid unnecessary transformations that disrupt spatial relationships in the network's feature maps."
+	},
+	{
+		"raw": {
+			"name": "convnext_trail1_convnext_p2313",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->10\n10->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 76.52
+		},
+		"inspiration": {
+			"id": "2892",
+			"content": "Implement feature disentanglement to separate semantic-related and semantic-unrelated visual features, enhancing the semantic alignment while retaining useful classification clues."
+		},
+		"new": {
+			"name": "convnext_trail1_convnext_p2313_p2892",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Conv2d(out_channels=C,kernel_size=1,stride=1)\n12:Add\n13:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n0->11\n9->12\n10->12\n12->13\n11->13\n13->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 17.95
+		},
+		"experience": "Ensure modifications introduce meaningful transformations and avoid redundant operations that do not contribute to feature learning."
+	},
+	{
+		"raw": {
+			"name": "convnext_trail1_convnext_p4563",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=1,stride=1,groups=C)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->10\n10->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 78.04
+		},
+		"inspiration": {
+			"id": "305",
+			"content": "Employing attention-based mechanisms, specifically transposed cross-attention, to facilitate soft-exclusive clustering of features into discrete internal representations."
+		},
+		"new": {
+			"name": "convnext_trail1_convnext_p4563_p305",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=1,stride=1,groups=C)\n10:permute(0, 2, 1, 3)\n11:permute(0, 2, 3, 1)\n12:multiply\n13:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n0->12\n9->13\n12->13\n13->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 0.1
+		},
+		"experience": "Avoid redundant tensor permutations and ensure matrix operations preserve spatial relationships."
+	},
+	{
+		"raw": {
+			"name": "convnext_trail1_convnext_p4563_p4143",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=1,stride=1,groups=C)\n10:AdaptiveAvgPool2d(output_size=1)\n11:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n12:ReLU\n13:Conv2d(out_channels=C,kernel_size=1,stride=1)\n14:Sigmoid\n15:Mul\n16:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n9->15\n0->16\n15->16\n16->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n0->2\n2->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->1"
+			],
+			"acc": 77.82
+		},
+		"inspiration": {
+			"id": "2324",
+			"content": "Incorporating self-attention mechanisms within anchor points to enhance the global context awareness, aiding in overcoming occlusions and improving joint articulation detection."
+		},
+		"new": {
+			"name": "convnext_trail1_convnext_p4563_p4143_p2324",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=1,stride=1,groups=C)\n10:AdaptiveAvgPool2d(output_size=1)\n11:Conv2d(out_channels=C//16,kernel_size=1,stride=1)\n12:ReLU\n13:Conv2d(out_channels=C,kernel_size=1,stride=1)\n14:Sigmoid\n15:Mul\n16:Add\n17:reshape(B, C, H*W)\n18:permute(0, 2, 1)\n19:Linear(out_channels=C)\n20:softmax(dim=-1)\n21:permute(0, 2, 1)\n22:reshape(B, C, H, W)\n23:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n9->15\n0->16\n15->16\n16->17\n17->18\n18->19\n19->20\n20->21\n21->22\n22->23\n16->23\n23->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 0.1
+		},
+		"experience": "Introduce changes incrementally and validate the impact of each modification to ensure they contribute positively to the model's performance."
+	},
+	{
+		"raw": {
+			"name": "resnet_bottle",
+			"blocks": [
+				"##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:Add\n11:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->10\n10->11\n11->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 73.6
+		},
+		"inspiration": {
+			"id": 1678,
+			"content": "Integrate a guidance-based feature aggregation module to enhance the feature representation by emphasizing subtle discriminative features through multi-scale feature aggregation."
+		},
+		"new": {
+			"name": "resnet_trail1_resnet_bottle_p1678",
+			"blocks": [
+				"##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:AdaptiveAvgPool2d(output_size=1)\n11:Conv2d(out_channels=C,kernel_size=1,stride=1)\n12:Sigmoid\n13:Mul\n14:Add\n15:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n0->13\n13->14\n0->14\n14->15\n15->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 64.11
+		},
+		"experience": "Ensure that modifications to residual connections do not disrupt the balance and information flow between the main and residual paths."
+	},
+	{
+		"raw": {
+			"name": "resnet_bottle",
+			"blocks": [
+				"##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:Add\n11:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->10\n10->11\n11->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 73.6
+		},
+		"inspiration": {
+			"id": 1065,
+			"content": "Apply spectrum-aware distillation to focus on enhancing the recovery of high-frequency details, weighting the distillation loss inversely based on frequency spectrum magnitudes to prioritize rare high-frequency components."
+		},
+		"new": {
+			"name": "resnet_trail1_resnet_bottle_p1065",
+			"blocks": [
+				"##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:Add\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1,stride=1)\n13:BN\n14:ReLU\n15:Conv2d(out_channels=C,kernel_size=1,stride=1,group=C)\n16:Mul\n17:Conv2d(out_channels=C,kernel_size=1,stride=1)\n18:BN\n19:Add\n20:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->10\n10->11\n11->12\n12->13\n13->14\n14->15\n10->16\n15->16\n16->17\n17->18\n11->19\n18->19\n19->20\n20->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 0.1
+		},
+		"experience": "Carefully manage the addition of new layers and operations to avoid over-complicating the architecture and ensure proper gradient flow."
+	},
+	{
+		"raw": {
+			"name": "resnet_trail1_resnet_bottle_p1375",
+			"blocks": [
+				"##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:Add\n11:ReLU\n12:reshape(B, C, H*W)\n13:permute(0, 2, 1)\n14:Linear(out_channels=C)\n15:reshape(B, H, W, C)\n16:permute(0, 3, 1, 2)\n17:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n11->17\n17->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 73.49
+		},
+		"inspiration": {
+			"id": "2524",
+			"content": "Incorporation of a graph residual block in MMIBs to capture local spatial relationships."
+		},
+		"new": {
+			"name": "resnet_trail1_resnet_bottle_p1375_p2524",
+			"blocks": [
+				"##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:Add\n11:ReLU\n12:reshape(B, C, H*W)\n13:permute(0, 2, 1)\n14:Linear(out_channels=C)\n15:reshape(B, H, W, C)\n16:permute(0, 3, 1, 2)\n17:Add\n18:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n11->17\n0->18\n17->18\n18->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 32.51
+		},
+		"experience": "Ensure skip connections align with feature transformations and avoid bypassing significant processing layers."
+	},
+	{
+		"raw": {
+			"name": "resnet_trail1_resnet_bottle_p4465",
+			"blocks": [
+				"###ResNetBottleBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:reshape(B, C, H*W)\n11:permute(0, 2, 1)\n12:Linear(out_channels=C)\n13:permute(0, 2, 1)\n14:reshape(B, C, H, W)\n15:Add\n16:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n0->15\n14->15\n15->16\n16->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->1"
+			],
+			"acc": 70.3
+		},
+		"inspiration": {
+			"id": "4040",
+			"content": "Design of a lightweight transformer decoder in the MAE architecture to efficiently reconstruct from masked tokens."
+		},
+		"new": {
+			"name": "resnet_trail1_resnet_bottle_p4465_p4040",
+			"blocks": [
+				"###ResNetBottleBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:reshape(B, C, H*W)\n11:permute(0, 2, 1)\n12:Linear(out_channels=C)\n13:permute(0, 2, 1)\n14:reshape(B, C, H, W)\n15:Add\n16:ReLU\n17:reshape(B, H*W, C)\n18:Linear(out_channels=C)\n19:reshape(B, C, H, W)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n0->15\n14->15\n15->16\n16->17\n17->18\n18->19\n19->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n0->2\n2->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->1"
+			],
+			"acc": 27.63
+		},
+		"experience": "Ensure modifications maintain the integrity of the original tensor dimensions and avoid unnecessary complexity that disrupts the model's learning process."
+	},
+	{
+		"raw": {
+			"name": "resnet_trail1_resnet_bottle_p4465",
+			"blocks": [
+				"###ResNetBottleBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:reshape(B, C, H*W)\n11:permute(0, 2, 1)\n12:Linear(out_channels=C)\n13:permute(0, 2, 1)\n14:reshape(B, C, H, W)\n15:Add\n16:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n0->15\n14->15\n15->16\n16->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->1"
+			],
+			"acc": 70.3
+		},
+		"inspiration": {
+			"id": "1426",
+			"content": "Implement a Cross-View Fusion (CVF) module that learns and fuses features from multiple views (front, side, top) to address the challenge of view inconsistency and improve the 3D pose estimation accuracy."
+		},
+		"new": {
+			"name": "resnet_trail1_resnet_bottle_p4465_p1426",
+			"blocks": [
+				"###ResNetBottleBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:reshape(B, C, H*W)\n11:permute(0, 2, 1)\n12:Linear(out_channels=C)\n13:permute(0, 2, 1)\n14:reshape(B, C, H, W)\n15:Conv2d(out_channels=C,kernel_size=1,stride=1)\n16:BN\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1,stride=1)\n19:BN\n20:ReLU\n21:Conv2d(out_channels=C,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:concat(dim=1)\n25:Conv2d(out_channels=C,kernel_size=1,stride=1)\n26:BN\n27:Add\n28:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n0->15\n15->16\n16->17\n17->18\n18->19\n19->20\n0->21\n21->22\n22->23\n14->24\n20->24\n23->24\n24->25\n25->26\n26->27\n0->27\n27->28\n28->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 26.63
+		},
+		"experience": "Maintain the simplicity of residual connections and avoid excessive layers or operations that increase model complexity unnecessarily."
+	},
+	{
+		"raw": {
+			"name": "convnext",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.42
+		},
+		"inspiration": {
+			"id": 2302,
+			"content": "Incorporating a transformer architecture, specifically designed for both stages, can enhance feature representation and similarity measurement between query and support keypoints."
+		},
+		"new": {
+			"name": "convnext_trail1_convnext_p2302",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:reshape(B, H*W, C)\n11:Linear(out_channels=C)\n12:reshape(B, C, H, W)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->10\n10->11\n11->12\n12->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n0->2\n2->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->1"
+			],
+			"acc": 58.82
+		},
+		"experience": "Minimize structural changes that disrupt the spatial correlations of feature maps, especially in convolutional models."
+	},
+	{
+		"raw": {
+			"name": "convnext",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.42
+		},
+		"inspiration": {
+			"id": 4564,
+			"content": "Incorporate orientation alignment loss and contrastive descriptor loss in a self-supervised manner to robustly train the network against various photometric and geometric transformations."
+		},
+		"new": {
+			"name": "convnext_trail1_convnext_p4564",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Conv2d(out_channels=C,kernel_size=1,stride=1)\n12:Mul\n13:Mul\n14:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n0->10\n0->11\n0->12\n10->12\n0->13\n11->13\n9->14\n12->14\n13->14\n14->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 0.1
+		},
+		"experience": "Avoid adding complex operations like multiple convolutions and element-wise multiplications without ensuring they contribute positively to feature extraction and model stability."
+	},
+	{
+		"raw": {
+			"name": "convnext",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": 77.42
+		},
+		"inspiration": {
+			"id": 1397,
+			"content": "Incorporating shallow MLPs for mapping input coordinates to RGB and SDF values, optimizing the trade-off between model complexity and real-time performance."
+		},
+		"new": {
+			"name": "convnext_trail1_convnext_p1397",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:permute(0,2,3,1)\n11:Linear(out_channels=C)  # MLP for RGB values\n12:Linear(out_channels=C)  # MLP for SDF values\n13:permute(0,3,1,2)\n14:permute(0,3,1,2)\n15:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->10\n10->11\n10->12\n11->13\n12->14\n13->15\n14->15\n15->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=3,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 24.38
+		},
+		"experience": "Ensure modifications simplify the network and maintain the integrity of the original computational paths."
+	},
+	{
+		"raw": {
+			"name": "convnext_trail1_convnext_p4563_p1136",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=1,stride=1,groups=C)\n10:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n11:AdaptiveAvgPool2d(output_size=1)\n12:Conv2d(out_channels=C,kernel_size=1,stride=1)\n13:Mul\n14:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n10->11\n11->12\n12->13\n9->13\n13->14\n0->14\n14->1",
+				"##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 77.88
+		},
+		"inspiration": {
+			"id": "4605",
+			"content": "Implement adaptive prompt learning to dynamically adjust and embed task-specific and category-specific prompts into the model, improving alignment between visual and textual representations."
+		},
+		"new": {
+			"name": "convnext_trail1_convnext_p4563_p1136_p4605",
+			"blocks": [
+				"##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=1,stride=1,groups=C)\n10:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n11:AdaptiveAvgPool2d(output_size=1)\n12:Conv2d(out_channels=C,kernel_size=1,stride=1)\n13:Mul\n14:Add\n15:permute(0,2,3,1)\n16:Linear(out_channels=C)  # Task-specific prompt embedding\n17:Linear(out_channels=C)  # Category-specific prompt embedding\n18:Add\n19:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n10->11\n11->12\n12->13\n9->13\n13->14\n0->14\n14->15\n15->16\n15->17\n16->18\n17->18\n18->19\n19->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+			],
+			"acc": 19.71
+		},
+		"experience": "Ensure that any added layers or operations are necessary and beneficial, and validate their impact on feature representation before finalizing the model structure."
+	},
+	{
+		"raw": {
+			"name": "convnext_trail1_convnext_p2313_p4451",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:Conv2d(out_channels=C,kernel_size=1,stride=1)\n4:Add\n5:permute(0,2,3,1)\n6:LN\n7:Linear(out_channels=C*4)\n8:GELU\n9:Linear(out_channels=C)\n10:permute(0,3,1,2)\n11:Add\n0->2\n0->3\n2->4\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n10->11\n11->1",
+				"##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=2)\n3:ReLU\n4:Conv2d(out_channels=dim,kernel_size=4,stride=2)\n5:ReLU\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:ReLU\n0->2\n2->3\n3->1"
+			],
+			"acc": 76.98
+		},
+		"inspiration": {
+			"id": "3786",
+			"content": "Efficient and Enriched Model Sampling: Introduce a model queue to dynamically manage different model states (with varying training iterations) to enrich the diversity of feature extractions, suggesting a dynamic adjustment mechanism in backbone design to accommodate varying complexities of input data."
+		},
+		"new": {
+			"name": "convnext_trail1_convnext_p2313_p4451_p3786",
+			"blocks": [
+				"###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:Conv2d(out_channels=C,kernel_size=1,stride=1)\n4:Add\n5:permute(0,2,3,1)\n6:LN\n7:Linear(out_channels=C*4)\n8:GELU\n9:Linear(out_channels=C)\n10:permute(0,3,1,2)\n11:Add\n12:AdaptiveAvgPool2d(output_size=1)\n13:reshape(B,C)\n14:Linear(out_channels=C)\n15:reshape(B,C,1,1)\n16:Mul\n0->2\n0->3\n2->4\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n10->11\n11->12\n12->13\n13->14\n14->15\n11->16\n15->16\n16->1",
+				"##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+				"##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+			],
+			"acc": -1.0
+		},
+		"experience": "Ensure modifications preserve essential spatial information and avoid adding operations that overly compress feature maps."
+	}
+]

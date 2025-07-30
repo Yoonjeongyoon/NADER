@@ -1,0 +1,1240 @@
+{
+	"stem": {
+		"convnext_macro1": {
+			"inspiration": "Integrate spatial attention mechanisms to enhance the focus on relevant spatial features, potentially improving the accuracy on tasks where spatial relationships are crucial.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:AdaptiveAvgPool2d(output_size=1)\n11:Conv2d(out_channels=C//8,kernel_size=1)\n12:ReLU\n13:Conv2d(out_channels=C,kernel_size=1)\n14:Sigmoid\n15:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n9->15\n15->1",
+						"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=dim*4)\n6:GELU\n7:Linear(out_channels=dim)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+						"downsample_block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=dim*4)\n6:GELU\n7:Linear(out_channels=dim)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1"
+					},
+					"error": "Add shape error"
+				}
+			]
+		},
+		"convnext_macro3": {
+			"inspiration": "Utilize dilation in convolution layers to increase the receptive field without increasing the number of parameters, which can help in capturing broader context.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,dilation=2,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+						"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:LN\n4:GELU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:LN\n4:GELU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "When using LN, the last dimension must be the channel dimension."
+				}
+			]
+		},
+		"convnext_macro4": {
+			"inspiration": "Add residual connections around nonlinearities and normalization layers to promote easier gradient flow during training and potentially enhance convergence rates.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Add\n6:Linear(out_channels=C*4)\n7:GELU\n8:Add\n9:Linear(out_channels=C)\n10:permute(0,3,1,2)\n11:Add\n0->2\n2->3\n3->4\n3->5\n4->5\n5->6\n6->7\n6->8\n7->8\n8->9\n9->10\n10->11\n0->11\n11->1",
+						"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4,groups=C)\n3:LN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n3:LN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "When using LN, the last dimension must be the channel dimension."
+				}
+			]
+		},
+		"mobilenet_macro2": {
+			"inspiration": "Use depthwise separable convolutions with mixed kernel sizes in depthwise layers to capture features at various scales effectively.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##MobileNetBlock##\n0:input\n1:output\n2a:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n2b:Conv2d(out_channels=C,kernel_size=5,stride=1,groups=C)\n2c:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3a:BN\n3b:BN\n3c:BN\n4a:ReLU\n4b:ReLU\n4c:ReLU\n5:concat(dim=1)\n6:Conv2d(out_channels=C,kernel_size=1,stride=1)\n7:BN\n8:ReLU\n0->2a\n0->2b\n0->2c\n2a->3a\n2b->3b\n2c->3c\n3a->4a\n3b->4b\n3c->4c\n4a->5\n4b->5\n4c->5\n5->6\n6->7\n7->8\n8->1",
+						"stem_block": "##MobileNetBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=2,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+						"downsample_block": "##MobileNetBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=2,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1"
+					},
+					"error": "The height and width of the output feature map must be 1/4 of the input feature map."
+				}
+			]
+		},
+		"convnext_micro3": {
+			"inspiration": "Introduce a second Add operation before the first permute to incorporate a shortcut connection from earlier in the block, promoting easier gradient flow.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->10\n0->10\n10->9\n0->9\n9->1",
+						"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4,groups=C)\n3:LN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n3:LN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "When using LN, the last dimension must be the channel dimension."
+				}
+			]
+		},
+		"convnext_micro5": {
+			"inspiration": "Swap the positions of the Linear(out_channels=C*4) and GELU to check the effect of applying activation before the linear transformation.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:GELU\n6:Linear(out_channels=C*4)\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+						"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:LN\n4:GELU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:LN\n4:GELU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "When using LN, the last dimension must be the channel dimension."
+				}
+			]
+		},
+		"convnext_micro6": {
+			"inspiration": "Replace Linear(out_channels=C*4) with Linear(out_channels=C/2) and then another Linear(out_channels=C) to introduce a bottleneck structure, which might help in learning more robust features.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C/2)\n6:GELU\n7:Linear(out_channels=C)\n8:GELU\n9:Linear(out_channels=C)\n10:permute(0,3,1,2)\n11:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n0->11\n11->1",
+						"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4,groups=C)\n3:LN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n3:LN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "When using LN, the last dimension must be the channel dimension."
+				}
+			]
+		},
+		"convnext_micro8": {
+			"inspiration": "Employ a Sigmoid activation instead of GELU to explore impacts on the non-linearity characteristics of the block.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:Sigmoid\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+						"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4,groups=C)\n3:LN\n4:Sigmoid\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:LN\n4:Sigmoid\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "When using LN, the last dimension must be the channel dimension."
+				}
+			]
+		}
+	},
+	"model_code": {
+		"convnext_macro1": {
+			"inspiration": "Integrate spatial attention mechanisms to enhance the focus on relevant spatial features, potentially improving the accuracy on tasks where spatial relationships are crucial.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Conv2d(out_channels=C//8,kernel_size=1)\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=1)\n13:Sigmoid\n14:Mul\n15:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n15->1",
+						"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4,groups=C)\n0->2\n2->1",
+						"downsample_block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n0->2\n2->1"
+					},
+					"error": "out_channels must be divisible by groups"
+				}
+			]
+		},
+		"convnext_macro2": {
+			"inspiration": "Incorporate depthwise separable convolutions to reduce the computational cost while maintaining performance, beneficial for deploying models on resource-constrained devices.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:Conv2d(out_channels=C,kernel_size=1,stride=1)\n4:permute(0,2,3,1)\n5:LN\n6:Linear(out_channels=C*4)\n7:GELU\n8:Linear(out_channels=C)\n9:permute(0,3,1,2)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->10\n10->1",
+						"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4,groups=C)\n3:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n4:permute(0,2,3,1)\n5:LN\n6:Linear(out_channels=dim*4)\n7:GELU\n8:Linear(out_channels=dim)\n9:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->1",
+						"downsample_block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n3:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n4:permute(0,2,3,1)\n5:LN\n6:Linear(out_channels=dim*4)\n7:GELU\n8:Linear(out_channels=dim)\n9:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->1"
+					},
+					"error": "out_channels must be divisible by groups"
+				}
+			]
+		},
+		"convnext_macro3": {
+			"inspiration": "Utilize dilation in convolution layers to increase the receptive field without increasing the number of parameters, which can help in capturing broader context.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,dilation=2,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+						"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4,dilation=2,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=dim*4)\n6:GELU\n7:Linear(out_channels=dim)\n8:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->1",
+						"downsample_block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,dilation=2,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=dim*4)\n6:GELU\n7:Linear(out_channels=dim)\n8:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->1"
+					},
+					"error": "out_channels must be divisible by groups"
+				}
+			]
+		},
+		"googlenet_macro4": {
+			"inspiration": "Embed feature recalibration through squeeze-and-excitation blocks to adaptively recalibrate channel-wise feature responses.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:concat(dim=1)\n25:AdaptiveAvgPool2d(output_size=1)\n26:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n27:ReLU\n28:Conv2d(out_channels=C,kernel_size=1,stride=1)\n29:Sigmoid\n30:Mul\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n24->25\n25->26\n26->27\n27->28\n28->29\n29->30\n4->24\n10->24\n19->24\n23->24\n24->30\n30->1",
+						"stem_block": "##GoogLeNetBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##GoogLeNetBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "The size of tensor a (268) must match the size of tensor b (267) at non-singleton dimension 1"
+				}
+			]
+		},
+		"mobilenet_macro4": {
+			"inspiration": "Integrate non-linear activation functions like GELU or Swish to potentially improve model training dynamics and performance on complex datasets.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###MobileNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:BN\n4:GELU\n5:Conv2d(out_channels=C,kernel_size=1,stride=1)\n6:BN\n7:GELU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+						"stem_block": "##MobileNetBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4,groups=C)\n3:BN\n4:GELU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##MobileNetBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n3:BN\n4:GELU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "out_channels must be divisible by groups"
+				}
+			]
+		},
+		"mobilenet_macro5": {
+			"inspiration": "Adopt a dual-pathway architecture to process features through parallel paths with different convolutional operations, allowing the model to learn more robust features.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##MobileNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=5,stride=1,groups=C)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n0->8\n8->9\n9->10\n10->11\n11->12\n12->13\n7->14\n13->14\n14->1",
+						"stem_block": "##MobileNetBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=4,groups=C)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##MobileNetBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "out_channels must be divisible by groups"
+				}
+			]
+		},
+		"mobilenet_macro6": {
+			"inspiration": "Include skip connections between non-consecutive layers to facilitate deeper layer training and mitigate the vanishing gradient problem.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##MobileNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n0->8\n7->8\n8->1",
+						"stem_block": "##MobileNetBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4,groups=C)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##MobileNetBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "out_channels must be divisible by groups"
+				}
+			]
+		},
+		"mobilenet_macro7": {
+			"inspiration": "Utilize dilated convolutions to increase the receptive field without reducing spatial resolution, enhancing the model's ability to understand larger context without increasing computational cost.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##MobileNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,dilation=2,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+						"stem_block": "##MobileNetBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4,groups=C)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##MobileNetBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "out_channels must be divisible by groups"
+				}
+			]
+		},
+		"googlenet_macro9": {
+			"inspiration": "Introduce a residual connection to improve gradient flow during training.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:concat(dim=1)\n25:Add\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n0->25\n24->25\n25->1",
+						"stem_block": "##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "The size of tensor a (268) must match the size of tensor b (267) at non-singleton dimension 1"
+				}
+			]
+		},
+		"convnext_micro2": {
+			"inspiration": "Change the activation function from GELU to ReLU in the block to check if it results in faster convergence during training.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:ReLU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+						"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4,groups=C)\n0->2\n2->1",
+						"downsample_block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n0->2\n2->1"
+					},
+					"error": "out_channels must be divisible by groups"
+				}
+			]
+		},
+		"convnext_micro4": {
+			"inspiration": "Implement a BN layer after the second permute to stabilize the learning by normalizing the feature maps at that stage.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:BN\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->10\n10->1",
+						"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4,groups=C)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "out_channels must be divisible by groups"
+				}
+			]
+		},
+		"googlenet_micro2": {
+			"inspiration": "Add a residual connection from the input to the output of the block to improve gradient flow during training.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:concat(dim=1)\n25:Add\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n24->25\n0->25\n25->1",
+						"stem_block": "##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##downsample_block##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "The size of tensor a (267) must match the size of tensor b (268) at non-singleton dimension 1"
+				}
+			]
+		},
+		"googlenet_micro7": {
+			"inspiration": "Integrate a shortcut connection from the input to the output of the block.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##GoogLeNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:concat(dim=1)\n25:Add\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n0->25\n24->25\n25->1",
+						"stem_block": "##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##downsample_block##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "The size of tensor a (268) must match the size of tensor b (267) at non-singleton dimension 1"
+				},
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:concat(dim=1)\n25:Add\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n24->25\n0->25\n25->1",
+						"stem_block": "##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##downsample_block##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "The size of tensor a (267) must match the size of tensor b (268) at non-singleton dimension 1"
+				}
+			]
+		},
+		"mobilenet_micro6": {
+			"inspiration": "Modify the second Conv2d to have groups=2, creating a grouped convolution that might help the model learn more diverse features.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###MobileNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=1,stride=1,groups=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+						"stem_block": "##MobileNetBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=4,groups=C)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##MobileNetBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "out_channels must be divisible by groups"
+				}
+			]
+		},
+		"mobilenet_micro7": {
+			"inspiration": "Add an additional Conv2d layer with a very small kernel_size=1 and dilation=2 between the first BN and ReLU to introduce an additional level of feature transformation.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##MobileNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:BN\n4:Conv2d(out_channels=C,kernel_size=1,dilation=2)\n5:ReLU\n6:Conv2d(out_channels=C,kernel_size=1,stride=1)\n7:BN\n8:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->1",
+						"stem_block": "##MobileNetBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=3,stride=4,groups=C)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##MobileNetBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "out_channels must be divisible by groups"
+				}
+			]
+		}
+	},
+	"base": {
+		"convnext_macro4": {
+			"inspiration": "Add residual connections around nonlinearities and normalization layers to promote easier gradient flow during training and potentially enhance convergence rates.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Add\n6:Linear(out_channels=C*4)\n7:GELU\n8:Linear(out_channels=C)\n9:Add\n10:permute(0,3,1,2)\n11:Add\n0->2\n2->3\n3->4\n3->5\n4->6\n6->7\n7->8\n8->9\n9->10\n10->11\n0->11\n5->11\n11->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Add cannot receive only one input."
+				},
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:Add\n0->2\n2->3\n3->4\n4->10\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->9\n10->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Add shape error"
+				}
+			]
+		},
+		"convnext_macro5": {
+			"inspiration": "Implement squeeze-and-excitation blocks to recalibrate channel-wise feature responses by explicitly modelling interdependencies between channels.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:Linear(out_channels=C//16)\n11:ReLU\n12:Linear(out_channels=C)\n13:Sigmoid\n14:Mul\n15:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n8->14\n14->15\n0->15\n15->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "When using Linear, the last dimension must be the channel dimension."
+				},
+				{
+					"fail_block": {
+						"base_block": "###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:AdaptiveAvgPool2d(output_size=1)\n10:reshape(0,C)\n11:Linear(out_channels=C//16)\n12:ReLU\n13:Linear(out_channels=C)\n14:Sigmoid\n15:reshape(0,C,1,1)\n16:Mul\n17:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n8->16\n15->16\n16->17\n0->17\n17->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "The block definition does not comply with the regulations."
+				}
+			]
+		},
+		"convnext_macro6": {
+			"inspiration": "Include feature pyramid networks within the block to build a multi-scale feature pyramid from a single scale input, enhancing the detection of objects at multiple scales.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:MaxPool2d(kernel_size=2,stride=2)\n11:Conv2d(out_channels=C,kernel_size=1,stride=1)\n12:Conv2d(out_channels=C,kernel_size=1,stride=1)\n13:Conv2d(out_channels=C,kernel_size=1,stride=1)\n14:concat(dim=1)\n15:Conv2d(out_channels=C,kernel_size=1,stride=1)\n16:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n9->12\n0->13\n11->14\n12->14\n13->14\n14->15\n15->16\n0->16\n16->1\n```",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Concat error: [4, 64, 32, 32],[4, 192, 16, 16]"
+				},
+				{
+					"fail_block": {
+						"base_block": "###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Conv2d(out_channels=C,kernel_size=3,stride=2)\n12:Conv2d(out_channels=C,kernel_size=1,stride=1)\n13:Conv2d(out_channels=C,kernel_size=3,stride=2)\n14:Conv2d(out_channels=C,kernel_size=1,stride=1)\n15:concat(dim=1)\n16:Conv2d(out_channels=C,kernel_size=1,stride=1)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->10\n10->11\n11->12\n12->13\n13->14\n10->15\n12->15\n14->15\n15->16\n16->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Concat error: [4, 64, 16, 16],[4, 192, 32, 32]"
+				},
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Conv2d(out_channels=C,kernel_size=1,stride=1)\n10:Conv2d(out_channels=C,kernel_size=3,stride=2)\n11:Conv2d(out_channels=C,kernel_size=1,stride=1)\n12:Conv2d(out_channels=C,kernel_size=3,stride=2)\n13:Conv2d(out_channels=C,kernel_size=1,stride=1)\n14:Conv2d(out_channels=C,kernel_size=3,stride=2)\n15:Conv2d(out_channels=C,kernel_size=1,stride=1)\n16:concat(dim=1)\n17:Conv2d(out_channels=C,kernel_size=1,stride=1)\n18:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n9->16\n11->16\n13->16\n15->16\n16->17\n17->18\n0->18\n18->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Concat error: [4, 64, 16, 16],[4, 256, 32, 32]"
+				},
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Conv2d(out_channels=C,kernel_size=3,stride=2)\n12:Conv2d(out_channels=C,kernel_size=1,stride=1)\n13:Conv2d(out_channels=C,kernel_size=3,stride=2)\n14:Conv2d(out_channels=C,kernel_size=1,stride=1)\n15:Conv2d(out_channels=C,kernel_size=3,stride=2)\n16:Conv2d(out_channels=C,kernel_size=1,stride=1)\n17:Conv2d(out_channels=C,kernel_size=3,stride=2)\n18:concat(dim=1)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n9->18\n11->18\n13->18\n15->18\n17->18\n18->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Concat error: [4, 64, 16, 16],[4, 320, 32, 32]"
+				},
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Conv2d(out_channels=C,kernel_size=3,stride=2)\n12:Conv2d(out_channels=C,kernel_size=1,stride=1)\n13:Conv2d(out_channels=C,kernel_size=3,stride=2)\n14:Conv2d(out_channels=C,kernel_size=1,stride=1)\n15:Conv2d(out_channels=C,kernel_size=3,stride=2)\n16:Conv2d(out_channels=C,kernel_size=1,stride=1)\n17:Conv2d(out_channels=C,kernel_size=3,stride=2)\n18:concat(dim=1)\n19:Conv2d(out_channels=C,kernel_size=1,stride=1)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n9->18\n11->18\n13->18\n15->18\n17->18\n18->19\n19->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Concat error: [4, 3, 112, 112],[4, 15, 224, 224]"
+				},
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Conv2d(out_channels=C,kernel_size=3,stride=2)\n12:Conv2d(out_channels=C,kernel_size=1,stride=1)\n13:Conv2d(out_channels=C,kernel_size=3,stride=2)\n14:Conv2d(out_channels=C,kernel_size=1,stride=1)\n15:Conv2d(out_channels=C,kernel_size=3,stride=2)\n16:Conv2d(out_channels=C,kernel_size=1,stride=1)\n17:Conv2d(out_channels=C,kernel_size=3,stride=2)\n18:AdaptiveAvgPool2d(output_size=(H//16, W//16))\n19:AdaptiveAvgPool2d(output_size=(H//8, W//8))\n20:AdaptiveAvgPool2d(output_size=(H//4, W//4))\n21:AdaptiveAvgPool2d(output_size=(H//2, W//2))\n22:concat(dim=1)\n23:Conv2d(out_channels=C,kernel_size=1,stride=1)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n9->21\n11->20\n13->19\n15->18\n18->22\n19->22\n20->22\n21->22\n22->23\n23->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "AdaptiveAvgPool2d can receive only one input."
+				},
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Conv2d(out_channels=C,kernel_size=3,stride=2)\n12:Conv2d(out_channels=C,kernel_size=1,stride=1)\n13:Conv2d(out_channels=C,kernel_size=3,stride=2)\n14:Conv2d(out_channels=C,kernel_size=1,stride=1)\n15:Conv2d(out_channels=C,kernel_size=3,stride=2)\n16:Conv2d(out_channels=C,kernel_size=1,stride=1)\n17:Conv2d(out_channels=C,kernel_size=3,stride=2)\n18:AdaptiveAvgPool2d(output_size=(H//16, W//16))\n19:AdaptiveAvgPool2d(output_size=(H//8, W//8))\n20:AdaptiveAvgPool2d(output_size=(H//4, W//4))\n21:AdaptiveAvgPool2d(output_size=(H//2, W//2))\n22:AdaptiveAvgPool2d(output_size=(H, W))\n23:concat(dim=1)\n24:Conv2d(out_channels=C,kernel_size=1,stride=1)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n17->19\n17->20\n17->21\n17->22\n18->23\n19->23\n20->23\n21->23\n22->23\n23->24\n24->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Output shape error."
+				}
+			]
+		},
+		"convnext_macro7": {
+			"inspiration": "Introduce conditional computation in the block, where parts of the network are activated based on the input, to increase model efficiency.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:mean(dim=(2,3))\n11:reshape(-1,C)\n12:Linear(out_channels=1)\n13:Sigmoid\n14:reshape(-1,1,1,1)\n15:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n9->15\n15->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Mul shape error"
+				},
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:mean(dim=(1,2,3))\n11:reshape(-1)\n12:Linear(out_channels=1)\n13:Sigmoid\n14:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1\n0->10\n10->11\n11->12\n12->13\n13->14\n9->14\n14->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "reshape dims error"
+				},
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:mean(dim=(1,2,3))\n11:Linear(out_channels=1)\n12:Sigmoid\n13:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1\n0->10\n10->11\n11->12\n12->13\n13->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "The block definition does not comply with the regulations."
+				},
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:mean(dim=(1,2,3))\n11:reshape(1,1,1,1)\n12:Linear(out_channels=1)\n13:Sigmoid\n14:reshape(1,1,1,1)\n15:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1\n0->10\n10->11\n11->12\n12->13\n13->14\n14->15\n9->15\n15->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "The output node can have only one input."
+				}
+			]
+		},
+		"convnext_macro8": {
+			"inspiration": "Apply a self-attention mechanism to capture global dependencies across the input feature map, potentially enhancing feature representation.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:reshape(0,-1,C)\n9:softmax(dim=-1)\n10:multiply\n11:reshape(0,C,H,W)\n12:permute(0,3,1,2)\n13:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n0->13\n13->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "The block definition does not comply with the regulations."
+				},
+				{
+					"fail_block": {
+						"base_block": "###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:reshape(B, H*W, C)\n11:Linear(out_channels=C)\n12:softmax(dim=-1)\n13:multiply\n14:reshape(B, C, H, W)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "multiply cannot receive only one input."
+				},
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:reshape(B, H*W, C)\n10:Linear(out_channels=C)\n11:softmax(dim=-1)\n12:multiply\n13:reshape(B, C, H, W)\n14:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n9->11\n10->12\n11->12\n12->13\n13->14\n0->14\n14->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Can not multiply error"
+				}
+			]
+		},
+		"googlenet_macro5": {
+			"inspiration": "Integrate attention gates before concatenation to focus the model on pertinent features across different convolution paths.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:Conv2d(out_channels=C,kernel_size=1,stride=1)\n25:Sigmoid\n26:Mul\n27:Conv2d(out_channels=C,kernel_size=1,stride=1)\n28:Sigmoid\n29:Mul\n30:Conv2d(out_channels=C,kernel_size=1,stride=1)\n31:Sigmoid\n32:Mul\n33:Conv2d(out_channels=C,kernel_size=1,stride=1)\n34:Sigmoid\n35:Mul\n36:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n24->25\n25->26\n10->27\n27->28\n28->29\n19->30\n30->31\n31->32\n23->33\n33->34\n34->35\n26->36\n29->36\n32->36\n35->36\n36->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Mul cannot receive only one input."
+				},
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n25:Sigmoid\n26:Mul\n27:Conv2d(out_channels=C/2,kernel_size=1,stride=1)\n28:Sigmoid\n29:Mul\n30:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n31:Sigmoid\n32:Mul\n33:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n34:Sigmoid\n35:Mul\n36:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n24->25\n25->26\n26->4\n10->27\n27->28\n28->29\n29->10\n19->30\n30->31\n31->32\n32->19\n23->33\n33->34\n34->35\n35->23\n4->36\n10->36\n19->36\n23->36\n36->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "The block definition does not comply with the regulations."
+				},
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n25:Sigmoid\n26:Mul\n27:Conv2d(out_channels=C/2,kernel_size=1,stride=1)\n28:Sigmoid\n29:Mul\n30:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n31:Sigmoid\n32:Mul\n33:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n34:Sigmoid\n35:Mul\n36:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n24->25\n25->26\n4->26\n10->27\n27->28\n28->29\n10->29\n19->30\n30->31\n31->32\n19->32\n23->33\n33->34\n34->35\n23->35\n26->36\n29->36\n32->36\n35->36\n36->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Output shape error."
+				}
+			]
+		},
+		"googlenet_macro6": {
+			"inspiration": "Introduce conditional computation in the block, where parts of the network are activated based on the input, to increase model efficiency.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##GoogLeNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:concat(dim=1)\n25:Linear(out_channels=1)\n26:Sigmoid\n27:Mul\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n24->25\n25->26\n26->27\n27->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "When using Linear, the last dimension must be the channel dimension."
+				}
+			]
+		},
+		"googlenet_macro8": {
+			"inspiration": "Use a hybrid dilated convolution approach to mix different dilation rates in parallel paths for enriched feature extraction.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/4,kernel_size=3,stride=1,dilation=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/4,kernel_size=3,stride=1,dilation=2)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/4,kernel_size=3,stride=1,dilation=3)\n15:BN\n16:ReLU\n17:MaxPool2d(kernel_size=3,stride=1)\n18:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n19:BN\n20:ReLU\n21:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->5\n5->6\n6->7\n7->11\n11->12\n12->13\n0->5\n5->6\n6->7\n7->14\n14->15\n15->16\n0->17\n17->18\n18->19\n19->20\n4->21\n10->21\n13->21\n16->21\n20->21\n21->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Output shape error."
+				},
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/4,kernel_size=3,stride=1,dilation=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/4,kernel_size=3,stride=1,dilation=2)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/4,kernel_size=3,stride=1,dilation=3)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n18:BN\n19:ReLU\n20:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n21:BN\n22:ReLU\n23:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n24:BN\n25:ReLU\n26:MaxPool2d(kernel_size=3,stride=1)\n27:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n28:BN\n29:ReLU\n30:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n7->11\n11->12\n12->13\n13->14\n14->15\n15->16\n0->17\n17->18\n18->19\n19->20\n20->21\n21->22\n22->23\n0->26\n26->27\n27->28\n28->29\n4->30\n10->30\n16->30\n23->30\n29->30\n30->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "The defined node 24:BN is not used"
+				}
+			]
+		},
+		"googlenet_macro10": {
+			"inspiration": "Apply feature pyramid networks within the block to build multi-scale feature representations that are beneficial for various vision tasks.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n25:BN\n26:ReLU\n27:Conv2d(out_channels=C/4,kernel_size=3,stride=2)\n28:BN\n29:ReLU\n30:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n31:BN\n32:ReLU\n33:Conv2d(out_channels=C/4,kernel_size=3,stride=2)\n34:BN\n35:ReLU\n36:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n37:BN\n38:ReLU\n39:Conv2d(out_channels=C/4,kernel_size=3,stride=2)\n40:BN\n41:ReLU\n42:AdaptiveAvgPool2d(output_size=1)\n43:Conv2d(out_channels=C,kernel_size=1,stride=1)\n44:BN\n45:ReLU\n46:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n0->24\n24->25\n25->26\n26->27\n27->28\n28->29\n0->30\n30->31\n31->32\n32->33\n33->34\n34->35\n0->36\n36->37\n37->38\n38->39\n39->40\n40->41\n41->42\n42->43\n43->44\n44->45\n4->46\n10->46\n19->46\n23->46\n29->46\n35->46\n41->46\n45->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Concat error: [4, 16, 16, 16],[4, 112, 32, 32]"
+				},
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n25:BN\n26:ReLU\n27:Conv2d(out_channels=C/4,kernel_size=3,stride=2)\n28:BN\n29:ReLU\n30:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n31:BN\n32:ReLU\n33:Conv2d(out_channels=C/4,kernel_size=3,stride=2)\n34:BN\n35:ReLU\n36:AdaptiveAvgPool2d(output_size=1)\n37:Conv2d(out_channels=C,kernel_size=1,stride=1)\n38:BN\n39:ReLU\n40:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n0->24\n24->25\n25->26\n26->27\n27->28\n28->29\n0->30\n30->31\n31->32\n32->33\n33->34\n34->35\n0->36\n36->37\n37->38\n38->39\n4->40\n10->40\n19->40\n23->40\n29->40\n35->40\n39->40\n40->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Concat error: [4, 16, 16, 16],[4, 160, 32, 32]"
+				},
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:concat(dim=1)\n25:Conv2d(out_channels=C,kernel_size=1,stride=1)\n26:BN\n27:ReLU\n28:Conv2d(out_channels=C,kernel_size=3,stride=2)\n29:BN\n30:ReLU\n31:Conv2d(out_channels=C,kernel_size=1,stride=1)\n32:BN\n33:ReLU\n34:Conv2d(out_channels=C,kernel_size=3,stride=2)\n35:BN\n36:ReLU\n37:AdaptiveAvgPool2d(output_size=1)\n38:Conv2d(out_channels=C,kernel_size=1,stride=1)\n39:BN\n40:ReLU\n41:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n24->25\n25->26\n26->27\n27->28\n28->29\n29->30\n24->31\n31->32\n32->33\n33->34\n34->35\n35->36\n24->37\n37->38\n38->39\n39->40\n28->41\n36->41\n40->41\n41->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Concat error: [4, 64, 32, 32],[4, 192, 16, 16]"
+				},
+				{
+					"fail_block": {
+						"base_block": "##GoogLeNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:concat(dim=1)\n25:Conv2d(out_channels=C,kernel_size=1,stride=1)\n26:Conv2d(out_channels=C,kernel_size=3,stride=2)\n27:Conv2d(out_channels=C,kernel_size=1,stride=1)\n28:Conv2d(out_channels=C,kernel_size=3,stride=2)\n29:Conv2d(out_channels=C,kernel_size=1,stride=1)\n30:Conv2d(out_channels=C,kernel_size=3,stride=2)\n31:Conv2d(out_channels=C,kernel_size=1,stride=1)\n32:Conv2d(out_channels=C,kernel_size=3,stride=2)\n33:concat(dim=1)\n34:Conv2d(out_channels=C,kernel_size=1,stride=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n24->25\n25->26\n26->27\n27->28\n28->29\n29->30\n30->31\n31->32\n25->33\n27->33\n29->33\n31->33\n33->34\n34->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Concat error: [4, 64, 16, 16],[4, 256, 32, 32]"
+				},
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n25:BN\n26:ReLU\n27:Conv2d(out_channels=C/4,kernel_size=3,stride=2)\n28:BN\n29:ReLU\n30:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n31:BN\n32:ReLU\n33:Conv2d(out_channels=C/4,kernel_size=3,stride=2)\n34:BN\n35:ReLU\n36:AdaptiveAvgPool2d(output_size=1)\n37:Conv2d(out_channels=C,kernel_size=1,stride=1)\n38:BN\n39:ReLU\n40:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n0->24\n24->25\n25->26\n26->27\n27->28\n28->29\n0->30\n30->31\n31->32\n32->33\n33->34\n34->35\n0->36\n36->37\n37->38\n38->39\n4->40\n10->40\n19->40\n23->40\n29->40\n35->40\n39->40\n40->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Concat error: [4, 0, 112, 112],[4, 4, 224, 224]"
+				},
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1,padding=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1,padding=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1,padding=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1,padding=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n25:BN\n26:ReLU\n27:Conv2d(out_channels=C/4,kernel_size=3,stride=1,padding=1)\n28:BN\n29:ReLU\n30:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n31:BN\n32:ReLU\n33:Conv2d(out_channels=C/4,kernel_size=3,stride=1,padding=1)\n34:BN\n35:ReLU\n36:AdaptiveAvgPool2d(output_size=1)\n37:Conv2d(out_channels=C,kernel_size=1,stride=1)\n38:BN\n39:ReLU\n40:Conv2d(out_channels=C,kernel_size=1,stride=1)\n41:BN\n42:ReLU\n43:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n0->24\n24->25\n25->26\n26->27\n27->28\n28->29\n0->30\n30->31\n31->32\n32->33\n33->34\n34->35\n0->36\n36->37\n37->38\n38->39\n39->40\n4->43\n10->43\n19->43\n23->43\n29->43\n35->43\n40->43\n43->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Output shape error."
+				}
+			]
+		},
+		"mobilenet_macro2": {
+			"inspiration": "Use depthwise separable convolutions with mixed kernel sizes in depthwise layers to capture features at various scales effectively.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###MobileNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:Conv2d(out_channels=C,kernel_size=5,stride=1,groups=C)\n4:BN\n5:ReLU\n6:Conv2d(out_channels=C,kernel_size=1,stride=1)\n7:BN\n8:ReLU\n0->2\n0->3\n2->4\n3->4\n4->5\n5->6\n6->7\n7->8\n8->1",
+						"stem_block": "##MobileNetBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=2,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+						"downsample_block": "##MobileNetBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=2,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1"
+					},
+					"error": "BN can receive only one input."
+				}
+			]
+		},
+		"mobilenet_macro10": {
+			"inspiration": "Employ a hybrid pooling strategy that combines average pooling and max pooling to capture both texture and structural information more effectively.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##MobileNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:MaxPool2d(kernel_size=2,stride=2)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n7->9\n8->10\n9->10\n10->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Output shape error."
+				},
+				{
+					"fail_block": {
+						"base_block": "##MobileNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:AvgPool2d(kernel_size=2,stride=2)\n9:MaxPool2d(kernel_size=2,stride=2)\n10:Conv2d(out_channels=C,kernel_size=1,stride=1)\n11:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n7->9\n8->10\n9->10\n10->11\n11->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Conv2d can receive only one input."
+				}
+			]
+		},
+		"resnet_base_macro4": {
+			"inspiration": "Insert squeeze-and-excitation blocks to recalibrate channel-wise feature responses by explicitly modelling interdependencies between channels.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:Linear(out_channels=C//16)\n9:ReLU\n10:Linear(out_channels=C)\n11:Sigmoid\n12:Mul\n13:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n6->12\n0->13\n12->13\n13->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "When using Linear, the last dimension must be the channel dimension."
+				},
+				{
+					"fail_block": {
+						"base_block": "##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AdaptiveAvgPool2d(output_size=1)\n8:reshape(0,C)\n9:Linear(out_channels=C//16)\n10:ReLU\n11:Linear(out_channels=C)\n12:Sigmoid\n13:reshape(0,C,1,1)\n14:Mul\n15:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n6->14\n0->15\n14->15\n15->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "The block definition does not comply with the regulations."
+				}
+			]
+		},
+		"resnet_base_macro10": {
+			"inspiration": "Adopt a hybrid pooling strategy combining average and max pooling to capture both texture and structural information more effectively.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:AvgPool2d(kernel_size=2,stride=2)\n8:MaxPool2d(kernel_size=2,stride=2)\n9:Add\n10:ReLU\n11:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n6->8\n7->9\n8->9\n9->10\n0->11\n10->11\n11->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Add shape error"
+				}
+			]
+		},
+		"resnet_bottle_macro5": {
+			"inspiration": "Implement squeeze-and-excitation blocks to recalibrate channel-wise feature responses by explicitly modelling interdependencies between channels.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:Add\n11:ReLU\n12:AdaptiveAvgPool2d(output_size=1)\n13:reshape(C)\n14:Linear(out_channels=C/16)\n15:ReLU\n16:Linear(out_channels=C)\n17:Sigmoid\n18:reshape(1,C,1,1)\n19:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n11->19\n19->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "reshape dims error"
+				},
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:AdaptiveAvgPool2d(output_size=1)\n11:reshape(C)\n12:Linear(out_channels=C/16)\n13:ReLU\n14:Linear(out_channels=C)\n15:Sigmoid\n16:reshape(1,C,1,1)\n17:Mul\n18:Add\n19:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->reshape(1,C,1,1)\n15->16\n16->17\n8->17\n17->18\n0->18\n18->19\n19->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Node reshape(1,C,1,1) is not defined."
+				},
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:AdaptiveAvgPool2d(output_size=1)\n11:reshape(C)\n12:Linear(out_channels=C/16)\n13:ReLU\n14:Linear(out_channels=C)\n15:Sigmoid\n16:reshape(1,C,1,1)\n17:Mul\n18:Add\n19:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n8->17\n16->17\n17->18\n0->18\n18->19\n19->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "reshape operation's first dimension must be B."
+				}
+			]
+		},
+		"resnet_bottle_macro6": {
+			"inspiration": "Apply feature pyramid networks within the block to build a multi-scale feature pyramid from a single-scale input, enhancing the detection of objects at different scales.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:Add\n11:ReLU\n12:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n13:BN\n14:ReLU\n15:Conv2d(out_channels=C/4,kernel_size=3,stride=2)\n16:BN\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1,stride=1)\n19:BN\n20:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n21:BN\n22:ReLU\n23:Conv2d(out_channels=C/4,kernel_size=3,stride=2)\n24:BN\n25:ReLU\n26:Conv2d(out_channels=C,kernel_size=1,stride=1)\n27:BN\n28:AdaptiveAvgPool2d(output_size=1)\n29:Conv2d(out_channels=C,kernel_size=1,stride=1)\n30:BN\n31:ReLU\n32:reshape(1,C,1,1)\n33:repeat(1,1,H,W)\n34:Mul\n35:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n11->20\n20->21\n21->22\n22->23\n23->24\n24->25\n25->26\n26->27\n27->28\n28->29\n29->30\n30->31\n31->32\n32->33\n33->34\n34->35\n19->35\n35->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "repeat sizes must numbers"
+				},
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:Add\n11:ReLU\n12:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n13:BN\n14:ReLU\n15:Conv2d(out_channels=C/4,kernel_size=3,stride=2)\n16:BN\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1,stride=1)\n19:BN\n20:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n21:BN\n22:ReLU\n23:Conv2d(out_channels=C/4,kernel_size=3,stride=2)\n24:BN\n25:ReLU\n26:Conv2d(out_channels=C,kernel_size=1,stride=1)\n27:BN\n28:concat(dim=1)\n29:Conv2d(out_channels=C,kernel_size=1,stride=1)\n30:BN\n31:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n11->20\n20->21\n21->22\n22->23\n23->24\n24->25\n25->26\n26->27\n19->28\n27->28\n28->29\n29->30\n30->31\n31->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Output shape error."
+				},
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:Add\n11:ReLU\n12:Conv2d(out_channels=C,kernel_size=3,stride=2)\n13:BN\n14:ReLU\n15:Conv2d(out_channels=C,kernel_size=3,stride=2)\n16:BN\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=3,stride=2)\n19:BN\n20:ReLU\n21:concat(dim=1)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n19->20\n11->21\n20->21\n21->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Concat error: [4, 64, 4, 4],[4, 128, 32, 32]"
+				},
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:Add\n11:ReLU\n12:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n13:BN\n14:ReLU\n15:Conv2d(out_channels=C/4,kernel_size=3,stride=2)\n16:BN\n17:ReLU\n18:Conv2d(out_channels=C,kernel_size=1,stride=1)\n19:BN\n20:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n21:BN\n22:ReLU\n23:Conv2d(out_channels=C/4,kernel_size=3,stride=4)\n24:BN\n25:ReLU\n26:Conv2d(out_channels=C,kernel_size=1,stride=1)\n27:BN\n28:concat(dim=1)\n29:Conv2d(out_channels=C,kernel_size=1,stride=1)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n11->20\n20->21\n21->22\n22->23\n23->24\n24->25\n25->26\n18->28\n26->28\n28->29\n29->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Concat error: [4, 64, 8, 8],[4, 128, 16, 16]"
+				}
+			]
+		},
+		"resnet_bottle_macro9": {
+			"inspiration": "Incorporate a non-local neural network block to capture long-range dependencies directly by computing interactions between any two positions, regardless of their positional distance.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:reshape(0,-1,H*W)  # Reshape for non-local block\n11:permute(0,2,1)  # Permute for non-local block\n12:Linear(out_channels=H*W)  # Non-local interaction\n13:reshape(0,C,H,W)  # Reshape back to original dimensions\n14:Add\n15:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n0->14\n14->15\n15->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "The block definition does not comply with the regulations."
+				},
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:Add\n11:ReLU\n12:reshape(B,C,H*W)\n13:permute(0,2,1)\n14:reshape(B,H*W,C)\n15:multiply\n16:softmax(dim=-1)\n17:multiply\n18:reshape(B,C,H,W)\n19:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n11->19\n19->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "multiply cannot receive only one input."
+				}
+			]
+		},
+		"googlenet_macro2": {
+			"inspiration": "Implement depthwise separable convolutions to reduce computational complexity while maintaining model effectiveness.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/4,kernel_size=3,stride=1,group=C/4)\n9:Conv2d(out_channels=C/2,kernel_size=1,stride=1)\n10:BN\n11:ReLU\n12:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n13:BN\n14:ReLU\n15:Conv2d(out_channels=C/16,kernel_size=3,stride=1,group=C/16)\n16:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n17:BN\n18:ReLU\n19:Conv2d(out_channels=C/8,kernel_size=3,stride=1,group=C/8)\n20:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n21:BN\n22:ReLU\n23:MaxPool2d(kernel_size=3,stride=1)\n24:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n25:BN\n26:ReLU\n27:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n0->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n19->20\n20->21\n21->22\n0->23\n23->24\n24->25\n25->26\n4->27\n11->27\n22->27\n26->27\n27->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Output shape error."
+				}
+			]
+		},
+		"googlenet_macro3": {
+			"inspiration": "Use dilated convolutions to increase the receptive field without increasing the number of parameters or computational cost.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1,dilation=2)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1,dilation=2)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1,dilation=2)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n24->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Output shape error."
+				}
+			]
+		},
+		"googlenet_macro7": {
+			"inspiration": "Incorporate low-rank factorization of convolutional layers to decompose filters into smaller, more manageable operations.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##GoogLeNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n9:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n10:BN\n11:ReLU\n12:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n13:BN\n14:ReLU\n15:Conv2d(out_channels=C/32,kernel_size=1,stride=1)\n16:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n17:BN\n18:ReLU\n19:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n20:BN\n21:ReLU\n22:MaxPool2d(kernel_size=3,stride=1)\n23:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n24:BN\n25:ReLU\n26:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n0->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n19->20\n20->21\n0->22\n22->23\n23->24\n24->25\n4->26\n11->26\n21->26\n25->26\n26->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Output shape error."
+				}
+			]
+		},
+		"mobilenet_macro3": {
+			"inspiration": "Add a squeeze-and-excitation block after the depthwise separable convolution to recalibrate channel-wise feature responses by explicitly modeling interdependencies between channels.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###MobileNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:AdaptiveAvgPool2d(output_size=1)\n9:Linear(out_channels=C//16)\n10:ReLU\n11:Linear(out_channels=C)\n12:Sigmoid\n13:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n7->13->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "When using Linear, the last dimension must be the channel dimension."
+				},
+				{
+					"fail_block": {
+						"base_block": "###MobileNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:AdaptiveAvgPool2d(output_size=1)\n9:reshape(0,C)\n10:Linear(out_channels=C//16)\n11:ReLU\n12:Linear(out_channels=C)\n13:Sigmoid\n14:reshape(1,C,1,1)\n15:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n7->15->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "The block definition does not comply with the regulations."
+				},
+				{
+					"fail_block": {
+						"base_block": "###MobileNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:AdaptiveAvgPool2d(output_size=1)\n9:reshape(-1,C)\n10:Linear(out_channels=C//16)\n11:ReLU\n12:Linear(out_channels=C)\n13:Sigmoid\n14:reshape(-1,C,1,1)\n15:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n7->15->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Mul shape error"
+				}
+			]
+		},
+		"mobilenet_macro8": {
+			"inspiration": "Apply low-rank factorization on convolutional layers to reduce parameters and computational complexity while maintaining performance.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##MobileNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C//r,kernel_size=3,stride=1,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "The block definition does not comply with the regulations."
+				}
+			]
+		},
+		"resnet_base_macro1": {
+			"inspiration": "Introduce spatial attention after each convolutional layer to focus on learning more relevant spatial features.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=1,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n12:Conv2d(out_channels=1,kernel_size=1,stride=1)\n13:Sigmoid\n14:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->9\n9->10\n10->11\n6->8\n0->8\n8->12\n12->13\n13->14\n14->7\n7->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Mul cannot receive only one input."
+				},
+				{
+					"fail_block": {
+						"base_block": "##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=1,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n12:Conv2d(out_channels=1,kernel_size=1,stride=1)\n13:Sigmoid\n14:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->9\n9->10\n10->11\n6->11\n6->8\n0->8\n8->12\n12->13\n13->14\n8->14\n14->7\n7->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "output is not the only output node."
+				}
+			]
+		},
+		"resnet_bottle_macro8": {
+			"inspiration": "Add an inception-style module to capture information at various scales concurrently within the block.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n11:BN\n12:ReLU\n13:Conv2d(out_channels=C/4,kernel_size=5,stride=1)\n14:BN\n15:ReLU\n16:Conv2d(out_channels=C,kernel_size=1,stride=1)\n17:BN\n18:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n19:BN\n20:ReLU\n21:MaxPool2d(kernel_size=3,stride=1)\n22:Conv2d(out_channels=C,kernel_size=1,stride=1)\n23:BN\n24:concat(dim=1)\n25:Conv2d(out_channels=C,kernel_size=1,stride=1)\n26:BN\n27:Add\n28:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n0->18\n18->19\n19->20\n20->21\n21->22\n22->23\n9->24\n17->24\n23->24\n24->25\n25->26\n0->26\n26->27\n27->28\n28->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "BN can receive only one input."
+				}
+			]
+		},
+		"convnext_micro7": {
+			"inspiration": "Integrate a concatenate operation after the GELU activation, concatenating the output with a previous intermediate layer to enrich feature representation.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:concat(dim=1)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->10\n0->10\n10->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Add shape error"
+				},
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:concat(dim=-1)\n9:permute(0,3,1,2)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n6->8\n7->8\n8->9\n9->10\n0->10\n10->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Concat error: [4, 224, 224, 12],[4, 224, 224, 15]"
+				},
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:concat(dim=1)\n9:permute(0,3,1,2)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n2->8\n8->9\n9->10\n0->10\n10->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Concat error: [4, 3, 224, 224],[4, 227, 224, 3]"
+				},
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:concat(dim=-1)\n8:Linear(out_channels=C)\n9:permute(0,3,1,2)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n2->7\n7->8\n8->9\n9->10\n0->10\n10->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Concat error: [4, 224, 224, 12],[4, 224, 224, 236]"
+				},
+				{
+					"fail_block": {
+						"base_block": "###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:concat(dim=-1)\n9:permute(0,3,1,2)\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n3->8\n8->9\n9->10\n0->10\n10->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Concat error: [4, 224, 224, 3],[4, 224, 224, 6]"
+				}
+			]
+		},
+		"googlenet_micro1": {
+			"inspiration": "Replace the ReLU activation functions with GELU for potentially better non-linearity handling and smoother gradients.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:GELU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:GELU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:GELU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:GELU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:GELU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:GELU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:GELU\n24:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n24->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Output shape error."
+				}
+			]
+		},
+		"googlenet_micro3": {
+			"inspiration": "Swap the order of the BN and ReLU operations in each sub-path for potentially better normalization effects.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##GoogLeNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:ReLU\n4:BN\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:ReLU\n7:BN\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:ReLU\n10:BN\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:ReLU\n13:BN\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:ReLU\n16:BN\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:ReLU\n19:BN\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:ReLU\n23:BN\n24:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n24->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Output shape error."
+				}
+			]
+		},
+		"googlenet_micro4": {
+			"inspiration": "Cut off an additional parallel path with a 5x5 convolution from fist branch to capture larger spatial dependencies.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:Conv2d(out_channels=C/4,kernel_size=5,stride=1)\n25:BN\n26:ReLU\n27:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n24->25\n25->26\n26->27\n10->27\n19->27\n23->27\n27->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Output shape error."
+				},
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:Conv2d(out_channels=C/4,kernel_size=5,stride=1)\n25:BN\n26:ReLU\n27:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n4->25\n25->26\n26->27\n24->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "concat cannot receive only one input."
+				}
+			]
+		},
+		"googlenet_micro5": {
+			"inspiration": "Modify the first convolution in each path to have a dilation of 2, enlarging the receptive field without increasing the kernel size.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##GoogLeNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1,dilation=2)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1,dilation=2)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1,dilation=2)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n24->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Output shape error."
+				}
+			]
+		},
+		"googlenet_micro6": {
+			"inspiration": "Change the kernel size of the second Conv2d in each path from 3 to 5, providing a larger receptive field.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=5,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=5,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=5,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n24->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Output shape error."
+				}
+			]
+		},
+		"googlenet_micro8": {
+			"inspiration": "Replace the concatenation operation with a summation to merge features across different paths more compactly and increase the width of each branch accordingly.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/2,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/2,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:Add\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n24->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Add shape error"
+				},
+				{
+					"fail_block": {
+						"base_block": "##GoogLeNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/2,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/2,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:sum(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n24->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "sum can receive only one input."
+				},
+				{
+					"fail_block": {
+						"base_block": "##GoogLeNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/2,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/2,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:Add\n25:Add\n26:Add\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n24->25\n19->25\n25->26\n23->26\n26->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "The block definition does not comply with the regulations."
+				},
+				{
+					"fail_block": {
+						"base_block": "##GoogLeNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/2,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/2,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:sum(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n24->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "node 24 error: sum operation can receive only one input."
+				},
+				{
+					"fail_block": {
+						"base_block": "##GoogLeNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/2,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/2,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:Add\n25:Add\n26:Add\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n24->25\n19->25\n25->26\n23->26\n26->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "node 24 error: Add operation's inputs can not Add."
+				}
+			]
+		},
+		"googlenet_micro9": {
+			"inspiration": "Apply a 1x1 convolution before each 3x3 convolution to reduce the dimensionality and computational cost.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##GoogLeNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/32,kernel_size=1,stride=1)\n18:BN\n19:ReLU\n20:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n21:BN\n22:ReLU\n23:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n24:BN\n25:ReLU\n26:MaxPool2d(kernel_size=3,stride=1)\n27:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n28:BN\n29:ReLU\n30:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n0->14\n14->15\n15->16\n16->17\n17->18\n18->19\n19->20\n20->21\n21->22\n22->23\n0->26\n26->27\n27->28\n28->29\n4->30\n13->30\n23->30\n29->30\n30->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Output shape error."
+				},
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n18:BN\n19:ReLU\n20:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n21:BN\n22:ReLU\n23:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n24:BN\n25:ReLU\n26:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n27:BN\n28:ReLU\n29:MaxPool2d(kernel_size=3,stride=1)\n30:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n31:BN\n32:ReLU\n33:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n0->14\n14->15\n15->16\n16->17\n17->18\n18->19\n19->20\n20->21\n21->22\n22->23\n23->24\n24->25\n25->26\n26->27\n27->28\n0->29\n29->30\n30->31\n31->32\n4->33\n12->33\n28->33\n32->33\n33->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "node 1 error: Output shape must be (B,C,H,W)."
+				},
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n18:BN\n19:ReLU\n20:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n21:BN\n22:ReLU\n23:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n24:BN\n25:ReLU\n26:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n27:BN\n28:ReLU\n29:MaxPool2d(kernel_size=3,stride=1)\n30:Conv2d(out_channels=C/2,kernel_size=1,stride=1)\n31:BN\n32:ReLU\n33:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n0->14\n14->15\n15->16\n16->17\n17->18\n18->19\n19->20\n20->21\n21->22\n22->23\n23->24\n24->25\n25->26\n26->27\n27->28\n0->29\n29->30\n30->31\n31->32\n4->33\n12->33\n28->33\n32->33\n33->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "node 13 error: The node is not used."
+				}
+			]
+		},
+		"googlenet_micro10": {
+			"inspiration": "Cut off a parallel branch from first branch that utilizes a dilated convolution with a rate of 4 and kernel size with 3 to capture broader context without losing resolution.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##GoogLeNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:Conv2d(out_channels=C/4,kernel_size=3,stride=1,dilation=4)\n25:BN\n26:ReLU\n27:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n0->24\n24->25\n25->26\n4->27\n10->27\n19->27\n23->27\n26->27\n27->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "Output shape error."
+				},
+				{
+					"fail_block": {
+						"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n25:Conv2d(out_channels=C/8,kernel_size=3,stride=1,dilation=4)\n26:BN\n27:ReLU\n24:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n0->25\n25->26\n26->27\n4->24\n10->24\n19->24\n23->24\n27->24\n24->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "node 1 error: Output shape must be (B,C,H,W)."
+				}
+			]
+		},
+		"mobilenet_micro2": {
+			"inspiration": "Add a Layer Normalization (LN) after the second ReLU to stabilize the training process by normalizing across features instead of mini-batch statistics.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###MobileNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:LN\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "When using LN, the last dimension must be the channel dimension."
+				}
+			]
+		},
+		"resnet_base_micro3": {
+			"inspiration": "Insert a Linear layer between the second BN and the second ReLU to introduce a fully connected feature transformation within the block.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:Linear(out_channels=C)\n8:ReLU\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n0->9\n8->9\n9->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "When using Linear, the last dimension must be the channel dimension."
+				},
+				{
+					"fail_block": {
+						"base_block": "##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:reshape(B,-1,C)\n8:Linear(out_channels=C)\n9:reshape(B,C,H,W)\n10:ReLU\n11:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n10->11\n11->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "node 9 error: reshape operation's dim error"
+				},
+				{
+					"fail_block": {
+						"base_block": "##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:permute(0,2,3,1)\n8:reshape(B*H*W,C)\n9:Linear(out_channels=C)\n10:reshape(B,H,W,C)\n11:permute(0,3,1,2)\n12:ReLU\n13:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n0->13\n12->13\n13->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "node 8 error: reshape operation's first dimension must be B."
+				}
+			]
+		},
+		"resnet_bottle_micro3": {
+			"inspiration": "Replace the Batch Normalizations with Layer Normalizations to experiment with different normalization effects on this architecture.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:LN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:LN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:LN\n10:Add\n11:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->10\n10->11\n11->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "When using LN, the last dimension must be the channel dimension."
+				},
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:permute(0, 2, 3, 1)\n4:reshape(-1, H*W, C/4)\n5:LN\n6:reshape(-1, H, W, C/4)\n7:permute(0, 3, 1, 2)\n8:ReLU\n9:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n10:permute(0, 2, 3, 1)\n11:reshape(-1, H*W, C/4)\n12:LN\n13:reshape(-1, H, W, C/4)\n14:permute(0, 3, 1, 2)\n15:ReLU\n16:Conv2d(out_channels=C,kernel_size=1,stride=1)\n17:permute(0, 2, 3, 1)\n18:reshape(-1, H*W, C)\n19:LN\n20:reshape(-1, H, W, C)\n21:permute(0, 3, 1, 2)\n22:Add\n23:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n19->20\n20->21\n21->22\n0->22\n22->23\n23->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "node 22 error: Add operation's inputs can not be Added."
+				},
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:permute(0, 2, 3, 1)\n4:reshape(-1, H*W, C/4)\n5:LN\n6:reshape(-1, H, W, C/4)\n7:permute(0, 3, 1, 2)\n8:ReLU\n9:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n10:permute(0, 2, 3, 1)\n11:reshape(-1, H*W, C/4)\n12:LN\n13:reshape(-1, H, W, C/4)\n14:permute(0, 3, 1, 2)\n15:ReLU\n16:Conv2d(out_channels=C,kernel_size=1,stride=1)\n17:permute(0, 2, 3, 1)\n18:reshape(-1, H*W, C)\n19:LN\n20:reshape(-1, H, W, C)\n21:permute(0, 3, 1, 2)\n22:Add\n23:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n19->20\n20->21\n21->22\n0->21\n22->23\n23->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "node 21 error: permute operation can receive only one input."
+				}
+			]
+		},
+		"resnet_bottle_micro10": {
+			"inspiration": "Integrate a small sub-network of linear layers after the second BN to perform a mini-transform operation on features before proceeding, potentially enhancing feature interaction.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:Linear(out_channels=C/4)\n8:ReLU\n9:Linear(out_channels=C/4)\n10:ReLU\n11:Conv2d(out_channels=C,kernel_size=1,stride=1)\n12:BN\n13:Add\n14:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n0->13\n13->14\n14->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "When using Linear, the last dimension must be the channel dimension."
+				},
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:permute(0, 2, 3, 1)\n8:reshape(-1, C/4)\n9:Linear(out_channels=C/4)\n10:ReLU\n11:Linear(out_channels=C/4)\n12:ReLU\n13:reshape(-1, H, W, C/4)\n14:permute(0, 3, 1, 2)\n15:Conv2d(out_channels=C,kernel_size=1,stride=1)\n16:BN\n17:Add\n18:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n0->17\n17->18\n18->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "node 13 error: reshape operation's dim error"
+				},
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:permute(0, 2, 3, 1)\n8:reshape(-1, H*W, C/4)\n9:Linear(out_channels=C/4)\n10:ReLU\n11:Linear(out_channels=C/4)\n12:ReLU\n13:reshape(-1, H, W, C/4)\n14:permute(0, 3, 1, 2)\n15:Conv2d(out_channels=C,kernel_size=1,stride=1)\n16:BN\n17:Add\n18:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n0->17\n17->18\n18->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "node 17 error: Add operation's inputs can not be Added."
+				},
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:permute(0, 2, 3, 1)\n8:reshape(B, H*W, C/4)\n9:Linear(out_channels=C/4)\n10:ReLU\n11:Linear(out_channels=C/4)\n12:ReLU\n13:reshape(B, H, W, C/4)\n14:permute(0, 3, 1, 2)\n15:Conv2d(out_channels=C,kernel_size=1,stride=1)\n16:BN\n17:Add\n18:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n0->15\n0->17\n17->18\n18->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "node 15 error: Conv2d operation can receive only one input."
+				},
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:permute(0, 2, 3, 1)\n8:reshape(B, H*W, C/4)\n9:Linear(out_channels=C/4)\n10:ReLU\n11:Linear(out_channels=C/4)\n12:ReLU\n13:reshape(B, H, W, C/4)\n14:permute(0, 3, 1, 2)\n15:Conv2d(out_channels=C,kernel_size=1,stride=1)\n16:BN\n17:Add\n18:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n0->16\n17->18\n18->1",
+						"stem_block": null,
+						"downsample_block": null
+					},
+					"error": "node 16 error: BN operation can receive only one input."
+				}
+			]
+		}
+	},
+	"block_code": {
+		"convnext_macro7": {
+			"inspiration": "Introduce conditional computation in the block, where parts of the network are activated based on the input, to increase model efficiency.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:mean(dim=(2,3), keepdim=True)\n11:Sigmoid\n12:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->10\n10->11\n11->12\n0->12\n12->1",
+						"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4,group=C)\n0->2\n2->1",
+						"downsample_block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,group=C)\n0->2\n2->1"
+					},
+					"error": "mean() received an invalid combination of arguments - got (Tensor, keepdim=bool, dim=float), but expected one of:\n * (Tensor input, *, torch.dtype dtype)\n      didn't match because some of the keywords were incorrect: keepdim, dim\n * (Tensor input, tuple of ints dim, bool keepdim, *, torch.dtype dtype, Tensor out)\n * (Tensor input, tuple of names dim, bool keepdim, *, torch.dtype dtype, Tensor out)\n"
+				}
+			]
+		},
+		"mobilenet_macro3": {
+			"inspiration": "Add a squeeze-and-excitation block after the depthwise separable convolution to recalibrate channel-wise feature responses by explicitly modeling interdependencies between channels.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "###MobileNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:AdaptiveAvgPool2d(output_size=1)\n9:reshape(1, C)\n10:Linear(out_channels=C//16)\n11:ReLU\n12:Linear(out_channels=C)\n13:Sigmoid\n14:reshape(C, 1, 1)\n15:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n7->15\n14->15\n15->1",
+						"stem_block": "##MobileNetBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+						"downsample_block": "##MobileNetBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=2,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1"
+					},
+					"error": "shape '[1, 256]' is invalid for input of size 1024"
+				}
+			]
+		},
+		"resnet_bottle_macro5": {
+			"inspiration": "Implement squeeze-and-excitation blocks to recalibrate channel-wise feature responses by explicitly modelling interdependencies between channels.",
+			"errors": [
+				{
+					"fail_block": {
+						"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:Add\n11:ReLU\n12:AdaptiveAvgPool2d(output_size=1)\n13:reshape(1,-1)\n14:Linear(out_channels=C/16)\n15:ReLU\n16:Linear(out_channels=C)\n17:Sigmoid\n18:reshape(1,C,1,1)\n19:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n11->19\n19->1",
+						"stem_block": "##ResNetBottleBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+						"downsample_block": "##ResNetBottleBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+					},
+					"error": "Trying to create tensor with negative dimension -1: [16, -1]"
+				}
+			]
+		}
+	}
+}

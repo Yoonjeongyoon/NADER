@@ -1,0 +1,47 @@
+{
+	"dartsv2_stem": {
+		"name": "DARTSv2_stem",
+		"params": 33536.0,
+		"flops": 138412032.0
+	},
+	"nasbench201_cifar100_optimal_forRes50_stem": {
+		"name": "NASBench201Seed777_stem",
+		"params": 1606400.0,
+		"flops": 1645215744.0
+	},
+	"nasbench201_cifar100_acc76_stem": {
+		"name": "ResNetBasicBlock_stem",
+		"params": 295680.0,
+		"flops": 1212153856.0
+	},
+	"darts_beta_stem": {
+		"name": "Beta_DARTS_stem",
+		"params": 33536.0,
+		"flops": 138412032.0
+	},
+	"darts_beta_v2_stem": {
+		"name": "Beta_DARTS_stem",
+		"params": 33536.0,
+		"flops": 138412032.0
+	},
+	"darts_beta_layers8_width36_stem": {
+		"name": "Beta_DARTS_stem",
+		"params": 33536.0,
+		"flops": 138412032.0
+	},
+	"dartsv2_layers8_width36_stem": {
+		"name": "DARTSv2_stem",
+		"params": 33536.0,
+		"flops": 138412032.0
+	},
+	"darts_beta_v2_dp3_stem": {
+		"name": "Beta_DARTS_stem",
+		"params": 33536.0,
+		"flops": 138412032.0
+	},
+	"nasbench201_cifar100_optimal_stem": {
+		"name": "ResNetBasicBlock_stem",
+		"params": 295680.0,
+		"flops": 1212153856.0
+	}
+}

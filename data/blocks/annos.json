@@ -1,0 +1,65 @@
+{
+	"convnext": {
+		"blocks": {
+			"base": "convnext_base",
+			"stem": "convnext_stem",
+			"downsample": "convnext_downsample"
+		},
+		"widths": [
+			107,
+			214,
+			428,
+			856
+		],
+		"depths": [
+			2,
+			2,
+			8,
+			2
+		],
+		"params": 26.7104,
+		"flops": 0.0889
+	},
+	"resnet_base": {
+		"blocks": {
+			"base": "resnet_base_base",
+			"stem": "resnet_base_stem",
+			"downsample": "resnet_base_downsample"
+		},
+		"widths": [
+			74,
+			148,
+			296,
+			592
+		],
+		"depths": [
+			2,
+			2,
+			8,
+			2
+		],
+		"params": 27.2365,
+		"flops": 0.2168
+	},
+	"resnet_bottle": {
+		"blocks": {
+			"base": "resnet_bottle_base",
+			"stem": "resnet_bottle_stem",
+			"downsample": "resnet_bottle_downsample"
+		},
+		"widths": [
+			243,
+			486,
+			972,
+			1944
+		],
+		"depths": [
+			2,
+			2,
+			8,
+			2
+		],
+		"params": 26.9036,
+		"flops": 0.1901
+	}
+}
