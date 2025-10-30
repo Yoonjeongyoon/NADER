@@ -54,6 +54,8 @@ EOF
 
 echo "DEBUG: Running MMDetection training"
 cd {nader_root}/mmdetection
+export PYTHONPATH="{nader_root}:$PYTHONPATH"
+echo "DEBUG: PYTHONPATH=$PYTHONPATH"
 python tools/train.py "$MODEL_CONFIG_DIR/retinanet_r50_nader_fpn_1x_coco.py" \\
     --work-dir "$MODEL_CONFIG_DIR/work_dir"
 TRAIN_EXIT_CODE=$?
@@ -142,6 +144,7 @@ DETECTION_TRAIN_TEMPLATE_MAP_LOCAL = {
 TRAIN_NAS_BENCH_201_CIFAR10_LOCAL = """echo "DEBUG: Starting training script for model {model_name}"
 echo "DEBUG: Current directory: $(pwd)"
 cd {nader_root}
+export PYTHONPATH="{nader_root}:$PYTHONPATH"
 
 echo "DEBUG: Running train_cifar10.py"
 python train_cifar10.py \
@@ -155,6 +158,7 @@ echo "done" > "{train_log_dir}/{model_name}/1/train_status.txt"
 """
 
 TRAIN_NAS_BENCH_201_CIFAR100_LOCAL = """cd {nader_root}
+export PYTHONPATH="{nader_root}:$PYTHONPATH"
 python train_cifar100.py \
     --model_name {model_name} \
     --tag 1 \
@@ -164,6 +168,7 @@ echo "done" > "{train_log_dir}/{model_name}/1/train_status.txt"
 """
 
 TRAIN_NAS_BENCH_201_IMAGENET16_120_LOCAL = """cd {nader_root}
+export PYTHONPATH="{nader_root}:$PYTHONPATH"
 python train_imagenet16_120.py \
     --model_name {model_name} \
     --tag 1 \
