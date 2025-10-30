@@ -50,6 +50,9 @@ class Nader:
         self.layers_num = layers_num
         code_dir = os.path.join(log_dir,'codes')
         self.code_dir = code_dir
+        
+        # Get absolute path of nader root directory (where nader.py is located)
+        self.nader_root = os.path.dirname(os.path.abspath(__file__))
 
         # blocks
         flag = False
@@ -250,7 +253,7 @@ class Nader:
         if len(models)>0:
             for model in models:
                 path = os.path.join(task_dir,f"{model}.sh")
-                txt = template.format(job_name=model[-10:],model_name=model,code_dir=self.code_dir,train_log_dir=self.train_log_dir)
+                txt = template.format(job_name=model[-10:],model_name=model,code_dir=self.code_dir,train_log_dir=self.train_log_dir,nader_root=self.nader_root)
                 with open(path,'w') as f:
                     f.write(txt)
             models_txt = [i+'.sh' for i in models]

@@ -68,89 +68,39 @@ Variables you may use include:
     output: output feature map;
 You can use the basic +,-,x, / operations.
 """
-definition_BDAG_FPN = f""" 
-###BlockDefinition###
-Each block starts with "##block_name##". 
-Each operator line uses "index:operation(params)".
-Each edge uses "index_from->index_to".
-Each block must define exactly one `output` node.
-Every block must have all external inputs explicitly marked with the prefix **input_**.
-
-###Available Operations###
-- Conv2d(out_channels,kernel_size,stride=1,padding=0,dilation=1,groups=1)
-  Standard 2D convolution.
-- Linear(out_channels)
-  Fully-connected layer.
-- AvgPool2d(kernel_size,stride), MaxPool2d(kernel_size,stride)
-  Average or max pooling.
-- AdaptiveAvgPool2d(output_size), AdaptiveMaxPool2d(output_size)
-- Upsample(scale_factor=?, mode=?)
-  Spatial upsampling. Typically `scale_factor=2`, `mode='nearest'`.
-- Add
-  Element-wise sum (requires identical tensor shapes).
-- Mul, multiply, concat(dim)
-  Element-wise or channel concatenation. If concat(dim=1) merges two feature maps, 
-  **immediately follow with a 1x1 Conv(+BN/Act) to project back to `dim` channels.**
-- mean(dim), max(dim), sum(dim), softmax(dim)
-  Standard reductions or activations.
-
-###Activations###
-- ReLU, GELU, Sigmoid, SiLU
-
-###Normalizations###
-- BN (BatchNorm)
-- LN (LayerNorm)
-- GN (GroupNorm)
-
-###Tensor Transforms###
-- permute(*dims), repeat(*sizes), reshape(*shape)
-  Standard PyTorch tensor transforms.
-
-###Variables & Shapes###
-- input_Pk: backbone feature for level k ∈ {{{{2,3,4,5}}}}
-- input_lat_Pk: lateral feature input (1×1 conv from backbone)
-- input_merged_P{{{{k+1}}}}: top-down merged feature from the higher pyramid level
-- input_output_Pk: final output from level Pk (used as source for ExtraConv)
-- lat_Pk: lateral conv output of shape (B, dim, H, W)
-- merged_Pk: top-down merged feature of shape (B, dim, H, W)
-- output: block’s single output tensor
-- dim: FPN feature channel dimension (typically 256)
-- H, W: spatial sizes corresponding to current pyramid level.
-
-###FPN Contracts (MUST FOLLOW)###
-1) **Channel Consistency**
-   - Every Conv2d in Lateral/Output/ExtraConv blocks must produce `dim` channels.
-   - TopDownMerge/Add requires both branches to have identical (N, dim, H, W).
-   - If concat is used, immediately re-project back to `dim` channels via 1x1 Conv(+BN/Act).
-
-2) **Spatial Consistency**
-   - Lateral blocks: keep spatial size (stride=1, kernel=1).
-   - Top-down merges: upsample high-level feature by `scale_factor=2` before merge.
-   - Output 3×3 conv: use (kernel=3, stride=1, padding=1).
-   - ExtraConv (P6/P7): use (kernel=3, stride=2, padding=1).
-   - ExtraPool (P6/P7): use MaxPool2d(kernel=1, stride=2).
-
-3) **add_extra_convs source (mmdet-compatible)**
-   - 'on_input'   → input_C5 (backbone C5)
-   - 'on_lateral' → input_lat_P5
-   - 'on_output'  → input_output_P5
-
-4) **Naming & I/O**
-   - Every external input node must start with `input_`.
-   - Each block must define exactly one `output` node.
-   - Do not rename `input_...` keys arbitrarily; adapter relies on them for wiring.
-   - Keep block DAG acyclic and fully connected.
-
-5) **Stability & Safety**
-   - Preserve normalization/activation unless explicitly modified.
-   - Avoid in-place ops; return new tensors.
-   - Maintain channel and spatial contracts across all blocks.
-
-###Example node/edge notation###
-index:Operation(params)
-i->j
-- The final node with label `output` must have exactly one incoming edge.
-- Each block must be self-contained (no cross-section dependencies inside one block).
+definition_BDAG_FPN = """\n###BlockDefinition###
+Each block starts with "##block_name##", and each line has a description. You can use the "index:operation" method to represent the operation, and use the "index1->index2" to describe the calculation graph. Noting that the output node can have only one input.
+The following is a list of available operations:
+    Conv2d(out_channels,kernel_size,stride,dilation,groups) Two-dimensional convolution operation, 'out_channels' represents the output dimension; 'kernel_size' represents the convolution kernel size; 'stride' represents the step size, default: 1; 'dilation' is the hole convolution size, default: 1; 'groups' groups number of the channels, default:1.
+    Linear(out_channels) Linear fully connected layer, 'out_channels' represents the output dimension.
+    AvgPool2d(kernel_size,stride) Two-dimensional average pooling operation, 'kernel_size' represents the kernel size, 'stride' represents the step size.
+    MaxPool2d(kernel_size,stride) Two-dimensional maximum pooling operation, 'kernel_size' represents the kernel size, 'stride' represents the step size.
+    AdaptiveMaxPool2d(output_size) Two-dimensional maximum pooling operation pools the input feature map into a feature map with a length and width of output_size. For example, AdaptiveMaxPool2d(output_size=1) pools a feature map of the shape of (B,C,H,W) into (B,C,1,1) shape.
+    AdaptiveAvgPool2d(output_size) Two-dimensional average pooling operation.
+    Add Tensor-by-element addition operation, the input tensor shape for this operation must conform to the pytorch broadcasting rule.
+    Mul Tensor-by-element multiplication operation, the input tensor shape for this operation must conform to the pytorch broadcasting rule.
+    multiply Matrix multiplication operation, the two tensor shapes entered for this operation must conform to the pytorch tensor multiplication rule.
+    concat(dim) Tensor concating operation, all tensors input to this operation are concated in the dim dimension. The sizes of the concated tensors dimensions other than the dim dimension should be consistent. For example, concat(dim=1) concates all input tensors in the 1 dimension.
+    mean(dim) Average the tensor in dim dimension. For example, mean(dim=1) pools a input tensor of shape (B,L,D) into the output tensor of shape (B,1,D) by average in the dimension 1.
+    max(dim) Maximize the tensor in dim dimension. For example, max(dim=2) pools a input tensor of shape (B,L,D) into the output tensor of shape (B,L,2) by max in the dimension 2.
+    sum(dim) Sum the tensor in dim dimension. For example, sum(dim=0) pools a input tensor of shape (B,L,D) into the output tensor of shape (0,L,D) by sum in the dimension 0.
+    softmax(dim) Apply a softmax operation at dim dimension. For example, softmax(dim=1) calculate the softmax of input tensor with shape (B,L,D) and the output tensor's shape is (B,L,D).
+The activation functions that can be used are: ReLU, GELU, Sigmoid.
+The normalization methods that can be used are:
+    BN: Batch normalization
+    LN: Layer normalization.
+The tensor can be transformed by using the following operations:
+    permute(*dims) rearranges the tensor dimensions, 'dims' is the order of the new dimensions, for example: permute(0, 2, 3, 1) changes the tensor shape from (B,C,H,W) to (B,H,W,C).
+    repeat(*sizes) repeats the tensor along the specified dimensions. 'sizes' is a list containing the number of repetitions along each dimension. For example: repeat(1,3,2,4) repeats the tensor 1 times in the first dimension, 3 times in the second dimension, 2 times in the third dimenstion, 4 times in the forth dimenstion.
+    reshape(*shape) changes the shape of the tensor to the specified shape; 'shape' is an array representing the new shape; you can use -1 as the size of a dimension to automatically calculate the size of the dimension to ensure that the total number of elements remains unchanged; for example: reshape(B,H,W,C) means changing the shape of the tensor to (B,H,W,C).
+Variables you may use include:
+    input: input feature map, the shape is (B,C,H,W);
+    output: output feature map, the shape is (B,dim,H,W);
+    C: the number of channels of the input feature map;
+    dim: the number of channels of the output feature map;
+    H: the height of the input feature map;
+    W: the width of the input feature map
+You can use the basic +,-,x, / operations.
 """
 
 prompt_generate_stem_downsample = f"""###Instruction###
@@ -285,9 +235,7 @@ Note that structures in the modified blocks that unrelated to the proposal shoul
 prompt_modify_block_detection = f"""###Instruction###
 You are an expert who is proficient in various model structures of deep learning.
 Please make reasonable modifications to the specified block based on the characteristics of the block and the proposal.
-This block is used in Feature Pyramid Network (FPN) for object detection and will be reused across multiple pyramid levels.
-Please ensure that the number of input channels and output channels of the generated block are both C (C = 256 for FPN).
-Please ensure that the spatial dimensions (H, W) of the input and output feature maps are the same (use stride=1 with appropriate padding).
+Please ensure that the number of input channels and output channels of the generated block are both C.
 Note that structures in the modified block that unrelated to the proposal should be kept as original as possible.
 {definition_BDAG}
 
@@ -301,8 +249,8 @@ Note that structures in the modified block that unrelated to the proposal should
 {{res_expe}}
 ###output###
 When outputting, you only need to output the block that meet the defined rules, and do not output other irrelevant information.
+\n###output###
 """
-
 
 prompt_check_proposals = """###Instruction###
 You are an expert who is proficient in various model structures of deep learning. 

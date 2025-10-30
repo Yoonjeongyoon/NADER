@@ -18,7 +18,7 @@ done
 
 TRAIN_DETECTION_COCO2017_LOCAL = """echo "DEBUG: Starting detection training for model {model_name}"
 echo "DEBUG: Current directory: $(pwd)"
-cd /home/jeongyoon/neural_architecture/NADER/nader
+cd {nader_root}
 
 # Create model-specific config
 MODEL_CONFIG_DIR="{train_log_dir}/{model_name}/1"
@@ -35,7 +35,7 @@ echo "DEBUG: BLOCKS_DIR absolute path: $BLOCKS_DIR"
 # Generate model-specific config file
 cat > "$MODEL_CONFIG_DIR/retinanet_r50_nader_fpn_1x_coco.py" << EOF
 _base_ = [
-    '/home/jeongyoon/neural_architecture/NADER/nader/mmdetection/configs/retinanet/retinanet_r50_fpn_1x_coco.py',
+    '{nader_root}/mmdetection/configs/retinanet/retinanet_r50_fpn_1x_coco.py',
 ]
 
 model = dict(
@@ -53,7 +53,7 @@ model = dict(
 EOF
 
 echo "DEBUG: Running MMDetection training"
-cd /home/jeongyoon/neural_architecture/NADER/nader/mmdetection
+cd {nader_root}/mmdetection
 python tools/train.py "$MODEL_CONFIG_DIR/retinanet_r50_nader_fpn_1x_coco.py" \\
     --work-dir "$MODEL_CONFIG_DIR/work_dir"
 TRAIN_EXIT_CODE=$?
@@ -141,7 +141,7 @@ DETECTION_TRAIN_TEMPLATE_MAP_LOCAL = {
 }   
 TRAIN_NAS_BENCH_201_CIFAR10_LOCAL = """echo "DEBUG: Starting training script for model {model_name}"
 echo "DEBUG: Current directory: $(pwd)"
-cd /home/jeongyoon/neural_architecture/NADER/nader
+cd {nader_root}
 
 echo "DEBUG: Running train_cifar10.py"
 python train_cifar10.py \
@@ -154,17 +154,23 @@ echo "DEBUG: train_cifar10.py completed with exit code: $?"
 echo "done" > "{train_log_dir}/{model_name}/1/train_status.txt"
 """
 
-TRAIN_NAS_BENCH_201_CIFAR100_LOCAL = """python train_cifar100.py \
+TRAIN_NAS_BENCH_201_CIFAR100_LOCAL = """cd {nader_root}
+python train_cifar100.py \
     --model_name {model_name} \
     --tag 1 \
     --code-dir {code_dir} \
-    --output {train_log_dir}"""
+    --output {train_log_dir}
+echo "done" > "{train_log_dir}/{model_name}/1/train_status.txt"
+"""
 
-TRAIN_NAS_BENCH_201_IMAGENET16_120_LOCAL = """python train_imagenet16_120.py \
+TRAIN_NAS_BENCH_201_IMAGENET16_120_LOCAL = """cd {nader_root}
+python train_imagenet16_120.py \
     --model_name {model_name} \
     --tag 1 \
     --code-dir {code_dir} \
-    --output {train_log_dir}"""
+    --output {train_log_dir}
+echo "done" > "{train_log_dir}/{model_name}/1/train_status.txt"
+"""
 
 NB201_TRAIN_TEMPLATE_MAP_LOCAL = {
     'nas-bench-201-cifar10': TRAIN_NAS_BENCH_201_CIFAR10_LOCAL,

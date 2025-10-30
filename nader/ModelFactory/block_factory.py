@@ -235,29 +235,114 @@ class BlockFactory():
         s = s.strip('\n')
         ls = re.split('\n+',s)
         name = ls[0].replace('#','')
+        
+        # ===== COMMON STRICT VALIDATION: Check block name (all modes except darts) =====
+        if self.mode != 'darts':
+            if not name or len(name.strip()) == 0:
+                raise DAGError('Block name cannot be empty.')
+            if len(name) > 100:
+                raise DAGError(f'Block name too long ({len(name)} chars). Maximum 100 characters allowed.')
+        
         for l in ls[1:]:
             l = l.split('#')[0].strip()
             if ':' in l:
                 its = l.split(':')
-                if its[0] not in nodes:
-                    nodes[its[0]] = its[1]
+                if len(its) != 2:
+                    raise DAGError(f'Invalid node definition: {l}. Expected format: "node_id:operation"')
+                
+                node_id = its[0].strip()
+                operation = its[1].strip()
+                
+                # ===== COMMON STRICT VALIDATION: Check node ID (all modes except darts) =====
+                if self.mode != 'darts':
+                    if not node_id:
+                        raise DAGError('Node ID cannot be empty.')
+                    # Node ID should be numeric or valid identifier
+                    if not (node_id.isdigit() or node_id.replace('_','').isalnum()):
+                        raise DAGError(f'Invalid node ID: {node_id}. Node IDs should be numeric or alphanumeric with underscores.')
+                    
+                    # Check operation is not empty
+                    if not operation:
+                        raise DAGError(f'Node {node_id} has empty operation.')
+                
+                if node_id not in nodes:
+                    nodes[node_id] = operation
                 else:
-                    raise DAGError(f'node {its[0]} error: Duplicate node name error.')
+                    raise DAGError(f'node {node_id} error: Duplicate node name error.')
             elif '->' in l:
                 its = l.split('->')
-                if ',' in its[0]:
-                    for i in its[0].split(','):
-                        i=i.strip()
-                        edges.append([i,its[1]])
+                if len(its) != 2:
+                    raise DAGError(f'Invalid edge definition: {l}. Expected format: "source->target" or "src1,src2->target"')
+                
+                source = its[0].strip()
+                target = its[1].strip()
+                
+                # ===== COMMON STRICT VALIDATION: Check edge format (all modes except darts) =====
+                if self.mode != 'darts':
+                    if not source or not target:
+                        raise DAGError(f'Invalid edge: {l}. Source and target cannot be empty.')
+                
+                if ',' in source:
+                    for i in source.split(','):
+                        i = i.strip()
+                        if not i and self.mode != 'darts':
+                            raise DAGError(f'Invalid edge source in multi-source edge: {l}')
+                        edges.append([i, target])
                 else:
-                    edges.append([its[0],its[1]])
+                    edges.append([source, target])
             else:
                 continue
+        
+        # ===== COMMON STRICT VALIDATION: Check minimum requirements (all modes except darts) =====
+        if self.mode != 'darts':
+            if len(nodes) < 3:
+                raise DAGError(f'Block must have at least 3 nodes (input, operation, output), got {len(nodes)}.')
+            if len(edges) < 2:
+                raise DAGError(f'Block must have at least 2 edges, got {len(edges)}.')
+            
+            # Check for input and output nodes
+            has_input = False
+            has_output = False
+            for node_id, operation in nodes.items():
+                op_lower = operation.lower()
+                if self.mode == 'detection':
+                    if op_lower.startswith('input'):
+                        has_input = True
+                else:
+                    # NAS-Bench mode: exact match "input"
+                    if op_lower == 'input':
+                        has_input = True
+                if op_lower == 'output':
+                    has_output = True
+            
+            if not has_input:
+                if self.mode == 'detection':
+                    raise DAGError('Block must have at least one input node (operation starting with "input").')
+                else:
+                    raise DAGError('Block must have exactly one input node (operation "input").')
+            if not has_output:
+                raise DAGError('Block must have exactly one output node (operation "output").')
+        
         # check all nodes are defined
         for edge in edges:
             for node in edge:
                 if node not in nodes:
                     raise DAGError(f'edge {edge[0]}->{edge[1]} error: Node {node} is not defined.')
+        
+        # ===== COMMON STRICT VALIDATION: Check for self-loops and duplicate edges (all modes except darts) =====
+        if self.mode != 'darts':
+            for edge in edges:
+                if edge[0] == edge[1]:
+                    raise DAGError(f'Self-loop detected: {edge[0]}->{edge[1]}. Self-loops are not allowed.')
+            
+            # Check for duplicate edges
+            edge_set = set()
+            for edge in edges:
+                edge_tuple = (edge[0], edge[1])
+                if edge_tuple in edge_set:
+                    raise DAGError(f'Duplicate edge detected: {edge[0]}->{edge[1]}.')
+                edge_set.add(edge_tuple)
+        
         dag = {
             'name':name,
             'nodes':nodes,
@@ -335,6 +420,38 @@ class BlockFactory():
             params['stride'] = replace_div(params.get('stride',1))
             params['dilation'] = replace_div(params.get('dilation',1))
             params['groups'] = replace_div(params.get('groups',1))
+            
+            # ===== COMMON STRICT VALIDATION: Conv2d parameters (all modes except darts) =====
+            if self.mode != 'darts':
+                # Validate kernel_size (should be reasonable, e.g., 1-11)
+                try:
+                    ks = params['kernel_size']
+                    if isinstance(ks, str) and ks.isdigit():
+                        ks_val = int(ks)
+                        if ks_val < 1 or ks_val > 11:
+                            raise DAGError(f'node {node} error: Conv2d kernel_size must be between 1 and 11, got {ks_val}.')
+                except:
+                    pass  # Skip validation for symbolic values like "C"
+                
+                # Validate stride
+                try:
+                    stride = params['stride']
+                    if isinstance(stride, str) and stride.isdigit():
+                        stride_val = int(stride)
+                        if stride_val < 1 or stride_val > 4:
+                            raise DAGError(f'node {node} error: Conv2d stride must be between 1 and 4, got {stride_val}.')
+                except:
+                    pass
+                
+                # Validate dilation
+                try:
+                    dilation = params['dilation']
+                    if isinstance(dilation, str) and dilation.isdigit():
+                        dilation_val = int(dilation)
+                        if dilation_val < 1 or dilation_val > 4:
+                            raise DAGError(f'node {node} error: Conv2d dilation must be between 1 and 4, got {dilation_val}.')
+                except:
+                    pass
             # if params['groups'] != 1:
             #     params['out_channels'] = f"{params['out_channels']}//{params['groups']}*{params['group']}"
         elif op=='Linear':
@@ -348,6 +465,26 @@ class BlockFactory():
                 raise DAGError(f'operation {node} error: {op} operation must has kernel_size parameter.')
             params['kernel_size'] = replace_div(params['kernel_size'])
             params['stride'] = replace_div(params['stride'])
+            
+            # ===== COMMON STRICT VALIDATION: Pooling parameters (all modes except darts) =====
+            if self.mode != 'darts':
+                try:
+                    ks = params['kernel_size']
+                    if isinstance(ks, str) and ks.isdigit():
+                        ks_val = int(ks)
+                        if ks_val < 1 or ks_val > 8:
+                            raise DAGError(f'node {node} error: {op} kernel_size must be between 1 and 8, got {ks_val}.')
+                except:
+                    pass
+                
+                try:
+                    stride = params['stride']
+                    if isinstance(stride, str) and stride.isdigit():
+                        stride_val = int(stride)
+                        if stride_val < 1 or stride_val > 8:
+                            raise DAGError(f'node {node} error: {op} stride must be between 1 and 8, got {stride_val}.')
+                except:
+                    pass
         elif op in ['AdaptiveMaxPool2d','AdaptiveAvgPool2d']:
             if 'output_size' not in params:
                 raise DAGError(f'node {node} error: {op} operation must has output_size parameter.')
@@ -355,6 +492,17 @@ class BlockFactory():
         elif op in ['concat','mean','max','sum','softmax']:
             if 'dim' not in params:
                 raise DAGError(f'node {node} error: {op} operation must has dim parameter.')
+            
+            # ===== COMMON STRICT VALIDATION: Dimension parameter (all modes except darts) =====
+            if self.mode != 'darts':
+                try:
+                    dim = params['dim']
+                    if isinstance(dim, str) and (dim.lstrip('-').isdigit()):
+                        dim_val = int(dim)
+                        if abs(dim_val) > 4:
+                            raise DAGError(f'node {node} error: {op} dim must be between -4 and 4, got {dim_val}.')
+                except:
+                    pass
         elif op in ['Upsample']:
             # support either scale_factor or size, and optional mode
             if 'scale_factor' not in params and 'size' not in params:
@@ -362,6 +510,24 @@ class BlockFactory():
             # normalize mode default
             if 'mode' not in params:
                 params['mode'] = 'nearest'
+            
+            # ===== COMMON STRICT VALIDATION: Upsample parameters (all modes except darts) =====
+            if self.mode != 'darts':
+                if 'scale_factor' in params:
+                    try:
+                        sf = params['scale_factor']
+                        if isinstance(sf, str):
+                            sf_val = float(sf)
+                            if sf_val < 0.5 or sf_val > 8.0:
+                                raise DAGError(f'node {node} error: Upsample scale_factor must be between 0.5 and 8.0, got {sf_val}.')
+                    except ValueError:
+                        pass
+                
+                # Validate mode
+                if 'mode' in params:
+                    valid_modes = ['nearest', 'linear', 'bilinear', 'bicubic', 'trilinear']
+                    if params['mode'] not in valid_modes:
+                        raise DAGError(f'node {node} error: Upsample mode must be one of {valid_modes}, got {params["mode"]}.')
         # elif op in ['DropPath']:
         #     if 'prob' not in params:
         #         raise DAGError(f'node {node} error: {op} operation must has prob parameter.')
@@ -1205,29 +1371,120 @@ class {block_name}(nn.Module):
     def check_dag(self,dag_nx):
         if not nx.is_directed_acyclic_graph(dag_nx):
             raise DAGError("The computation graph of the block is not a directed acyclic graph.")
+        
+        in_degrees = dag_nx.in_degree()
+        out_degrees = dag_nx.out_degree()
+        input_nodes = [node for node, degree in in_degrees if degree == 0]
+        output_nodes = [node for node, degree in out_degrees if degree == 0]
+        
+        # ===== COMMON STRICT VALIDATION FOR ALL MODES (except darts) =====
+        if self.mode == 'darts' and self.type in ['base','downsample']:
+            # DARTS mode: special case with 2 inputs
+            if len(input_nodes) != 2:
+                raise DAGError('Must has two input nodes named input1 and input2.')
+            if len(output_nodes) != 1 or dag_nx.nodes[output_nodes[0]]['value']!='output':
+                raise DAGError('output must be the only output node.')
         else:
-            in_degrees = dag_nx.in_degree()
-            out_degrees = dag_nx.out_degree()
-            input_nodes = [node for node, degree in in_degrees if degree == 0]
-            if self.mode == 'darts' and self.type in ['base','downsample']:
-                if len(input_nodes) != 2:
-                    raise DAGError('Must has two input nodes named input1 and input2.')
-                output_nodes = [node for node, degree in out_degrees if degree == 0]
-            elif self.mode == 'detection':
-                # allow 1~4 input nodes, and each input node's value must start with 'input'
+            # COMMON VALIDATION for both NAS-BENCH and DETECTION modes
+            
+            # 1. Check number of nodes (prevent overly complex graphs)
+            num_nodes = len(dag_nx.nodes())
+            if num_nodes < 3:
+                raise DAGError(f'Block requires at least 3 nodes (input, operation, output), got {num_nodes}.')
+            if num_nodes > 50:
+                raise DAGError(f'Block allows maximum 50 nodes to prevent overly complex graphs, got {num_nodes}.')
+            
+            # 2. Check number of edges (prevent overly connected graphs)
+            num_edges = len(dag_nx.edges())
+            if num_edges > 100:
+                raise DAGError(f'Block allows maximum 100 edges to prevent overly complex graphs, got {num_edges}.')
+            
+            # 3. Check input nodes (ONLY DIFFERENCE between detection and nas-bench)
+            if self.mode == 'detection':
+                # Detection: 1~4 inputs allowed
                 if len(input_nodes) < 1 or len(input_nodes) > 4:
-                    raise DAGError('detection mode requires 1~4 input nodes (input_*).')
+                    raise DAGError(f'Detection mode requires 1~4 input nodes (input_*), got {len(input_nodes)}.')
+                # Validate input node names
                 for n in input_nodes:
                     v = str(dag_nx.nodes[n]['value']).lower()
                     if not v.startswith('input'):
-                        raise DAGError('All zero-indegree nodes must be inputs named like input_*.')
-                output_nodes = [node for node, degree in out_degrees if degree == 0]
+                        raise DAGError(f'All zero-indegree nodes must be inputs named like input_*, got: {v}')
             else:
-                if len(input_nodes) != 1 or dag_nx.nodes[input_nodes[0]]['value']!='input':
-                    raise DAGError('input must be the only input node.')
-                output_nodes = [node for node, degree in out_degrees if degree == 0]
-            if len(output_nodes) != 1 or dag_nx.nodes[output_nodes[0]]['value']!='output':
-                raise DAGError('output must be the only output node.')
+                # NAS-Bench: exactly 1 input
+                if len(input_nodes) != 1:
+                    raise DAGError(f'NAS-Bench mode requires exactly 1 input node, got {len(input_nodes)}.')
+                if dag_nx.nodes[input_nodes[0]]['value'] != 'input':
+                    raise DAGError(f"Input node must be named 'input', got: {dag_nx.nodes[input_nodes[0]]['value']}")
+            
+            # 4. Check output nodes (must be exactly 1) - COMMON
+            if len(output_nodes) != 1:
+                raise DAGError(f'Block requires exactly 1 output node, got {len(output_nodes)}.')
+            if dag_nx.nodes[output_nodes[0]]['value'].lower() != 'output':
+                raise DAGError(f"Output node must be named 'output', got: {dag_nx.nodes[output_nodes[0]]['value']}")
+            
+            # 5. Check for isolated nodes (not connected to main graph) - COMMON
+            for node in dag_nx.nodes():
+                if node in input_nodes or node in output_nodes:
+                    continue
+                # Check if node is reachable from any input
+                reachable_from_input = False
+                for input_node in input_nodes:
+                    if nx.has_path(dag_nx, input_node, node):
+                        reachable_from_input = True
+                        break
+                if not reachable_from_input:
+                    raise DAGError(f'Node {node} is isolated: not reachable from any input node.')
+                
+                # Check if node can reach output
+                if not nx.has_path(dag_nx, node, output_nodes[0]):
+                    raise DAGError(f'Node {node} is isolated: cannot reach output node.')
+            
+            # 6. Check node degree constraints - COMMON
+            for node in dag_nx.nodes():
+                if node in input_nodes:
+                    continue
+                if node in output_nodes:
+                    in_deg = dag_nx.in_degree(node)
+                    if in_deg == 0:
+                        raise DAGError(f'Output node {node} has no incoming edges.')
+                    continue
+                
+                # Check intermediate nodes
+                in_deg = dag_nx.in_degree(node)
+                out_deg = dag_nx.out_degree(node)
+                
+                if in_deg == 0 and out_deg == 0:
+                    raise DAGError(f'Node {node} is completely isolated (0 in-degree, 0 out-degree).')
+                
+                # Prevent nodes with too many inputs (unlikely to be valid)
+                if in_deg > 10:
+                    raise DAGError(f'Node {node} has too many inputs ({in_deg}). Maximum 10 inputs allowed.')
+                
+                # Check operation validity
+                node_val = dag_nx.nodes[node]['value']
+                op_name = node_val.split('(')[0] if '(' in node_val else node_val
+                
+                # Validate operation is in allowed list or has valid pattern
+                if op_name not in self.ops:
+                    # Check if it's a valid operation pattern (e.g., "Conv2d(...)")
+                    valid_pattern = False
+                    for allowed_op in self.ops:
+                        if op_name.startswith(allowed_op):
+                            valid_pattern = True
+                            break
+                    if not valid_pattern:
+                        raise DAGError(f'Node {node} uses unknown operation: {op_name}. Allowed operations: {", ".join(self.ops)}')
+            
+            # 7. Check graph complexity (max path length) - COMMON
+            try:
+                for input_node in input_nodes:
+                    path_length = nx.shortest_path_length(dag_nx, input_node, output_nodes[0])
+                    if path_length > 30:
+                        raise DAGError(f'Graph is too deep: path from {input_node} to output has {path_length} nodes. Maximum 30 allowed.')
+            except nx.NetworkXNoPath:
+                raise DAGError(f'No path exists from input {input_node} to output.')
+        
+        # ===== END COMMON STRICT VALIDATION =====
         return True
     
     def check(self,txt,with_isomorphic=False):
@@ -1271,6 +1528,23 @@ class {block_name}(nn.Module):
             params,flops = self.cal_params_flops(block_name,input_shape=(4,128,32,32))
         except Exception as e:
             return {'error':str(e)}
+        
+        # ===== COMMON STRICT VALIDATION: Check params and flops limits (all modes except darts) =====
+        if self.mode != 'darts':
+            # Params limit: 100M parameters (100 million)
+            params_millions = params / 1e6
+            if params_millions > 100:
+                return {'error':f'Block has too many parameters ({params_millions:.2f}M). Maximum 100M parameters allowed.'}
+            
+            # FLOPs limit: 1000G FLOPs (1 TFLOPs)
+            flops_giga = flops / 1e9
+            if flops_giga > 1000:
+                return {'error':f'Block has too many FLOPs ({flops_giga:.2f}G). Maximum 1000G FLOPs allowed.'}
+            
+            # Minimum check: block should have reasonable complexity
+            if params_millions < 0.001:
+                return {'error':f'Block has too few parameters ({params_millions:.6f}M). Block seems trivial or incorrectly defined.'}
+        
         dag['params'] = params
         dag['flops'] = flops
         dag_path = os.path.join(self.dag_dir,f"{block_name}.json")
