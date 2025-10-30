@@ -1,0 +1,132 @@
+{
+	"neck_fpn_simple__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 295680.0,
+		"flops": 1212153856.0
+	},
+	"nader_llm_neck_fpn_seed777_neck_fpn_simple_p4488__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 295680.0,
+		"flops": 1212153856.0
+	},
+	"nader_llm_neck_fpn_seed777_neck_fpn_simple_p4148__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 295680.0,
+		"flops": 1212153856.0
+	},
+	"nader_llm_neck_fpn_seed777_neck_fpn_simple_p2930__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 295680.0,
+		"flops": 1212153856.0
+	},
+	"nader_llm_neck_fpn_seed777_neck_fpn_simple_p1981__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 295680.0,
+		"flops": 1212153856.0
+	},
+	"nader_llm_neck_fpn_seed777_neck_fpn_simple_p1443__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 295680.0,
+		"flops": 1212153856.0
+	},
+	"nader_llm_neck_fpn_seed777_neck_fpn_simple_p1339__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 295680.0,
+		"flops": 1212153856.0
+	},
+	"nader_llm_neck_fpn_seed777_neck_fpn_simple_p935__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 295680.0,
+		"flops": 1212153856.0
+	},
+	"fpn_nasbench__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 147584.0,
+		"flops": 603979776.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p4488__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 147584.0,
+		"flops": 603979776.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p2930__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 147584.0,
+		"flops": 603979776.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p1981__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 147584.0,
+		"flops": 603979776.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p1443__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 147584.0,
+		"flops": 603979776.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p935__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 295680.0,
+		"flops": 1212153856.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p1510__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 295680.0,
+		"flops": 1212153856.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p5341__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 295680.0,
+		"flops": 1212153856.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p3250__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 295680.0,
+		"flops": 1212153856.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p1497__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 295680.0,
+		"flops": 1212153856.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p4109__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 295680.0,
+		"flops": 1212153856.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p4148__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 147584.0,
+		"flops": 603979776.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p4488_p1339__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 147584.0,
+		"flops": 603979776.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p4488_p1421__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 147584.0,
+		"flops": 603979776.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p4488_p935__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 147584.0,
+		"flops": 603979776.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p4488_p4872__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 147584.0,
+		"flops": 603979776.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p4488_p4703__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 147584.0,
+		"flops": 603979776.0
+	},
+	"nader_llm_fpn_nasbench_seed777_fpn_nasbench_p4488_p935_p5386__FPN_base_base": {
+		"name": "FPN_base",
+		"params": 147584.0,
+		"flops": 603979776.0
+	}
+}

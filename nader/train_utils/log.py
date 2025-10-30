@@ -9,6 +9,7 @@ class Log:
     
     def update(self,name='val_res',epoch=0,acc1=0,acc5=0):
         path = os.path.join(self.root_dir,f'{name}.txt')
+        print(f"Log.update: writing to {path}")
         if not os.path.isfile(path):
             with open(path,'w') as f:
                 f.write('epoch,acc1,acc5\n')

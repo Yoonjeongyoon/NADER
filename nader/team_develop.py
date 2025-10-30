@@ -32,13 +32,13 @@ def set_seed(seed):
     random.seed(seed)
     torch.backends.cudnn.deterministic = True
 
-class TeamDevelop:
+class  TeamDevelop:
     """
     base->
     """
 
     def __init__(self,
-                 team_name='try-nfb',
+                 team_name='try-nfb', #피드백 여부 없으면 chain1 있으면 chain2 
                  model_name='gpt4o',
                  dataset='imagenet-1k',
                  use_experience=None,
@@ -110,6 +110,8 @@ class TeamDevelop:
             stem_down_scale=4
         elif 'cifar' in dataset.lower() or 'imagenet16-120' in dataset.lower():
             stem_down_scale=1
+        elif 'coco2017' in dataset.lower():
+            stem_down_scale=1
         else:
             raise NotImplementedError
         self.block_gen = BlockGen(blocks_dir,stem_down_scale=stem_down_scale,mode=cell_mode)
@@ -123,7 +125,7 @@ class TeamDevelop:
     def __call__(self,inspiration=None,block=None,**kwargs):
         if self.team_name.startswith('try-nfb'):
             return self.chain1(inspiration=inspiration,block=block,**kwargs)
-        elif self.team_name.startswith('try-fb'):
+        elif self.team_name.startswith('try-fb'):#보통 여기로 옴 
             return self.chain2(inspiration=inspiration,block=block,**kwargs)
         else:
             raise NotImplementedError
@@ -154,6 +156,19 @@ class TeamDevelop:
             iter+=1
             anno['try'] = iter
             res = self.agent_modify.run(inspiration,block,experiences)
+            # Check if we got a valid block
+            if not res['list'] or len(res['list']) == 0:
+                self.logger.info(f"\tGenerate base_block try {iter}/{self.max_try}, error: GPT did not return a valid block (empty list)")
+                ann = copy.deepcopy(anno)
+                ann['status'] = False
+                ann['fail'] = {
+                    'type':'base',
+                    'error':'GPT response could not be parsed or returned empty list'
+                }
+                ann['prompt_tokens'] = anno['prompt_tokens'] + res['prompt_tokens']
+                ann['completion_tokens'] = anno['completion_tokens'] + res['completion_tokens']
+                self.append_anno(ann)
+                continue
             new_block = res['list'][0]
             anno['prompt_tokens']+=res['prompt_tokens']
             anno['completion_tokens']+=res['completion_tokens']
@@ -170,6 +185,13 @@ class TeamDevelop:
                 self.append_anno(ann)
                 continue
             elif check==-1:
+                # detection 모드: stem/downsample 생략
+                if self.cell_mode == 'detection':
+                    self.logger.info(f"\tDetection mode: skip stem/downsample generation")
+                    stem_block = ''
+                    downsample_block = ''
+                    iter = -1
+                    break
                 res2 = self.agent_generate_stem_downample.run(block=new_block,proposal=inspiration,example_num=3)
                 stem_block,downsample_block = res2['list'][0],res2['list'][1]
                 check1 = self.block_gen.stem_block.check(stem_block)
@@ -204,8 +226,12 @@ class TeamDevelop:
                 self.logger.info(f"\tGenerate base_block try {iter}/{self.max_try}, base_block existed")
                 anno['existed']=True
                 pairs = self.block_gen.load_annos()
-                stem_block = self.block_gen.stem_block.get_block_txt(pairs[check.replace('_base','')]['stem'])
-                downsample_block = self.block_gen.downsample_block.get_block_txt(pairs[check.replace('_base','')]['downsample'])
+                if self.cell_mode == 'detection':
+                    stem_block = ''
+                    downsample_block = ''
+                else:
+                    stem_block = self.block_gen.stem_block.get_block_txt(pairs[check.replace('_base','')]['stem'])
+                    downsample_block = self.block_gen.downsample_block.get_block_txt(pairs[check.replace('_base','')]['downsample'])
                 iter=-1
                 anno['stem_block'] = stem_block
                 anno['downsample_block'] = downsample_block
@@ -219,40 +245,71 @@ class TeamDevelop:
         block_id = re.sub(f"{tag}[\d]*_",'',block_id)
         if self.tag_prefix not in block_id:
             block_id = self.tag_prefix+'_'+block_id
-        block_txt = new_block+'\n'+stem_block+'\n'+downsample_block
-        txt_path = os.path.join(self.block_txt_dir,f'{block_id}.txt')
-        with open(txt_path,'w') as f:
-            f.write(block_txt)
-        anno['new_block'] = block_id
-            
-        # generate code
-        status = self.block_gen.add_blocks_from_txt_path(txt_path)
-        if isinstance(status,dict):
-            self.logger.info(f"\tGenerate block code error: {status['error']}")
-            anno['status']=False
-            anno['fail']={
-                'type':'block_code',
-                'error':status['error']
-            }
-            self.append_anno(anno)
-            return anno
-        elif status==True:
-            try:
-                model_name = self.model_gen.generate_one(block_id)
-            except Exception as e:
-                model_name = None
+        if self.cell_mode == 'detection':
+            # detection: base block만 저장/코드 생성
+            block_txt = new_block
+            base_status = self.block_gen.base_block.check(block_txt,with_isomorphic=True)
+            if isinstance(base_status,dict):
+                self.logger.info(f"\tGenerate block code error: {base_status['error']}")
                 anno['status']=False
                 anno['fail']={
-                    'type':'model_code',
-                    'error':str(e)
+                    'type':'block_code',
+                    'error':base_status['error']
                 }
                 self.append_anno(anno)
                 return anno
-        assert model_name is not None
-        anno['model_name'] = model_name
-        anno['status'] = True
-        self.append_anno(anno)
-        return anno
+            add_res = self.block_gen.base_block.add_block(block_txt,block_id)
+            if isinstance(add_res,dict):
+                self.logger.info(f"\tGenerate block code error: {add_res['error']}")
+                anno['status']=False
+                anno['fail']={
+                    'type':'block_code',
+                    'error':add_res['error']
+                }
+                self.append_anno(anno)
+                return anno
+            model_name = block_id
+            anno['new_block'] = block_id
+            anno['model_name'] = model_name
+            anno['status'] = True
+            self.append_anno(anno)
+            return anno
+        else:
+            block_txt = new_block+'\n'+stem_block+'\n'+downsample_block
+            #block graph DAG 경로 
+            txt_path = os.path.join(self.block_txt_dir,f'{block_id}.txt')
+            with open(txt_path,'w') as f:
+                f.write(block_txt)
+            anno['new_block'] = block_id
+                
+            # generate code
+            status = self.block_gen.add_blocks_from_txt_path(txt_path)#block graph DAG 경로 
+            if isinstance(status,dict):
+                self.logger.info(f"\tGenerate block code error: {status['error']}")
+                anno['status']=False
+                anno['fail']={
+                    'type':'block_code',
+                    'error':status['error']
+                }
+                self.append_anno(anno)
+                return anno
+            elif status==True:
+                try:
+                    model_name = self.model_gen.generate_one(block_id)
+                except Exception as e:
+                    model_name = None
+                    anno['status']=False
+                    anno['fail']={
+                        'type':'model_code',
+                        'error':str(e)
+                    }
+                    self.append_anno(anno)
+                    return anno
+            assert model_name is not None
+            anno['model_name'] = model_name
+            anno['status'] = True
+            self.append_anno(anno)
+            return anno
 
     def chain2(self,inspiration=None,inspiration_id=None,block=None,block_name=None,experiences=None):
         """
@@ -281,8 +338,24 @@ class TeamDevelop:
             if iter==1 or not base_error:
                 res = self.agent_modify.run(proposal=inspiration,block=block,res_expe=experiences)
             else:
+                print(f"오류발생해서 다시실행 중")
+                print(f"오류: {base_error}")
                 assert isinstance(base_error,str),base_error
                 res = self.agent_modify.run(feedback=base_error)
+            # Check if we got a valid block
+            if not res['list'] or len(res['list']) == 0:
+                self.logger.info(f"\tGenerate base_block try {iter}/{self.max_try}, error: GPT did not return a valid block (empty list)")
+                ann = copy.deepcopy(anno)
+                ann['status'] = False
+                ann['fail'] = {
+                    'type':'base',
+                    'error':'GPT response could not be parsed or returned empty list'
+                }
+                ann['prompt_tokens'] = anno['prompt_tokens'] + res['prompt_tokens']
+                ann['completion_tokens'] = anno['completion_tokens'] + res['completion_tokens']
+                self.append_anno(ann)
+                base_error = "The previous response could not be parsed. Please ensure you provide a valid block in the format: ##BlockName##\\n0:input\\n1:output\\n..."
+                continue
             new_block = res['list'][0]
             anno['prompt_tokens']+=res['prompt_tokens']
             anno['completion_tokens']+=res['completion_tokens']
@@ -297,69 +370,99 @@ class TeamDevelop:
                     'error':check['error']
                 }
                 self.append_anno(ann)
-                base_error = check['error']
+                
+                # Enhanced error message for detection mode
+                if self.cell_mode == 'detection':
+                    base_error = f"FPN block error: {check['error']}. Please ensure the block follows FPN structure with proper input nodes (input_P*, input_lat_*, input_merged_*, input_C*, input_output_*) and correct operations for detection tasks."
+                else:
+                    base_error = check['error']
                 continue
             elif check==-1:
-                stem_error = None
-                iiter = 0
-                self.agent_generate_stem_downample.clear_history()
-                while iiter<self.max_try:
-                    iiter+=1
-                    anno['try_stem'] = iiter
-                    if iiter==1 or not stem_error:
-                        res2 = self.agent_generate_stem_downample.run(block=new_block,proposal=inspiration,example_num=3)
-                    else:
-                        assert isinstance(stem_error,str),stem_error
-                        res2 = self.agent_generate_stem_downample.run(feedback=stem_error)
-                    if len(res2['list'])<2:
-                        ann = copy.deepcopy(anno)
-                        ann['fail'] = {
-                            'type':'stem',
-                            'error':'generat stem and downsample'
-                        }
-                        self.append_anno(ann)
-                        stem_error = None
-                        continue
-                    stem_block,downsample_block = res2['list'][0],res2['list'][1]
-                    check1 = self.block_gen.stem_block.check(stem_block)
-                    check2 = self.block_gen.downsample_block.check(downsample_block)
+                # Skip stem and downsample generation for detection mode
+                if self.cell_mode == 'detection':
+                    print(f"Detection 이라서 stem과 downsample 생성 건너뜀")
+                    # For detection, we only use the base_block (FPN sections)
+                    # Skip stem and downsample generation
+                    stem_block = None
+                    downsample_block = None
                     anno['stem_block'] = stem_block
                     anno['downsample_block'] = downsample_block
-                    if isinstance(check1,dict):
-                        self.logger.info(f"\tGenerate stem_block try {iter}/{self.max_try} error:{check1['error']}")
-                        ann = copy.deepcopy(anno)
-                        ann['fail'] = {
-                            'type':'stem',
-                            'error':check1['error']
-                        }
-                        self.append_anno(ann)
-                        stem_error = f"stem block error:{check1['error']}"
-                        continue
-                    if isinstance(check2,dict):
-                        self.logger.info(f"\tGenerate downsample_block try {iter}/{self.max_try} error:{check2['error']}")
-                        ann = copy.deepcopy(anno)
-                        ann['fail'] = {
-                            'type':'downsample',
-                            'error':check2['error']
-                        }
-                        self.append_anno(ann)
-                        stem_error = f"downsample block error:{check2['error']}"
-                        continue
-                    if not isinstance(check1,dict) and not isinstance(check2,dict):
-                        self.logger.info(f"\tGenerate stem_block and downsample_block try {iter}/{self.max_try}, success")
-                        iiter=-1
-                        break
-                if iiter==-1:
+                    self.logger.info(f"\tDetection mode: skipping stem and downsample generation")
                     iter=-1
                     break
+                else:
+                    stem_error = None
+                    iiter = 0
+                    self.agent_generate_stem_downample.clear_history()
+                    while iiter<self.max_try:
+                        iiter+=1
+                        anno['try_stem'] = iiter
+                        if iiter==1 or not stem_error:
+                            res2 = self.agent_generate_stem_downample.run(block=new_block,proposal=inspiration,example_num=3)
+                        else:
+                            assert isinstance(stem_error,str),stem_error
+                            res2 = self.agent_generate_stem_downample.run(feedback=stem_error)
+                        if len(res2['list'])<2:
+                            ann = copy.deepcopy(anno)
+                            ann['fail'] = {
+                                'type':'stem',
+                                'error':'generat stem and downsample'
+                            }
+                            self.append_anno(ann)
+                            stem_error = None
+                            continue
+                        stem_block,downsample_block = res2['list'][0],res2['list'][1]
+                        check1 = self.block_gen.stem_block.check(stem_block)
+                        check2 = self.block_gen.downsample_block.check(downsample_block)
+                        anno['stem_block'] = stem_block
+                        anno['downsample_block'] = downsample_block
+                        if isinstance(check1,dict):
+                            self.logger.info(f"\tGenerate stem_block try {iter}/{self.max_try} error:{check1['error']}")
+                            ann = copy.deepcopy(anno)
+                            ann['fail'] = {
+                                'type':'stem',
+                                'error':check1['error']
+                            }
+                            self.append_anno(ann)
+                            stem_error = f"stem block error:{check1['error']}"
+                            continue
+                        if isinstance(check2,dict):
+                            self.logger.info(f"\tGenerate downsample_block try {iter}/{self.max_try} error:{check2['error']}")
+                            ann = copy.deepcopy(anno)
+                            ann['fail'] = {
+                                'type':'downsample',
+                                'error':check2['error']
+                            }
+                            self.append_anno(ann)
+                            stem_error = f"downsample block error:{check2['error']}"
+                            continue
+                        if not isinstance(check1,dict) and not isinstance(check2,dict):
+                            self.logger.info(f"\tGenerate stem_block and downsample_block try {iter}/{self.max_try}, success")
+                            iiter=-1
+                            break
+                    if iiter==-1:
+                        iter=-1
+                        break
             else:
                 self.logger.info(f"\tGenerate base_block try {iter}/{self.max_try}, base_block existed")
-                anno['existed']=True
+                # For detection mode, always treat as new block even if similar exists
+                if self.cell_mode == 'detection':
+                    anno['existed'] = False  # Always new for detection
+                else:
+                    anno['existed'] = True
+                    
                 pairs = self.block_gen.load_annos()
                 if check.endswith('_base') and not check.endswith('resnet_base'):
                     check = check[:-5]
-                stem_block = self.block_gen.stem_block.get_block_txt(pairs[check]['stem'])
-                downsample_block = self.block_gen.downsample_block.get_block_txt(pairs[check]['downsample'])
+                
+                # Handle detection mode where stem and downsample blocks don't exist
+                if self.cell_mode == 'detection':
+                    stem_block = None
+                    downsample_block = None
+                else:
+                    stem_block = self.block_gen.stem_block.get_block_txt(pairs[check]['stem'])
+                    downsample_block = self.block_gen.downsample_block.get_block_txt(pairs[check]['downsample'])
+                
                 anno['stem_block'] = stem_block
                 anno['downsample_block'] = downsample_block
                 iter=-1
@@ -373,7 +476,13 @@ class TeamDevelop:
         # result = re.sub(f"{old_tag}[\d]*_", '', block_id)
         if self.tag_prefix not in block_id:
             block_id = self.tag_prefix+'_'+block_id
-        block_txt = new_block+'\n'+stem_block+'\n'+downsample_block
+        
+        # Handle detection mode where stem_block and downsample_block can be None
+        if self.cell_mode == 'detection':
+            block_txt = new_block
+        else:
+            block_txt = new_block+'\n'+stem_block+'\n'+downsample_block
+            
         txt_path = os.path.join(self.block_txt_dir,f'{block_id}.txt')
         with open(txt_path,'w') as f:
             f.write(block_txt)
@@ -391,17 +500,24 @@ class TeamDevelop:
             self.append_anno(anno)
             return anno
         elif status==True:
-            try:
-                model_name = self.model_gen.generate_one(block_id)
-            except Exception as e:
-                model_name = None
-                anno['status']=False
-                anno['fail']={
-                    'type':'model_code',
-                    'error':str(e)
-                }
-                self.append_anno(anno)
-                return anno
+            # Handle detection mode differently - no need for full model generation
+            if self.cell_mode == 'detection':
+                # For detection, the block_id itself is the model name
+                # Individual FPN sections are generated and will be assembled by NADERFPNAdapter
+                model_name = block_id
+                self.logger.info(f"\tDetection mode: using block_id as model_name: {model_name}")
+            else:
+                try:
+                    model_name = self.model_gen.generate_one(block_id)
+                except Exception as e:
+                    model_name = None
+                    anno['status']=False
+                    anno['fail']={
+                        'type':'model_code',
+                        'error':str(e)
+                    }
+                    self.append_anno(anno)
+                    return anno
         assert model_name is not None
         anno['model_name'] = model_name
         anno['status'] = True
@@ -410,8 +526,3 @@ class TeamDevelop:
         anno['stem_block'] = stem_block
         anno['downsample_block'] = downsample_block
         return anno
-    
-
-
-if __name__=='__main__':
-    main()

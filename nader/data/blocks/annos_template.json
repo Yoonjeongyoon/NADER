@@ -1,0 +1,22 @@
+{
+    "block_1":{
+        "blocks":{
+            "base":"",
+            "stem":"",
+            "downsample":""
+        },
+        "width":"",
+        "depth":"",
+        "params": 26.3174,
+		"flops": 1.5123,
+        "test_result":{
+            "accuracy":"",
+            "top1_error":"",
+            "top5_error":""
+        },
+        "from":{
+            "blocks":[],
+            "proposals":[]
+        }
+    }
+}

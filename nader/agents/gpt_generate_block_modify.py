@@ -10,7 +10,7 @@ import pdb
 import requests
 import json
 
-from .prompts import prompt_modify_block,prompt_modify_block_darts,prompt_modify_block2,prompt_develop_experience,prompt_research_experience
+from .prompts import prompt_modify_block,prompt_modify_block_darts,prompt_modify_block_detection,prompt_modify_block2,prompt_develop_experience,prompt_research_experience
 from .gpt_generate_block_base import GPTGenerateBlockBase
 
 
@@ -26,6 +26,8 @@ class GPTGenerateBlockModify(GPTGenerateBlockBase):
             self.prompt_template = prompt_modify_block
         elif mode=='darts':
             self.prompt_template = prompt_modify_block_darts
+        elif mode=='detection':
+            self.prompt_template = prompt_modify_block_detection
         else:
             raise NotImplementedError
     
@@ -34,6 +36,10 @@ class GPTGenerateBlockModify(GPTGenerateBlockBase):
         multi round conversation
         """
         if proposal is not None and block is not None:
+            def _escape_braces(text):
+                if text is None:
+                    return ""
+                return text.replace('{', '{{').replace('}', '}}')
             if res_expe:
                 expe_s = '\n'.join([f"{i+1}. {expe}" for i, expe in enumerate(res_expe)])
                 res_expe = prompt_research_experience.format(experience=expe_s)+"\n"
@@ -45,25 +51,42 @@ class GPTGenerateBlockModify(GPTGenerateBlockBase):
                 dev_expe = prompt_develop_experience.format(experience=expe_s)+"\n"
             else:
                 dev_expe = ""
-            prompt = self.prompt_template.format(proposal=proposal,res_expe=res_expe,dev_expe=dev_expe,block=block)
+            # Escape any braces in dynamic contents to avoid str.format collisions
+            proposal_esc = _escape_braces(proposal)
+            block_esc = _escape_braces(block)
+            res_expe_esc = _escape_braces(res_expe)
+            dev_expe_esc = _escape_braces(dev_expe)
+            prompt = self.prompt_template.format(proposal=proposal_esc,res_expe=res_expe_esc,dev_expe=dev_expe_esc,block=block_esc)
             self.history = [{'role':'user','content':prompt}]
         elif feedback is not None:
             assert len(self.history)>=1
-            self.history.append({'role':'user','content':f"The block you generate has following error:{feedback},please fix it and generate a new one."})
+            feedback_msg = f"The block you generate has following error:{feedback},please fix it and generate a new one."
+            self.history.append({'role':'user','content':feedback_msg})
         else:
             raise NotImplementedError
         # print(self.history)
         response = self.call_gpt(self.history,temperature)
-        res = response['output']
+        res = response['output']  # BaseAgent returns 'output' key
+        parsed_list = [] if 'yes' in res.lower() else self.parse_result(res)
         ret = {
             'output':res,
             'prompt_tokens':response['prompt_tokens'],
             'completion_tokens':response['completion_tokens'],
-            'list':[] if 'yes' in res.lower() else self.parse_result(res),
+            'list':parsed_list,
             'time':response['time']
         }
-        self.history.append({'role':'assistant','content':ret['list'][0]})
+        # Only append to history if we have a valid block
+        if parsed_list and len(parsed_list) > 0:
+            self.history.append({'role':'assistant','content':parsed_list[0]})
+        else:
+            # If no block was parsed, append the raw response or a placeholder
+            self.history.append({'role':'assistant','content':res})
         return ret
+    
+    def parse_result(self, res):
+        """Parse result - detection mode uses same logic as NAS-Bench."""
+        # All modes (nas-bench, darts, detection) use the same parsing logic
+        return super().parse_result(res)
     
 if __name__=='__main__':
     p = {

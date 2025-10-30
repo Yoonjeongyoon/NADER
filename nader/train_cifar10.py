@@ -243,6 +243,8 @@ def set_seed(seed):
 
 
 def train(train_loader,test_loader,typ='val'):
+    print(f"DEBUG train: Starting training with typ='{typ}'")
+    print(f"DEBUG train: log_dir='{log_dir}'")
     net = Registers.model[args.model_name](num_classes=10)
     net = net.cuda()
 
@@ -262,7 +264,9 @@ def train(train_loader,test_loader,typ='val'):
             res['acc'],
             res['time']
         ))
-        log.update(f'{typ}_acc',epoch,res['acc']*100)
+        print(f"DEBUG: About to call log.update with typ='{typ}', epoch={epoch}, acc={res['acc']*100}")
+        log.update(f'{typ}_acc',epoch,res['acc']*100,0)
+        print(f"DEBUG: log.update completed for {typ}_acc")
         if best_acc < res['acc']:
             weights_path = os.path.join(log_dir, 'best.pth')
             print('saving weights file to {}'.format(weights_path))
@@ -294,6 +298,8 @@ if __name__ == '__main__':
 
     log_dir = os.path.join(args.output,args.model_name,args.tag)
     status_path = os.path.join(log_dir,'train_status.txt')
+    print(f"Creating log_dir: {log_dir}")
+    print(f"Creating status_path: {status_path}")
     log = Log(log_dir)
     try:
         #data preprocessing:
@@ -311,18 +317,24 @@ if __name__ == '__main__':
             num_workers=4,
             batch_size=args.b,
         )
+        print(f"DEBUG main: About to start val training")
+        print(f"DEBUG main: log_dir='{log_dir}'")
         best_val = train(training_loader2,test_loader2,'val')
+        print(f"DEBUG main: val training completed, result={best_val}")
         if best_val[0]==-1:
-            log.update(f'test_acc',1,0)
+            print(f"DEBUG main: val training failed, updating test_acc")
+            log.update(f'test_acc',1,0,0)
             best_test = [-1,-1]
         else:
+            print(f"DEBUG main: val training succeeded, starting test training")
             best_test = train(training_loader1,test_loader1,'test')
+            print(f"DEBUG main: test training completed, result={best_test}")
 
         print(f"val best epoch {best_val[0]}: acc{best_val[1]}")
         print(f"Test best epoch {best_test[0]}: acc{best_test[1]}")
     except:
         with open(status_path,'w') as f:
-            f.write('success')
+            f.write('error')
     else:
         with open(status_path,'w') as f:
-            f.write('error')
+            f.write('success')

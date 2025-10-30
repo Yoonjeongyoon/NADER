@@ -34,7 +34,7 @@ class TeamResearch:
                  insp_table_name='inspirations_040611',
                  db_insp_dir='data/ChromDB/inspirations',
                  retriever_mode='random',
-                 candiate_inspiration_num=10,
+                 candidate_inspiration_num=10,
                  inspirations_path = 'data/inspirations/inspirations_040611.json',
                  use_experience=None,
                  experience_mode='VDB',
@@ -49,7 +49,7 @@ class TeamResearch:
                  use_logger=False) -> None:
         self.base_block = base_block
         self.retriever_mode = retriever_mode
-        self.candiate_inspiration_num = candiate_inspiration_num
+        self.candidate_inspiration_num = candidate_inspiration_num
         self.mode = mode
         self.proposer_mode = proposer_mode
         self.use_experience = use_experience
@@ -119,8 +119,8 @@ class TeamResearch:
         block_list = self.mog_graph_manage.load_blocks()
         if len(block_list)==0:
             block_list = [self.base_block]
-        self.mog_graph_manage.update_train_result(self.train_log_dir,tag_prefix=self.tag_prefix)
-        insps = self.agent_insp_retriever(num=self.candiate_inspiration_num)
+        self.mog_graph_manage.update_train_result(self.train_log_dir,tag_prefix=self.tag_prefix) # 현재까지 존재하는 블록 목록을 읽고 학습 로그 /성능을 그래프에 업데이트 
+        insps = self.agent_insp_retriever(num=self.candidate_inspiration_num)
         if len(block_list)==0 or len(block_list)==1:
             if len(block_list)==1:
                 assert block_list[0] == self.base_block,block_list

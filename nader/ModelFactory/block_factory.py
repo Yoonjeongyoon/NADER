@@ -31,7 +31,7 @@ class DAGError(Exception):
 
 class BlockFactory():
 
-    ops = ['Conv2d','Linear','AvgPool2d','MaxPool2d','AdaptiveMaxPool2d','AdaptiveAvgPool2d',
+    ops = ['Conv2d','Linear','AvgPool2d','MaxPool2d','AdaptiveMaxPool2d','AdaptiveAvgPool2d','Upsample',
             'ReLU','Sigmoid','GELU','BN','LN','mean','sum','max','permute','repeat','reshape',
             'concat','Add','Mul','multiply','softmax','DropPath']
 
@@ -81,6 +81,126 @@ class BlockFactory():
         with open(path,'r') as f:
             s = f.read()
         return s
+
+    def split_sections(self, txt):
+        """
+        Split a multi-section BDAG text into ordered list of (section_name, section_text).
+        A section starts with a line like: ##SectionName## and continues until next ##...## or EOF.
+        """
+        pattern = r'(##(.*?)##(.(?!##))*)'
+        matches = re.findall(pattern, txt, flags=re.MULTILINE|re.DOTALL)
+        sections = []
+        for full, name, _ in matches:
+            sections.append((name.strip(), full.strip('\n')))
+        return sections
+
+    def sanitize_id(self, name):
+        """Sanitize a section name to be used as part of block id."""
+        s = re.sub(r'[^A-Za-z0-9_]+','_', name)
+        s = re.sub(r'_+','_', s).strip('_')
+        return s
+
+    def add_blocks_from_sections_path(self, path, id_prefix='fpn', with_isomorphic=True):
+        """
+        Detection-oriented helper: read a multi-section txt and create a block per section.
+        Returns a dict mapping section_name -> block_id (or {'error': ...} on first failure).
+        
+        Special handling for FPN minimal mode:
+        - If only 1 section (FPN_Lateral_base), auto-expand to 10 blocks
+        - Lateral: 4 copies (P2, P3, P4, P5)
+        - Output: 4 copies with kernel_size=3 (P2, P3, P4, P5)
+        - Extra: Skip (handled in code)
+        """
+        import json
+        
+        txt = self.load_txt(path)
+        sections = self.split_sections(txt)
+        if len(sections) == 0:
+            return {'error': 'No sections found in txt.'}
+        
+        # Check if this is FPN minimal mode (1 Lateral_base section only)
+        is_fpn_minimal = (len(sections) == 1 and 
+                         'FPN_Lateral_base' in sections[0][0])
+        
+        if is_fpn_minimal and self.mode == 'detection':
+            print(f"[FPN Minimal Mode] Detected - Auto-expanding 1 block to 8 blocks")
+            name2id = self._expand_fpn_minimal(sections[0][1], id_prefix, with_isomorphic)
+            if isinstance(name2id, dict) and 'error' in name2id:
+                return name2id
+        else:
+            # Standard mode: process each section as-is
+            name2id = {}
+            for section_name, section_txt in sections:
+                sid = f"{id_prefix}__{self.sanitize_id(section_name)}"
+                check_res = self.check(section_txt,with_isomorphic=with_isomorphic)
+                if isinstance(check_res,dict):
+                    return {'error': f"Section {section_name} invalid: {check_res['error']}"}
+                add_res = self.add_block(section_txt, sid)
+                if isinstance(add_res,dict):
+                    return {'error': f"Section {section_name} codegen failed: {add_res['error']}"}
+                name2id[section_name] = add_res
+        
+        # Save mapping to JSON file for the adapter to use
+        mapping_file = os.path.join(os.path.dirname(self.anno_path), 'block_mapping.json')
+        with open(mapping_file, 'w') as f:
+            json.dump(name2id, f, indent=2, ensure_ascii=False)
+        
+        return name2id
+    
+    def _expand_fpn_minimal(self, lateral_base_txt, id_prefix, with_isomorphic):
+        """
+        Expand 1 FPN_Lateral_base block to 8 blocks:
+        - 4 Lateral blocks (P2, P3, P4, P5) - same as base
+        - 4 Output blocks (P2, P3, P4, P5) - kernel_size=1 -> kernel_size=3, padding=1
+        """
+        import re
+        name2id = {}
+        
+        # 1. Create 4 Lateral blocks (identical to base)
+        for level in ['P2', 'P3', 'P4', 'P5']:
+            section_name = f'FPN_Lateral_{level}'
+            sid = f"{id_prefix}__FPN_Lateral_{level}_base"
+            
+            check_res = self.check(lateral_base_txt, with_isomorphic=with_isomorphic)
+            if isinstance(check_res, dict):
+                return {'error': f"Lateral {level} invalid: {check_res['error']}"}
+            
+            add_res = self.add_block(lateral_base_txt, sid)
+            if isinstance(add_res, dict):
+                return {'error': f"Lateral {level} codegen failed: {add_res['error']}"}
+            
+            name2id[section_name] = add_res
+            print(f"  → Created FPN_Lateral_{level}_base")
+        
+        # 2. Create 4 Output blocks (kernel_size=1 -> 3, add padding=1)
+        output_txt = lateral_base_txt
+        # Replace kernel_size=1 with kernel_size=3
+        output_txt = re.sub(r'kernel_size=1', 'kernel_size=3', output_txt)
+        # Add padding=1 if not present
+        if 'padding=' not in output_txt:
+            output_txt = re.sub(
+                r'(Conv2d\([^)]*stride=1)',
+                r'\1,padding=1',
+                output_txt
+            )
+        
+        for level in ['P2', 'P3', 'P4', 'P5']:
+            section_name = f'FPN_Output_{level}'
+            sid = f"{id_prefix}__FPN_Output_{level}_base"
+            
+            check_res = self.check(output_txt, with_isomorphic=with_isomorphic)
+            if isinstance(check_res, dict):
+                return {'error': f"Output {level} invalid: {check_res['error']}"}
+            
+            add_res = self.add_block(output_txt, sid)
+            if isinstance(add_res, dict):
+                return {'error': f"Output {level} codegen failed: {add_res['error']}"}
+            
+            name2id[section_name] = add_res
+            print(f"  → Created FPN_Output_{level}_base")
+        
+        print(f"[FPN Minimal Mode] Successfully expanded to {len(name2id)} blocks")
+        return name2id
 
     def save_txt(self,txt,path):
         with open(path,'w') as f:
@@ -196,6 +316,15 @@ class BlockFactory():
                 val = [v.strip() for v in val]
             else:
                 val = val.strip()
+            # normalize quoted strings like 'nearest' or "nearest" → nearest
+            def _strip_quotes(x):
+                if isinstance(x,str) and len(x)>=2 and ((x[0]==x[-1]=="'") or (x[0]==x[-1]=='"')):
+                    return x[1:-1]
+                return x
+            if isinstance(val,list):
+                val = [_strip_quotes(v) for v in val]
+            else:
+                val = _strip_quotes(val)
             params[key.strip()] = val
         if op=='Conv2d':
             if 'out_channels' not in params:
@@ -226,6 +355,13 @@ class BlockFactory():
         elif op in ['concat','mean','max','sum','softmax']:
             if 'dim' not in params:
                 raise DAGError(f'node {node} error: {op} operation must has dim parameter.')
+        elif op in ['Upsample']:
+            # support either scale_factor or size, and optional mode
+            if 'scale_factor' not in params and 'size' not in params:
+                raise DAGError(f'node {node} error: {op} operation must have scale_factor or size parameter.')
+            # normalize mode default
+            if 'mode' not in params:
+                params['mode'] = 'nearest'
         # elif op in ['DropPath']:
         #     if 'prob' not in params:
         #         raise DAGError(f'node {node} error: {op} operation must has prob parameter.')
@@ -279,8 +415,33 @@ class BlockFactory():
         for node in list(nx.topological_sort(g)):
             op,params = self.split_op(node,dag['nodes'][node])
             ns = list(g.predecessors(node))
-            if op.lower() in ['input','input1','input2']:
-                node2shape[node] = [['B','C','H','W'],['B','C','H','W']]
+            # accept input nodes like input, input1, input2, input_Pk
+            if op.lower() in ['input','input1','input2'] or op.lower().startswith('input'):
+                # detection: some inputs (lateral/merged/output) are already in dim channels
+                if self.mode=='detection':
+                    val_str = str(dag['nodes'][node]).lower()
+                    if val_str.startswith('input_lat_'):
+                        node2shape[node] = [['B','dim','H','W'],['B','dim','H','W']]
+                    elif val_str.startswith('input_merged_'):
+                        # Decide spatial size by level: input_merged_Pn feeding block *_Pn keeps H,W; feeding *_P(n-1) is smaller.
+                        import re as _re
+                        def _get_p(s):
+                            m = _re.search(r'_p(\d+)', s)
+                            return int(m.group(1)) if m else None
+                        lvl_in = _get_p(val_str)
+                        lvl_blk = _get_p(dag['name'].lower())
+                        if lvl_in is not None and lvl_blk is not None and lvl_in == lvl_blk:
+                            node2shape[node] = [['B','dim','H','W'],['B','dim','H','W']]
+                        else:
+                            node2shape[node] = [['B','dim','H//2','W//2'],['B','dim','H//2','W//2']]
+                    elif val_str.startswith('input_output_'):
+                        node2shape[node] = [['B','dim','H','W'],['B','dim','H','W']]
+                    elif val_str.startswith('input_c'):
+                        node2shape[node] = [['B','C','H','W'],['B','C','H','W']]
+                    else:
+                        node2shape[node] = [['B','C','H','W'],['B','C','H','W']]
+                else:
+                    node2shape[node] = [['B','C','H','W'],['B','C','H','W']]
                 out_shapes_v = self.shape2val(node2shape[node][1])
                 node2out[node] = out_shapes_v
                 continue
@@ -290,8 +451,13 @@ class BlockFactory():
                 node2shape[node] = [copy.deepcopy(node2shape[ns[0]][1]),['B','dim','H','W']]
                 in_shapes_v = self.shape2val(node2shape[node][0])
                 if self.type in ['base','normal']:
-                    if in_shapes_v[1]!=cdim or in_shapes_v[2]!=cH or in_shapes_v[3]!=cW:
-                        raise DAGError(f'node {node} error: Output shape must be (B,dim,H,W).')
+                    if self.mode=='detection':
+                        # detection: only enforce channel==dim; spatial size can differ (e.g., stride-2 extra conv)
+                        if in_shapes_v[1]!=cdim:
+                            raise DAGError(f'node {node} error: Output channel must be dim.')
+                    else:
+                        if in_shapes_v[1]!=cdim or in_shapes_v[2]!=cH or in_shapes_v[3]!=cW:
+                            raise DAGError(f'node {node} error: Output shape must be (B,dim,H,W).')
                 elif self.type in ['stem','downsample']:
                     if self.mode=='nas-bench' and in_shapes_v[1]!=cdim:
                         raise DAGError(f"node {node} error: Output's channel dimension must be dim.")
@@ -358,6 +524,27 @@ class BlockFactory():
                         if input_shapes[i]!=out_shapes[i]:
                             out_shapes_v[i]=out_shapes[i]
                     out_shapes_v = self.shape2val(out_shapes_v)
+                elif op in ['Upsample']:
+                    # handle upsample by scale_factor or size
+                    input_shapes = copy.deepcopy(node2shape[ns[0]][1])
+                    out_shapes = copy.deepcopy(input_shapes)
+                    if params and 'size' in params:
+                        size = params['size']
+                        if isinstance(size,list):
+                            assert len(size)==2
+                            out_shapes[2] = size[0]
+                            out_shapes[3] = size[1]
+                        else:
+                            # single int means square size
+                            out_shapes[2] = size
+                            out_shapes[3] = size
+                    else:
+                        # default by scale_factor
+                        sf = params.get('scale_factor','2')
+                        out_shapes[2] = f'({out_shapes[2]})*({sf})'
+                        out_shapes[3] = f'({out_shapes[3]})*({sf})'
+                    node2shape[node] = [input_shapes,out_shapes]
+                    out_shapes_v = self.shape2val(out_shapes)
                 elif op in ['mean','sum','max']:
                     assert 'dim' in params
                     out_shapes = copy.deepcopy(node2shape[ns[0]][1])
@@ -600,6 +787,25 @@ class BlockFactory():
                 row = f"LayerNorm(normalized_shape={out_channels})"
             elif op in ['Sigmoid','ReLU','GELU']:
                 row = f"{op}()"
+            elif op == 'Upsample':
+                # build Upsample layer in __init__
+                # prefer size if provided, otherwise scale_factor
+                scale_factor = None
+                size = None
+                mode = 'nearest'
+                if params:
+                    if 'size' in params:
+                        size = replace(params['size'])
+                    if 'scale_factor' in params:
+                        scale_factor = replace(params['scale_factor'])
+                    if 'mode' in params:
+                        mode = params['mode'] if isinstance(params['mode'],str) else str(params['mode'])
+                if size is not None:
+                    row = f"CustomUpsample(size={size}, mode={repr(mode)})"
+                elif scale_factor is not None:
+                    row = f"CustomUpsample(scale_factor={scale_factor}, mode={repr(mode)})"
+                else:
+                    row = f"CustomUpsample(scale_factor=2, mode={repr(mode)})"
             else:
                 continue
             row = f"self.op{op_num}={row}"
@@ -611,7 +817,7 @@ class BlockFactory():
         var_num = 0
         for i in list(nx.topological_sort(g)):
             op,params = self.split_op(i,dag['nodes'][i])
-            if op=='input':
+            if op=='input' or op.lower().startswith('input'):
                 node2out_var[i] = 'x'
                 continue
             elif op=='input1':
@@ -680,6 +886,10 @@ class BlockFactory():
                 for x in p[1:]:
                     row = row + f",{x}"
                 row = row + ')'
+            elif op == 'Upsample':
+                # use F.interpolate or nn.Upsample; keep module style for consistency
+                # define as layer during init already
+                row = f"{out_var} = {node2op[i]}({in_var})"
             elif op.lower() in ['add','mul']:
                 # Add, Mul
                 op_map = {'add':'+','mul':'*'}
@@ -710,7 +920,7 @@ class BlockFactory():
             fun_forward = fun_forward + '\n' + tab*2+row
         
         # All codes
-        if self.mode=='nas-bench' or self.type=='stem':
+        if self.mode=='nas-bench' or self.type=='stem' or self.mode=='detection':
             codes = f"""import torch
 import torch.nn as nn
 from torch.nn import (
@@ -797,6 +1007,20 @@ class CustomAvgPool2d(nn.Module):
         if self.padding_ceil[1]==self.padding_right[1]:
             res =  res[:,:,:,:-1]
         return res
+
+class CustomUpsample(nn.Module):
+
+    def __init__(self, scale_factor: Union[int, float, Tuple[float, float]] = None, size: Union[int, Tuple[int, int]] = None, mode: str = 'nearest', **kwargs):
+        super().__init__()
+        if size is not None:
+            self.module = nn.Upsample(size=size, mode=mode, **kwargs)
+        else:
+            if scale_factor is None:
+                scale_factor = 2
+            self.module = nn.Upsample(scale_factor=scale_factor, mode=mode, **kwargs)
+
+    def forward(self, input):
+        return self.module(input)
 
 @Registers.block
 class {block_name}(nn.Module):
@@ -967,7 +1191,12 @@ class {block_name}(nn.Module):
         import_module_from_path(block_name,save_file_path)
 
     def cal_params_flops(self,block_name,input_shape=(4,128,32,32)):
-        model = Registers.block[block_name](input_shape[1],input_shape[1]*2)
+        # For detection blocks, inputs are often already in `dim` channels.
+        # Use identical in/out channels to avoid artificial mismatches.
+        if self.mode=='detection':
+            model = Registers.block[block_name](input_shape[1],input_shape[1])
+        else:
+            model = Registers.block[block_name](input_shape[1],input_shape[1]*2)
         flops, params = profile(model,(torch.randn(input_shape),),verbose=False)
         # flops = '{:.2f}'.format(flops/(1000**3))
         # params = '{:.2f}'.format(params/(1000**2))
@@ -983,6 +1212,15 @@ class {block_name}(nn.Module):
             if self.mode == 'darts' and self.type in ['base','downsample']:
                 if len(input_nodes) != 2:
                     raise DAGError('Must has two input nodes named input1 and input2.')
+                output_nodes = [node for node, degree in out_degrees if degree == 0]
+            elif self.mode == 'detection':
+                # allow 1~4 input nodes, and each input node's value must start with 'input'
+                if len(input_nodes) < 1 or len(input_nodes) > 4:
+                    raise DAGError('detection mode requires 1~4 input nodes (input_*).')
+                for n in input_nodes:
+                    v = str(dag_nx.nodes[n]['value']).lower()
+                    if not v.startswith('input'):
+                        raise DAGError('All zero-indegree nodes must be inputs named like input_*.')
                 output_nodes = [node for node, degree in out_degrees if degree == 0]
             else:
                 if len(input_nodes) != 1 or dag_nx.nodes[input_nodes[0]]['value']!='input':

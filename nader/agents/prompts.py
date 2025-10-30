@@ -68,6 +68,90 @@ Variables you may use include:
     output: output feature map;
 You can use the basic +,-,x, / operations.
 """
+definition_BDAG_FPN = f""" 
+###BlockDefinition###
+Each block starts with "##block_name##". 
+Each operator line uses "index:operation(params)".
+Each edge uses "index_from->index_to".
+Each block must define exactly one `output` node.
+Every block must have all external inputs explicitly marked with the prefix **input_**.
+
+###Available Operations###
+- Conv2d(out_channels,kernel_size,stride=1,padding=0,dilation=1,groups=1)
+  Standard 2D convolution.
+- Linear(out_channels)
+  Fully-connected layer.
+- AvgPool2d(kernel_size,stride), MaxPool2d(kernel_size,stride)
+  Average or max pooling.
+- AdaptiveAvgPool2d(output_size), AdaptiveMaxPool2d(output_size)
+- Upsample(scale_factor=?, mode=?)
+  Spatial upsampling. Typically `scale_factor=2`, `mode='nearest'`.
+- Add
+  Element-wise sum (requires identical tensor shapes).
+- Mul, multiply, concat(dim)
+  Element-wise or channel concatenation. If concat(dim=1) merges two feature maps, 
+  **immediately follow with a 1x1 Conv(+BN/Act) to project back to `dim` channels.**
+- mean(dim), max(dim), sum(dim), softmax(dim)
+  Standard reductions or activations.
+
+###Activations###
+- ReLU, GELU, Sigmoid, SiLU
+
+###Normalizations###
+- BN (BatchNorm)
+- LN (LayerNorm)
+- GN (GroupNorm)
+
+###Tensor Transforms###
+- permute(*dims), repeat(*sizes), reshape(*shape)
+  Standard PyTorch tensor transforms.
+
+###Variables & Shapes###
+- input_Pk: backbone feature for level k ∈ {{{{2,3,4,5}}}}
+- input_lat_Pk: lateral feature input (1×1 conv from backbone)
+- input_merged_P{{{{k+1}}}}: top-down merged feature from the higher pyramid level
+- input_output_Pk: final output from level Pk (used as source for ExtraConv)
+- lat_Pk: lateral conv output of shape (B, dim, H, W)
+- merged_Pk: top-down merged feature of shape (B, dim, H, W)
+- output: block’s single output tensor
+- dim: FPN feature channel dimension (typically 256)
+- H, W: spatial sizes corresponding to current pyramid level.
+
+###FPN Contracts (MUST FOLLOW)###
+1) **Channel Consistency**
+   - Every Conv2d in Lateral/Output/ExtraConv blocks must produce `dim` channels.
+   - TopDownMerge/Add requires both branches to have identical (N, dim, H, W).
+   - If concat is used, immediately re-project back to `dim` channels via 1x1 Conv(+BN/Act).
+
+2) **Spatial Consistency**
+   - Lateral blocks: keep spatial size (stride=1, kernel=1).
+   - Top-down merges: upsample high-level feature by `scale_factor=2` before merge.
+   - Output 3×3 conv: use (kernel=3, stride=1, padding=1).
+   - ExtraConv (P6/P7): use (kernel=3, stride=2, padding=1).
+   - ExtraPool (P6/P7): use MaxPool2d(kernel=1, stride=2).
+
+3) **add_extra_convs source (mmdet-compatible)**
+   - 'on_input'   → input_C5 (backbone C5)
+   - 'on_lateral' → input_lat_P5
+   - 'on_output'  → input_output_P5
+
+4) **Naming & I/O**
+   - Every external input node must start with `input_`.
+   - Each block must define exactly one `output` node.
+   - Do not rename `input_...` keys arbitrarily; adapter relies on them for wiring.
+   - Keep block DAG acyclic and fully connected.
+
+5) **Stability & Safety**
+   - Preserve normalization/activation unless explicitly modified.
+   - Avoid in-place ops; return new tensors.
+   - Maintain channel and spatial contracts across all blocks.
+
+###Example node/edge notation###
+index:Operation(params)
+i->j
+- The final node with label `output` must have exactly one incoming edge.
+- Each block must be self-contained (no cross-section dependencies inside one block).
+"""
 
 prompt_generate_stem_downsample = f"""###Instruction###
 You are an expert who is proficient in various model structures of deep learning. 
@@ -197,6 +281,26 @@ Note that structures in the modified blocks that unrelated to the proposal shoul
 \n###blocks###
 {{blocks}}
 \n###output###
+"""
+prompt_modify_block_detection = f"""###Instruction###
+You are an expert who is proficient in various model structures of deep learning.
+Please make reasonable modifications to the specified block based on the characteristics of the block and the proposal.
+This block is used in Feature Pyramid Network (FPN) for object detection and will be reused across multiple pyramid levels.
+Please ensure that the number of input channels and output channels of the generated block are both C (C = 256 for FPN).
+Please ensure that the spatial dimensions (H, W) of the input and output feature maps are the same (use stride=1 with appropriate padding).
+Note that structures in the modified block that unrelated to the proposal should be kept as original as possible.
+{definition_BDAG}
+
+###proposal###
+{{proposal}}
+
+###block###
+{{block}}
+
+{{dev_expe}}
+{{res_expe}}
+###output###
+When outputting, you only need to output the block that meet the defined rules, and do not output other irrelevant information.
 """
 
 

@@ -1,0 +1,534 @@
+{
+	"block_1": {
+		"blocks": {
+			"base": "block_1_base",
+			"stem": "block_1_stem",
+			"downsample": "block_1_downsample"
+		},
+		"widths": [
+			80,
+			160,
+			320,
+			640
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 26.7406,
+		"flops": 1.4611,
+		"test": {
+			"accuracy": 0.7658,
+			"top1_error": 0.23419999999999996,
+			"top5_error": 0.06799999999999995
+		}
+	},
+	"block_2": {
+		"blocks": {
+			"base": "block_2_base",
+			"stem": "block_1_stem",
+			"downsample": "block_1_downsample"
+		},
+		"widths": [
+			256,
+			512,
+			1024,
+			2048
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 26.7424,
+		"flops": 1.2754,
+		"test": {
+			"accuracy": 0.7732,
+			"top1_error": 0.2268,
+			"top5_error": 0.05940000000000001
+		}
+	},
+	"block_3": {
+		"blocks": {
+			"base": "block_3_base",
+			"stem": "block_1_stem",
+			"downsample": "block_1_downsample"
+		},
+		"widths": [
+			83,
+			166,
+			332,
+			664
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 28.7729,
+		"flops": 1.5708,
+		"test": {
+			"accuracy": 0.7344,
+			"top1_error": 0.26559999999999995,
+			"top5_error": 0.07720000000000005
+		}
+	},
+	"block_4": {
+		"blocks": {
+			"base": "block_4_base",
+			"stem": "block_1_stem",
+			"downsample": "block_4_downsample"
+		},
+		"widths": [
+			640,
+			1280,
+			2560,
+			5120
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 26.4446,
+		"flops": 1.4983,
+		"test": {
+			"accuracy": 0.723,
+			"top1_error": 0.277,
+			"top5_error": 0.09219999999999995
+		}
+	},
+	"block_5": {
+		"blocks": {
+			"base": "block_5_base",
+			"stem": "block_5_stem",
+			"downsample": "block_1_downsample"
+		},
+		"widths": [
+			256,
+			512,
+			1024,
+			2048
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 18.8082,
+		"flops": 0.8303,
+		"test": {
+			"accuracy": 0.7748,
+			"top1_error": 0.22519999999999996,
+			"top5_error": 0.06040000000000001
+		}
+	},
+	"block_6": {
+		"blocks": {
+			"base": "block_6_base",
+			"stem": "block_6_stem",
+			"downsample": "block_6_downsample"
+		},
+		"widths": [
+			116,
+			232,
+			464,
+			928
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 26.549,
+		"flops": 1.4416,
+		"test": {
+			"accuracy": 0.675,
+			"top1_error": 0.32499999999999996,
+			"top5_error": 0.10899999999999999
+		}
+	},
+	"block_7": {
+		"blocks": {
+			"base": "block_7_base",
+			"stem": "block_5_stem",
+			"downsample": "block_7_downsample"
+		},
+		"widths": [
+			247,
+			494,
+			988,
+			1976
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 26.5814,
+		"flops": 1.1811,
+		"test": {
+			"accuracy": 0.77,
+			"top1_error": 0.22999999999999998,
+			"top5_error": 0.061000000000000054
+		}
+	},
+	"block_8": {
+		"blocks": {
+			"base": "block_8_base",
+			"stem": "block_1_stem",
+			"downsample": "block_1_downsample"
+		},
+		"widths": [
+			208,
+			416,
+			832,
+			1664
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 26.9236,
+		"flops": 1.3552,
+		"test": {
+			"accuracy": 0.7474,
+			"top1_error": 0.25260000000000005,
+			"top5_error": 0.07699999999999996
+		}
+	},
+	"block_9": {
+		"blocks": {
+			"base": "block_9_base",
+			"stem": "block_9_stem",
+			"downsample": "block_9_downsample"
+		},
+		"widths": [
+			104,
+			208,
+			416,
+			832
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 26.689,
+		"flops": 1.1971,
+		"test": {
+			"accuracy": 0.7308,
+			"top1_error": 0.2692,
+			"top5_error": 0.0746
+		}
+	},
+	"block_10": {
+		"blocks": {
+			"base": "block_10_base",
+			"stem": "block_10_stem",
+			"downsample": "block_10_downsample"
+		},
+		"widths": [
+			96,
+			192,
+			384,
+			768
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 26.3174,
+		"flops": 1.5123,
+		"test": {
+			"accuracy": 0.736,
+			"top1_error": 0.264,
+			"top5_error": 0.08940000000000003
+		}
+	},
+	"block_solution2_run1_step1_1": {
+		"blocks": {
+			"base": "block_solution2_run1_step1_1",
+			"stem": "stem_3",
+			"downsample": "downsample_3"
+		},
+		"widths": [
+			177,
+			354,
+			708,
+			1416
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 26.7599,
+		"flops": 0.6224,
+		"test": {
+			"accuracy": 0.7566,
+			"top1_error": 0.24339999999999995,
+			"top5_error": 0.0696
+		},
+		"from": {
+			"blocks": [
+				"block_2"
+			],
+			"proposals": [
+				"squeeze_and_excitation"
+			]
+		}
+	},
+	"block_solution2_run1_step1_2": {
+		"blocks": {
+			"base": "block_solution2_run1_step1_2",
+			"stem": "stem_3",
+			"downsample": "downsample_3"
+		},
+		"widths": [
+			177,
+			354,
+			708,
+			1416
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 26.7599,
+		"flops": 0.6224,
+		"test": {
+			"accuracy": 0.7566,
+			"top1_error": 0.24339999999999995,
+			"top5_error": 0.0696
+		},
+		"from": {
+			"blocks": [
+				"block_2"
+			],
+			"proposals": [
+				"squeeze_and_excitation"
+			]
+		}
+	},
+	"block_solution2_run1_step1_3": {
+		"blocks": {
+			"base": "block_solution2_run1_step1_3",
+			"stem": "stem_2",
+			"downsample": "downsample_3"
+		},
+		"widths": [
+			177,
+			354,
+			708,
+			1416
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 26.7641,
+		"flops": 0.6267,
+		"test": {
+			"accuracy": 0.7702,
+			"top1_error": 0.2298,
+			"top5_error": 0.06399999999999995
+		},
+		"from": {
+			"blocks": [
+				"block_2"
+			],
+			"proposals": [
+				"squeeze_and_excitation"
+			]
+		}
+	},
+	"block_solution2_run1_step2_1": {
+		"blocks": {
+			"base": "block_solution2_run1_step2_1",
+			"stem": "stem_solution2_run1_step2_1",
+			"downsample": "downsample_solution2_run1_step2_1"
+		},
+		"widths": [
+			104,
+			208,
+			416,
+			832
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 26.8709,
+		"flops": 1.4487,
+		"test": {
+			"accuracy": 0.749,
+			"top1_error": 0.251,
+			"top5_error": 0.0756
+		},
+		"from": {
+			"blocks": [
+				"block_2"
+			],
+			"proposals": [
+				"depthwise_separable_convolution"
+			]
+		}
+	},
+	"block_solution2_run1_step3_1": {
+		"blocks": {
+			"base": "block_solution2_run1_step3_1",
+			"stem": "stem_2",
+			"downsample": "downsample_3"
+		},
+		"widths": [
+			173,
+			346,
+			692,
+			1384
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 26.8166,
+		"flops": 1.3905,
+		"test": {
+			"accuracy": 0.772,
+			"top1_error": 0.22799999999999998,
+			"top5_error": 0.06159999999999999
+		},
+		"from": {
+			"blocks": [
+				"block_2"
+			],
+			"proposals": [
+				"residual"
+			]
+		}
+	},
+	"block_solution2_run1_step3_3": {
+		"blocks": {
+			"base": "block_solution2_run1_step3_3",
+			"stem": "stem_3",
+			"downsample": "downsample_3"
+		},
+		"widths": [
+			206,
+			412,
+			824,
+			1648
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 26.7722,
+		"flops": 1.3419,
+		"test": {
+			"accuracy": 0.7658,
+			"top1_error": 0.23419999999999996,
+			"top5_error": 0.06520000000000004
+		},
+		"from": {
+			"blocks": [
+				"block_2"
+			],
+			"proposals": [
+				"residual"
+			]
+		}
+	},
+	"block_solution2_run1_step4_1": {
+		"blocks": {
+			"base": "block_solution2_run1_step4_1",
+			"stem": "stem_solution2_run1_step4_1",
+			"downsample": "downsample_solution2_run1_step4_1"
+		},
+		"widths": [
+			256,
+			512,
+			1024,
+			2048
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 26.7362,
+		"flops": 1.2691,
+		"test": {
+			"accuracy": 0.7712,
+			"top1_error": 0.2288,
+			"top5_error": 0.056599999999999984
+		},
+		"from": {
+			"blocks": [
+				"block_2"
+			],
+			"proposals": [
+				"grouped_convolution"
+			]
+		}
+	},
+	"block_solution2_run1_step5_3": {
+		"blocks": {
+			"base": "block_solution2_run1_step5_3",
+			"stem": "stem_2",
+			"downsample": "downsample_3"
+		},
+		"widths": [
+			256,
+			512,
+			1024,
+			2048
+		],
+		"depths": [
+			2,
+			3,
+			5,
+			2
+		],
+		"params": 26.7424,
+		"flops": 1.2754,
+		"test": {
+			"accuracy": 0.7732,
+			"top1_error": 0.2268,
+			"top5_error": 0.05940000000000001
+		},
+		"from": {
+			"blocks": [
+				"block_2"
+			],
+			"proposals": [
+				"grouped_convolution"
+			]
+		}
+	}
+}

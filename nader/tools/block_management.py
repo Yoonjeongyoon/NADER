@@ -206,16 +206,29 @@ class BlockGraphManagement:
             if block in files and ((not flush and block not in annos) or flush):
                 res_path = os.path.join(train_log_dir,block,'1',f'{filename}.txt')
                 if os.path.isfile(res_path):
-                    res = np.genfromtxt(res_path,delimiter=',',skip_header=1)
-                    if len(res.shape)==1:
-                        res = np.array([res])
-                    # print(f'{block} is training {len(res)}/{50}.')
-                    maxi = max(res[:,1])
-                    acc = round(maxi,2)
+                    # Check if this is detection mode (single value) or NAS-Bench mode (CSV)
+                    with open(res_path, 'r') as f:
+                        content = f.read().strip()
+                    
+                    if ',' in content:
+                        # NAS-Bench mode: CSV format
+                        res = np.genfromtxt(res_path,delimiter=',',skip_header=1)
+                        if len(res.shape)==1:
+                            res = np.array([res])
+                        maxi = max(res[:,1])
+                        acc = round(maxi,2)
+                    else:
+                        # Detection mode: single value
+                        try:
+                            acc = round(float(content), 2)
+                        except ValueError:
+                            acc = 0.0
                     block_list.append(block)
                     txt_path = os.path.join(self.block_dir,f'{block}.txt')
                     blocks = load_block(txt_path)
-                    assert len(blocks)==3
+                    # Detection mode may have different block structure
+                    if len(blocks) != 3:
+                        print(f"Warning: {block} has {len(blocks)} blocks instead of 3")
                     annos[block] = {
                         'iter':anno['iter'],
                         "from_block_name": anno['raw_block_name'],
@@ -245,9 +258,16 @@ class BlockGraphManagement:
                 if val['iter']==0:
                     root = key
                 else:
-                    edges1[val['from_block_name']].append(key)
-                    if val['acc']>annos[val['from_block_name']]['acc']:
-                        edges2[val['from_block_name']].append(key)
+                    # Skip if from_block_name doesn't exist in annos
+                    if val['from_block_name'] in annos:
+                        edges1[val['from_block_name']].append(key)
+                        if val['acc']>annos[val['from_block_name']]['acc']:
+                            edges2[val['from_block_name']].append(key)
+            
+            # If no root found (iter==0), use the first available block
+            if 'root' not in locals():
+                root = list(annos.keys())[0]
+                print(f"Warning: No root block found (iter==0), using {root} as root")
             for node in edges2:
                 edges2[node] = sorted(edges2[node],key=lambda x:annos[x]['acc'],reverse=True)
             def dfs(root):

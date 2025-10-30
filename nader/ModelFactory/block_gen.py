@@ -9,7 +9,7 @@ import pdb
 
 class BlockGen:
 
-    def __init__(self,blocks_dir='/data3/yangzekang/ModelGen/ModelGen/ModelFactory/blocks',register_path='ModelFactory.register',stem_down_scale=1,mode='nas-bench') -> None:
+    def __init__(self,blocks_dir='./blocks',register_path='ModelFactory.register',stem_down_scale=1,mode='nas-bench') -> None:
         self.base_block = BlockFactory(os.path.join(blocks_dir,'base'),type='base',register_path=register_path,mode=mode)
         self.stem_block = BlockFactory(os.path.join(blocks_dir,'stem'),type='stem',register_path=register_path,stem_down_scale=stem_down_scale,mode=mode)
         self.downsample_block = BlockFactory(os.path.join(blocks_dir,'downsample'),type='downsample',register_path=register_path,mode=mode)
@@ -39,7 +39,7 @@ class BlockGen:
             json.dump(self.annos,f,indent='\t')
 
 
-    def add_blocks_from_txt_path(self,path,with_isomorphic=True):
+    def add_blocks_from_txt_path(self, path, with_isomorphic=True):
         """
         -1: existed
         {'error':...} error
@@ -52,18 +52,45 @@ class BlockGen:
             blocks = f.read()
         pattern = '(##(.*?)##(.(?!##))*)'
         matches = re.findall(pattern, blocks, flags=re.MULTILINE|re.DOTALL)
-        assert len(matches)==3
-        name2s = {}
-        for i,match in enumerate(matches):
-            name = match[1]
-            s = match[0].strip('\n')
-            if 'stem' in name or i==1:
-                name2s['stem'] = s
-            elif 'downsample' in name or i==2:
-                name2s['downsample'] = s
-            else:
-                name2s['base'] = s
-        if set(name2s.keys()) == set(['base','stem','downsample']):
+        
+        # Handle detection mode where only base block is present
+        if self.base_block.mode == 'detection':
+            assert len(matches) >= 1, f"Detection mode requires at least 1 block, got {len(matches)}"
+            # For detection mode, treat all sections as base blocks
+            name2s = {}
+            for i, match in enumerate(matches):
+                name = match[1]
+                s = match[0].strip('\n')
+                name2s[f'base_{i}'] = s
+        else:
+            assert len(matches)==3, f"Expected 3 blocks (base, stem, downsample), got {len(matches)}"
+            name2s = {}
+            for i,match in enumerate(matches):
+                name = match[1]
+                s = match[0].strip('\n')
+                if 'stem' in name or i==1:
+                    name2s['stem'] = s
+                elif 'downsample' in name or i==2:
+                    name2s['downsample'] = s
+                else:
+                    name2s['base'] = s
+        # Handle detection mode
+        if self.base_block.mode == 'detection':
+            # For detection mode, process all sections as base blocks
+            base_ids = []
+            for key, block_txt in name2s.items():
+                out = self.base_block.check(block_txt, with_isomorphic=with_isomorphic)
+                if isinstance(out, dict):
+                    return out
+                elif out == -1:
+                    base_id = self.base_block.add_block(block_txt, f"{id}_{key}")
+                    if isinstance(base_id, dict):
+                        return base_id
+                    base_ids.append(base_id)
+                else:
+                    base_ids.append(out)
+            return True
+        elif set(name2s.keys()) == set(['base','stem','downsample']):
             out = self.base_block.check(name2s['base'],with_isomorphic=with_isomorphic)
             if isinstance(out,dict):
                 return out
@@ -116,7 +143,8 @@ class BlockGen:
                     print(status)
 
 if __name__=='__main__':
-    gen = BlockGen(block_dir='/home/SENSETIME/yangzekang/ModelGen/ModelFactoryV1/blocks',blocks_path='ModelFactoryV1')
-    gen.add_blocks_from_txt_path('/data3/yangzekang/ModelGen/ModelGen/block_txts/block_2.txt')
+    gen = BlockGen(blocks_dir='./blocks')
+    # block이 잘 되는지 테스트용 같음 
+    gen.add_blocks_from_txt_path('./block.txt')
 
         

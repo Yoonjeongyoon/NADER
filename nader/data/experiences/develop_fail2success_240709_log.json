@@ -1,0 +1,231 @@
+{
+	"base": {
+		"mobilenet_macro2": [
+			{
+				"fail_block": {
+					"base_block": "##MobileNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:Conv2d(out_channels=C,kernel_size=5,stride=1,groups=C)\n4:BN\n5:ReLU\n6:Conv2d(out_channels=C,kernel_size=1,stride=1)\n7:BN\n8:ReLU\n0->2\n0->3\n2->4\n3->4\n4->5\n5->6\n6->7\n7->8\n8->1",
+					"stem_block": "##MobileNetBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=2,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1",
+					"downsample+block": "##MobileNetBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=2,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1"
+				},
+				"error": "BN can receive only one input.",
+				"success_block": {
+					"base_block": "##MobileNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:Conv2d(out_channels=C,kernel_size=5,stride=1,groups=C)\n4:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n5:Add\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:ReLU\n0->2\n0->3\n0->4\n2->5\n3->5\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->1",
+					"stem_block": "##MobileNetBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+					"downsample+block": "##MobileNetBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n6:BN\n7:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->1"
+				}
+			}
+		],
+		"convnext_macro4": [
+			{
+				"fail_block": {
+					"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:Add\n0->2\n2->3\n3->4\n4->10\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->10\n10->1",
+					"stem_block": null,
+					"downsample+block": null
+				},
+				"error": "Add shape error",
+				"success_block": {
+					"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n2->9\n9->10\n0->10\n10->1",
+					"stem_block": "##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+					"downsample+block": "##input_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+				}
+			}
+		],
+		"googlenet_macro6": [
+			{
+				"fail_block": {
+					"base_block": "##GoogLeNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:concat(dim=1)\n25:Linear(out_channels=1)\n26:Sigmoid\n27:Mul\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n24->25\n25->26\n26->27\n0->27\n27->1",
+					"stem_block": null,
+					"downsample+block": null
+				},
+				"error": "When using Linear, the last dimension must be the channel dimension.",
+				"success_block": {
+					"base_block": "##GoogLeNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n24:concat(dim=1)\n25:AdaptiveAvgPool2d(output_size=1)\n26:Conv2d(out_channels=C,kernel_size=1,stride=1)\n27:Sigmoid\n28:Mul\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n4->24\n10->24\n19->24\n23->24\n24->25\n25->26\n26->27\n27->28\n0->28\n28->1",
+					"stem_block": "##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+					"downsample+block": "##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+				}
+			}
+		],
+		"resnet_base_macro1": [
+			{
+				"fail_block": {
+					"base_block": "##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Add\n9:Conv2d(out_channels=1,kernel_size=1,stride=1)\n10:Sigmoid\n11:Mul\n12:Conv2d(out_channels=1,kernel_size=1,stride=1)\n13:Sigmoid\n14:Mul\n0->2\n2->3\n3->4\n4->5\n5->6\n6->9\n9->10\n10->11\n6->11\n6->8\n0->8\n8->12\n12->13\n13->14\n8->14\n14->7\n7->1",
+					"stem_block": null,
+					"downsample+block": null
+				},
+				"error": "output is not the only output node.",
+				"success_block": {
+					"base_block": "##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:Conv2d(out_channels=1,kernel_size=1,stride=1)\n8:Sigmoid\n9:Mul\n10:Add\n11:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n6->9\n9->10\n0->10\n10->11\n11->1",
+					"stem_block": "##stem_block##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+					"downsample+block": "##downsample_block##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+				}
+			}
+		],
+		"resnet_base_macro10": [
+			{
+				"fail_block": {
+					"base_block": "##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:MaxPool2d(kernel_size=2,stride=2)\n9:AvgPool2d(kernel_size=2,stride=2)\n10:Add\n11:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n6->9\n8->10\n9->10\n10->11\n0->11\n11->7\n7->1",
+					"stem_block": null,
+					"downsample+block": null
+				},
+				"error": "Add shape error",
+				"success_block": {
+					"base_block": "##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:MaxPool2d(kernel_size=2,stride=1)\n9:AvgPool2d(kernel_size=2,stride=1)\n10:Add\n11:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->8\n6->9\n8->10\n9->10\n10->11\n0->11\n11->7\n7->1",
+					"stem_block": "##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+					"downsample+block": "##input_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+				}
+			}
+		],
+		"resnet_bottle_macro5": [
+			{
+				"fail_block": {
+					"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:AdaptiveAvgPool2d(output_size=1)\n11:reshape(C)\n12:Linear(out_channels=C/16)\n13:ReLU\n14:Linear(out_channels=C)\n15:Sigmoid\n16:reshape(1,C,1,1)\n17:Mul\n18:Add\n19:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n8->17\n16->17\n17->18\n0->18\n18->19\n19->1",
+					"stem_block": null,
+					"downsample+block": null
+				},
+				"error": "reshape operation's first dimension must be B.",
+				"success_block": {
+					"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:AdaptiveAvgPool2d(output_size=1)\n11:reshape(B,C)\n12:Linear(out_channels=C/16)\n13:ReLU\n14:Linear(out_channels=C)\n15:Sigmoid\n16:reshape(B,C,1,1)\n17:Mul\n18:Add\n19:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n8->17\n16->17\n17->18\n0->18\n18->19\n19->1",
+					"stem_block": "##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+					"downsample+block": "##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+				}
+			}
+		],
+		"resnet_bottle_macro8": [
+			{
+				"fail_block": {
+					"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n11:BN\n12:ReLU\n13:Conv2d(out_channels=C/4,kernel_size=5,stride=1)\n14:BN\n15:ReLU\n16:Conv2d(out_channels=C,kernel_size=1,stride=1)\n17:BN\n18:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n19:BN\n20:ReLU\n21:MaxPool2d(kernel_size=3,stride=1)\n22:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n23:BN\n24:concat(dim=1)\n25:Conv2d(out_channels=C,kernel_size=1,stride=1)\n26:BN\n27:Add\n28:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n0->18\n18->19\n19->20\n20->21\n21->22\n22->23\n9->24\n17->24\n23->24\n24->25\n25->26\n0->26\n26->27\n27->28\n28->1",
+					"stem_block": null,
+					"downsample+block": null
+				},
+				"error": "BN can receive only one input.",
+				"success_block": {
+					"base_block": "##ResNetBottleBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=3,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C,kernel_size=1,stride=1)\n9:BN\n10:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n11:BN\n12:ReLU\n13:Conv2d(out_channels=C/4,kernel_size=5,stride=1)\n14:BN\n15:ReLU\n16:Conv2d(out_channels=C,kernel_size=1,stride=1)\n17:BN\n18:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n19:BN\n20:ReLU\n21:MaxPool2d(kernel_size=3,stride=1)\n22:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n23:BN\n24:concat(dim=1)\n25:Conv2d(out_channels=C,kernel_size=1,stride=1)\n26:BN\n27:Add\n28:ReLU\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->10\n10->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n0->18\n18->19\n19->20\n20->21\n21->22\n22->23\n9->24\n17->24\n23->24\n24->25\n25->26\n26->27\n0->27\n27->28\n28->1",
+					"stem_block": "##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+					"downsample+block": "##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+				}
+			}
+		],
+		"googlenet_micro9": [
+			{
+				"fail_block": {
+					"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n18:BN\n19:ReLU\n20:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n21:BN\n22:ReLU\n23:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n24:BN\n25:ReLU\n26:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n27:BN\n28:ReLU\n29:MaxPool2d(kernel_size=3,stride=1)\n30:Conv2d(out_channels=C/2,kernel_size=1,stride=1)\n31:BN\n32:ReLU\n33:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n0->14\n14->15\n15->16\n16->17\n17->18\n18->19\n19->20\n20->21\n21->22\n22->23\n23->24\n24->25\n25->26\n26->27\n27->28\n0->29\n29->30\n30->31\n31->32\n4->33\n12->33\n28->33\n32->33\n33->1",
+					"stem_block": null,
+					"downsample+block": null
+				},
+				"error": "node 13 error: The node is not used.",
+				"success_block": {
+					"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n18:BN\n19:ReLU\n20:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n21:BN\n22:ReLU\n23:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n24:BN\n25:ReLU\n26:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n27:BN\n28:ReLU\n29:MaxPool2d(kernel_size=3,stride=1)\n30:Conv2d(out_channels=C/2,kernel_size=1,stride=1)\n31:BN\n32:ReLU\n33:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n12->13\n0->14\n14->15\n15->16\n16->17\n17->18\n18->19\n19->20\n20->21\n21->22\n22->23\n23->24\n24->25\n25->26\n26->27\n27->28\n0->29\n29->30\n30->31\n31->32\n4->33\n13->33\n28->33\n32->33\n33->1",
+					"stem_block": "##stem_block##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+					"downsample+block": "##downsample_block##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+				}
+			}
+		],
+		"googlenet_micro10": [
+			{
+				"fail_block": {
+					"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n25:Conv2d(out_channels=C/8,kernel_size=3,stride=1,dilation=4)\n26:BN\n27:ReLU\n24:concat(dim=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n0->25\n25->26\n26->27\n4->24\n10->24\n19->24\n23->24\n27->24\n24->1",
+					"stem_block": null,
+					"downsample+block": null
+				},
+				"error": "node 1 error: Output shape must be (B,C,H,W).",
+				"success_block": {
+					"base_block": "###GoogLeNetBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C/4,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:Conv2d(out_channels=C/2,kernel_size=3,stride=1)\n9:BN\n10:ReLU\n11:Conv2d(out_channels=C/16,kernel_size=1,stride=1)\n12:BN\n13:ReLU\n14:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n15:BN\n16:ReLU\n17:Conv2d(out_channels=C/8,kernel_size=3,stride=1)\n18:BN\n19:ReLU\n20:MaxPool2d(kernel_size=3,stride=1)\n21:Conv2d(out_channels=C/8,kernel_size=1,stride=1)\n22:BN\n23:ReLU\n25:Conv2d(out_channels=C/8,kernel_size=3,stride=1,dilation=4)\n26:BN\n27:ReLU\n28:concat(dim=1)\n29:Conv2d(out_channels=C,kernel_size=1,stride=1)\n0->2\n2->3\n3->4\n0->5\n5->6\n6->7\n7->8\n8->9\n9->10\n0->11\n11->12\n12->13\n13->14\n14->15\n15->16\n16->17\n17->18\n18->19\n0->20\n20->21\n21->22\n22->23\n0->25\n25->26\n26->27\n4->28\n10->28\n19->28\n23->28\n27->28\n28->29\n29->1",
+					"stem_block": "##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+					"downsample+block": "##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+				}
+			}
+		],
+		"mobilenet_micro2": [
+			{
+				"fail_block": {
+					"base_block": "##MobileNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:LN\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->1",
+					"stem_block": null,
+					"downsample+block": null
+				},
+				"error": "node 8 error: When using LN, the last dimension must be the channel dimension.",
+				"success_block": {
+					"base_block": "##MobileNetBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1,groups=C)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=1,stride=1)\n6:BN\n7:ReLU\n8:permute(0, 2, 3, 1)\n9:LN\n10:permute(0, 3, 1, 2)\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->1",
+					"stem_block": "##input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+					"downsample+block": "##input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+				}
+			}
+		],
+		"resnet_base_micro3": [
+			{
+				"fail_block": {
+					"base_block": "##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:permute(0,2,3,1)\n8:reshape(B*H*W,C)\n9:Linear(out_channels=C)\n10:reshape(B,H,W,C)\n11:permute(0,3,1,2)\n12:ReLU\n13:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n0->13\n12->13\n13->1",
+					"stem_block": null,
+					"downsample+block": null
+				},
+				"error": "node 8 error: reshape operation's first dimension must be B.",
+				"success_block": {
+					"base_block": "##ResNetBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=3,stride=1)\n3:BN\n4:ReLU\n5:Conv2d(out_channels=C,kernel_size=3,stride=1)\n6:BN\n7:permute(0,2,3,1)\n8:reshape(B,H*W,C)\n9:Linear(out_channels=C)\n10:reshape(B,H,W,C)\n11:permute(0,3,1,2)\n12:ReLU\n13:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n11->12\n0->13\n12->13\n13->1",
+					"stem_block": "##built-in function input_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=2)\n3:BN\n4:ReLU\n5:MaxPool2d(kernel_size=3,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+					"downsample+block": "##built-in function input_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:BN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+				}
+			}
+		]
+	},
+	"stem": {
+		"convnext_micro3": [
+			{
+				"fail_block": {
+					"base_block": "###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->10\n0->10\n10->9\n0->9\n9->1",
+					"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4,groups=C)\n3:LN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+					"downsample+block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n3:LN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+				},
+				"error": "When using LN, the last dimension must be the channel dimension.",
+				"success_block": {
+					"base_block": "###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:GELU\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n10:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->10\n2->10\n10->1",
+					"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+					"downsample+block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+				}
+			}
+		],
+		"convnext_micro5": [
+			{
+				"fail_block": {
+					"base_block": "###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:GELU\n6:Linear(out_channels=C*4)\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+					"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4,groups=C)\n3:LN\n4:GELU\n0->2\n2->3\n3->4\n4->1",
+					"downsample+block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n3:LN\n4:GELU\n0->2\n2->3\n3->4\n4->1"
+				},
+				"error": "When using LN, the last dimension must be the channel dimension.",
+				"success_block": {
+					"base_block": "###ConvNextBasicBlock###\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:GELU\n6:Linear(out_channels=C*4)\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+					"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+					"downsample+block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+				}
+			}
+		],
+		"convnext_micro6": [
+			{
+				"fail_block": {
+					"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C/2)\n6:GELU\n7:Linear(out_channels=C)\n8:GELU\n9:Linear(out_channels=C)\n10:permute(0,3,1,2)\n11:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n0->11\n11->1",
+					"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4,groups=C)\n3:LN\n4:ReLU\n0->2\n2->3\n3->4\n4->1",
+					"downsample+block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2,groups=C)\n3:LN\n4:ReLU\n0->2\n2->3\n3->4\n4->1"
+				},
+				"error": "When using LN, the last dimension must be the channel dimension.",
+				"success_block": {
+					"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C/2)\n6:GELU\n7:Linear(out_channels=C)\n8:GELU\n9:Linear(out_channels=C)\n10:permute(0,3,1,2)\n11:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n9->10\n10->11\n0->11\n11->1",
+					"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+					"downsample+block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+				}
+			}
+		],
+		"convnext_micro8": [
+			{
+				"fail_block": {
+					"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:Sigmoid\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+					"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=7,stride=4,groups=C)\n3:LN\n4:Sigmoid\n0->2\n2->3\n3->4\n4->1",
+					"downsample+block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n3:LN\n4:Sigmoid\n0->2\n2->3\n3->4\n4->1"
+				},
+				"error": "When using LN, the last dimension must be the channel dimension.",
+				"success_block": {
+					"base_block": "##ConvNextBasicBlock##\n0:input\n1:output\n2:Conv2d(out_channels=C,kernel_size=7,stride=1,groups=C)\n3:permute(0,2,3,1)\n4:LN\n5:Linear(out_channels=C*4)\n6:Sigmoid\n7:Linear(out_channels=C)\n8:permute(0,3,1,2)\n9:Add\n0->2\n2->3\n3->4\n4->5\n5->6\n6->7\n7->8\n8->9\n0->9\n9->1",
+					"stem_block": "##ConvNextBasicBlock_stem##\n0:input\n1:output\n2:Conv2d(out_channels=dim,kernel_size=4,stride=4)\n3:permute(0,2,3,1)\n4:LN\n5:permute(0,3,1,2)\n0->2\n2->3\n3->4\n4->5\n5->1",
+					"downsample+block": "##ConvNextBasicBlock_downsample##\n0:input\n1:output\n2:permute(0,2,3,1)\n3:LN\n4:permute(0,3,1,2)\n5:Conv2d(out_channels=dim,kernel_size=2,stride=2)\n0->2\n2->3\n3->4\n4->5\n5->1"
+				}
+			}
+		]
+	}
+}

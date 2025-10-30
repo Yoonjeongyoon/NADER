@@ -20,7 +20,7 @@ def call_llm(messages,max_try=50,use_proxy=False,*agrs,**kwds):
         open_proxy()
     if 'deepseek' in model_name:
         client = OpenAI(api_key=os.environ['API_KEY_DEEPSEEK'], base_url="https://api.deepseek.com", max_retries=10)
-    elif 'gpt' in model_name:
+    elif 'gpt' in model_name.lower():
         client = OpenAI(max_retries=10)
     else:
         raise NotImplementedError

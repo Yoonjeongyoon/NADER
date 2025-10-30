@@ -1,0 +1,1037 @@
+{
+	"convnext_macro1": {
+		"inspiration": "Integrate spatial attention mechanisms to enhance the focus on relevant spatial features, potentially improving the accuracy on tasks where spatial relationships are crucial.",
+		"base": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network blocks involving grouped convolutions, ensure that the `out_channels` parameter of the `Conv2d` operation is divisible by the `groups` parameter. This is necessary to maintain the integrity of the grouped convolution operation. For instance, if you set `groups` to the number of input channels (`C`), make sure that the `out_channels` is also set to a value that is divisible by `C`."
+			}
+		],
+		"stem": [
+			{
+				"error": "Add shape error",
+				"experience": "When designing a neural network using a directed acyclic graph, ensure that the shapes of the tensors match appropriately for any operation that requires tensors of the same shape, such as element-wise addition (`Add`). In particular:\n- Pay attention to changes in shape induced by convolution and pooling operations.\n- Ensure that the dimensions match before performing operations like `Add` or `Mul`.\n- Use reshape or pooling operations to align tensor dimensions if necessary.\n- Always validate tensor shapes at each step to avoid shape mismatches."
+			},
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network blocks involving grouped convolutions, ensure that the `out_channels` parameter of the `Conv2d` operation is divisible by the `groups` parameter. This is necessary to maintain the integrity of the grouped convolution operation. For instance, if you set `groups` to the number of input channels (`C`), make sure that the `out_channels` is also set to a value that is divisible by `C`."
+			}
+		],
+		"downsample": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network blocks involving grouped convolutions, ensure that the `out_channels` parameter of the `Conv2d` operation is divisible by the `groups` parameter. This is necessary to maintain the integrity of the grouped convolution operation. For instance, if you set `groups` to the number of input channels (`C`), make sure that the `out_channels` is also set to a value that is divisible by `C`."
+			}
+		]
+	},
+	"convnext_macro3": {
+		"inspiration": "Utilize dilation in convolution layers to increase the receptive field without increasing the number of parameters, which can help in capturing broader context.",
+		"base": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing convolutional layers using the `Conv2d` operation with a `groups` parameter, ensure that the `out_channels` value is divisible by the `groups` value. This will ensure that the convolutional operation is valid and does not produce an error. Specifically, for `Conv2d(out_channels=X, kernel_size=..., stride=..., dilation=..., groups=Y)`, the condition `X % Y == 0` must hold true. Adjust either `out_channels` or `groups` to satisfy this requirement."
+			}
+		],
+		"stem": [
+			{
+				"error": "When using LN, the last dimension must be the channel dimension.",
+				"experience": "When using Layer Normalization (LN) in your network design, ensure that the last dimension of the tensor is the channel dimension. You can rearrange the tensor dimensions using the `permute` operation to place the channel dimension last before applying LN."
+			},
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing convolutional layers using the `Conv2d` operation with a `groups` parameter, ensure that the `out_channels` value is divisible by the `groups` value. This will ensure that the convolutional operation is valid and does not produce an error. Specifically, for `Conv2d(out_channels=X, kernel_size=..., stride=..., dilation=..., groups=Y)`, the condition `X % Y == 0` must hold true. Adjust either `out_channels` or `groups` to satisfy this requirement."
+			}
+		],
+		"downsample": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing convolutional layers using the `Conv2d` operation with a `groups` parameter, ensure that the `out_channels` value is divisible by the `groups` value. This will ensure that the convolutional operation is valid and does not produce an error. Specifically, for `Conv2d(out_channels=X, kernel_size=..., stride=..., dilation=..., groups=Y)`, the condition `X % Y == 0` must hold true. Adjust either `out_channels` or `groups` to satisfy this requirement."
+			}
+		]
+	},
+	"convnext_macro4": {
+		"inspiration": "Add residual connections around nonlinearities and normalization layers to promote easier gradient flow during training and potentially enhance convergence rates.",
+		"base": [
+			{
+				"error": "Add cannot receive only one input.",
+				"experience": "When designing neural network blocks using the directed acyclic graph (DAG) method, ensure that operations such as `Add` and `Mul` that require multiple input tensors are supplied with the correct number of inputs. Carefully trace each tensor's flow through the network to make sure all operations receive the necessary inputs and that the overall structure adheres to the intended design."
+			},
+			{
+				"error": "Add shape error",
+				"experience": "When designing neural network blocks, ensure that the shapes of tensors being added, multiplied, or concatenated are compatible according to the PyTorch broadcasting rules. This helps prevent shape mismatches and ensures smooth execution of the network."
+			}
+		],
+		"stem": [
+			{
+				"error": "When using LN, the last dimension must be the channel dimension.",
+				"experience": "When using Layer Normalization (LN), ensure that the tensor's last dimension is the channel dimension. You can achieve this by using the `permute` operation to rearrange the tensor dimensions accordingly before applying LN, and then rearrange them back to the original order if needed for subsequent operations."
+			}
+		],
+		"downsample": []
+	},
+	"mobilenet_macro2": {
+		"inspiration": "Use depthwise separable convolutions with mixed kernel sizes in depthwise layers to capture features at various scales effectively.",
+		"base": [
+			{
+				"error": "BN can receive only one input.",
+				"experience": "When designing neural network architectures based on directed acyclic graphs, ensure that each node in the graph receives only one input. If you need to combine multiple inputs, use operations like `Add`, `Mul`, or `concat` to merge them into a single tensor before passing it to the next layer."
+			}
+		],
+		"stem": [
+			{
+				"error": "The height and width of the output feature map must be 1/4 of the input feature map.",
+				"experience": "To ensure the output feature map's height and width are 1/4 of the input feature map, you need to apply two operations that each halve the height and width of the feature map. For example, you can use two convolution layers each with `stride=2` or combine a convolution layer with `stride=2` followed by a pooling layer with `kernel_size=2` and `stride=2`. This will ensure the correct spatial dimensions of the output feature map."
+			}
+		],
+		"downsample": []
+	},
+	"convnext_micro3": {
+		"inspiration": "Introduce a second Add operation before the first permute to incorporate a shortcut connection from earlier in the block, promoting easier gradient flow.",
+		"base": [],
+		"stem": [
+			{
+				"error": "When using LN, the last dimension must be the channel dimension.",
+				"experience": "When using Layer Normalization (LN), always ensure that the last dimension of the input tensor is the channel dimension. You can achieve this by using the `permute` operation to rearrange the tensor dimensions appropriately before applying LN."
+			}
+		],
+		"downsample": []
+	},
+	"convnext_micro5": {
+		"inspiration": "Swap the positions of the Linear(out_channels=C*4) and GELU to check the effect of applying activation before the linear transformation.",
+		"base": [],
+		"stem": [
+			{
+				"error": "When using LN, the last dimension must be the channel dimension.",
+				"experience": "When using Layer Normalization (LN), always ensure that the last dimension of the tensor is the channel dimension. You can use the permute operation to rearrange the tensor dimensions such that the channel dimension is last before applying LN, and then permute it back to the original order afterward."
+			}
+		],
+		"downsample": []
+	},
+	"convnext_micro6": {
+		"inspiration": "Replace Linear(out_channels=C*4) with Linear(out_channels=C/2) and then another Linear(out_channels=C) to introduce a bottleneck structure, which might help in learning more robust features.",
+		"base": [],
+		"stem": [
+			{
+				"error": "When using LN, the last dimension must be the channel dimension.",
+				"experience": "When using Layer Normalization (LN), ensure that the channel dimension is the last dimension of the tensor. If the input tensor shape is (B, C, H, W), you need to rearrange it to (B, H, W, C) before applying LN and then rearrange it back to (B, C, H, W) if needed for subsequent operations."
+			}
+		],
+		"downsample": []
+	},
+	"convnext_micro8": {
+		"inspiration": "Employ a Sigmoid activation instead of GELU to explore impacts on the non-linearity characteristics of the block.",
+		"base": [],
+		"stem": [
+			{
+				"error": "When using LN, the last dimension must be the channel dimension.",
+				"experience": "When using Layer Normalization (LN), ensure that the last dimension of the tensor is the channel dimension. If the tensor shape is (B, C, H, W), you need to permute it to (B, H, W, C) before applying LN, and then permute it back to the original shape if needed."
+			}
+		],
+		"downsample": []
+	},
+	"convnext_macro2": {
+		"inspiration": "Incorporate depthwise separable convolutions to reduce the computational cost while maintaining performance, beneficial for deploying models on resource-constrained devices.",
+		"base": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing a neural network, ensure that the `out_channels` parameter in the `Conv2d` operation is divisible by the `groups` parameter. This is necessary to maintain valid configurations and avoid errors. Specifically, if you set `groups` to be equal to `C` (the number of input channels), make sure that `out_channels` is also a multiple of `C`."
+			}
+		],
+		"stem": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing a neural network, ensure that the `out_channels` parameter in the `Conv2d` operation is divisible by the `groups` parameter. This is necessary to maintain valid configurations and avoid errors. Specifically, if you set `groups` to be equal to `C` (the number of input channels), make sure that `out_channels` is also a multiple of `C`."
+			}
+		],
+		"downsample": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing a neural network, ensure that the `out_channels` parameter in the `Conv2d` operation is divisible by the `groups` parameter. This is necessary to maintain valid configurations and avoid errors. Specifically, if you set `groups` to be equal to `C` (the number of input channels), make sure that `out_channels` is also a multiple of `C`."
+			}
+		]
+	},
+	"googlenet_macro4": {
+		"inspiration": "Embed feature recalibration through squeeze-and-excitation blocks to adaptively recalibrate channel-wise feature responses.",
+		"base": [
+			{
+				"error": "The size of tensor a (268) must match the size of tensor b (267) at non-singleton dimension 1",
+				"experience": "When designing complex neural network blocks involving multiple branches and concatenation, always ensure that the spatial dimensions of the tensors being concatenated or operated upon are consistent. This can be achieved by maintaining consistent padding or explicitly setting the spatial dimensions using pooling operations or ensuring the input sizes are appropriate. Additionally, always verify the output dimensions after each operation to prevent mismatches."
+			}
+		],
+		"stem": [
+			{
+				"error": "The size of tensor a (268) must match the size of tensor b (267) at non-singleton dimension 1",
+				"experience": "When designing complex neural network blocks involving multiple branches and concatenation, always ensure that the spatial dimensions of the tensors being concatenated or operated upon are consistent. This can be achieved by maintaining consistent padding or explicitly setting the spatial dimensions using pooling operations or ensuring the input sizes are appropriate. Additionally, always verify the output dimensions after each operation to prevent mismatches."
+			}
+		],
+		"downsample": [
+			{
+				"error": "The size of tensor a (268) must match the size of tensor b (267) at non-singleton dimension 1",
+				"experience": "When designing complex neural network blocks involving multiple branches and concatenation, always ensure that the spatial dimensions of the tensors being concatenated or operated upon are consistent. This can be achieved by maintaining consistent padding or explicitly setting the spatial dimensions using pooling operations or ensuring the input sizes are appropriate. Additionally, always verify the output dimensions after each operation to prevent mismatches."
+			}
+		]
+	},
+	"mobilenet_macro4": {
+		"inspiration": "Integrate non-linear activation functions like GELU or Swish to potentially improve model training dynamics and performance on complex datasets.",
+		"base": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network blocks involving grouped convolutions (`Conv2d` with `groups` parameter), ensure that the `out_channels` parameter is divisible by the `groups` parameter. This is a necessary condition for grouped convolutions to function correctly. Always verify that `out_channels % groups == 0` to avoid configuration errors. Additionally, carefully consider the relationship between the input and output dimensions, especially when using grouped convolutions and pooling layers, to maintain the desired tensor shapes throughout the network."
+			}
+		],
+		"stem": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network blocks involving grouped convolutions (`Conv2d` with `groups` parameter), ensure that the `out_channels` parameter is divisible by the `groups` parameter. This is a necessary condition for grouped convolutions to function correctly. Always verify that `out_channels % groups == 0` to avoid configuration errors. Additionally, carefully consider the relationship between the input and output dimensions, especially when using grouped convolutions and pooling layers, to maintain the desired tensor shapes throughout the network."
+			}
+		],
+		"downsample": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network blocks involving grouped convolutions (`Conv2d` with `groups` parameter), ensure that the `out_channels` parameter is divisible by the `groups` parameter. This is a necessary condition for grouped convolutions to function correctly. Always verify that `out_channels % groups == 0` to avoid configuration errors. Additionally, carefully consider the relationship between the input and output dimensions, especially when using grouped convolutions and pooling layers, to maintain the desired tensor shapes throughout the network."
+			}
+		]
+	},
+	"mobilenet_macro5": {
+		"inspiration": "Adopt a dual-pathway architecture to process features through parallel paths with different convolutional operations, allowing the model to learn more robust features.",
+		"base": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing convolutional neural networks with grouped convolutions, always ensure that the `out_channels` parameter is divisible by the `groups` parameter. For instance, if `groups=C`, then `out_channels` should be a multiple of `C`. This guarantees that each group processes an equal portion of the input channels."
+			}
+		],
+		"stem": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing convolutional neural networks with grouped convolutions, always ensure that the `out_channels` parameter is divisible by the `groups` parameter. For instance, if `groups=C`, then `out_channels` should be a multiple of `C`. This guarantees that each group processes an equal portion of the input channels."
+			}
+		],
+		"downsample": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing convolutional neural networks with grouped convolutions, always ensure that the `out_channels` parameter is divisible by the `groups` parameter. For instance, if `groups=C`, then `out_channels` should be a multiple of `C`. This guarantees that each group processes an equal portion of the input channels."
+			}
+		]
+	},
+	"mobilenet_macro6": {
+		"inspiration": "Include skip connections between non-consecutive layers to facilitate deeper layer training and mitigate the vanishing gradient problem.",
+		"base": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network blocks that utilize grouped convolutions (`Conv2d` with `groups` parameter), always ensure that the `out_channels` parameter is divisible by the `groups` parameter. This is a mandatory requirement for grouped convolutions to work correctly. For example, if `groups=C`, then `out_channels` must be a multiple of `C`. If `groups` is not explicitly specified, it defaults to 1, and any value of `out_channels` is valid since any integer is divisible by 1."
+			}
+		],
+		"stem": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network blocks that utilize grouped convolutions (`Conv2d` with `groups` parameter), always ensure that the `out_channels` parameter is divisible by the `groups` parameter. This is a mandatory requirement for grouped convolutions to work correctly. For example, if `groups=C`, then `out_channels` must be a multiple of `C`. If `groups` is not explicitly specified, it defaults to 1, and any value of `out_channels` is valid since any integer is divisible by 1."
+			}
+		],
+		"downsample": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network blocks that utilize grouped convolutions (`Conv2d` with `groups` parameter), always ensure that the `out_channels` parameter is divisible by the `groups` parameter. This is a mandatory requirement for grouped convolutions to work correctly. For example, if `groups=C`, then `out_channels` must be a multiple of `C`. If `groups` is not explicitly specified, it defaults to 1, and any value of `out_channels` is valid since any integer is divisible by 1."
+			}
+		]
+	},
+	"mobilenet_macro7": {
+		"inspiration": "Utilize dilated convolutions to increase the receptive field without reducing spatial resolution, enhancing the model's ability to understand larger context without increasing computational cost.",
+		"base": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing a neural network with convolution operations, ensure that the `out_channels` parameter is divisible by the `groups` parameter to avoid errors. This applies particularly when using grouped convolutions. If the network block uses a variable `dim` for `out_channels`, make sure that `dim` is always defined such that it is divisible by the number of `groups`."
+			}
+		],
+		"stem": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing a neural network with convolution operations, ensure that the `out_channels` parameter is divisible by the `groups` parameter to avoid errors. This applies particularly when using grouped convolutions. If the network block uses a variable `dim` for `out_channels`, make sure that `dim` is always defined such that it is divisible by the number of `groups`."
+			}
+		],
+		"downsample": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing a neural network with convolution operations, ensure that the `out_channels` parameter is divisible by the `groups` parameter to avoid errors. This applies particularly when using grouped convolutions. If the network block uses a variable `dim` for `out_channels`, make sure that `dim` is always defined such that it is divisible by the number of `groups`."
+			}
+		]
+	},
+	"googlenet_macro9": {
+		"inspiration": "Introduce a residual connection to improve gradient flow during training.",
+		"base": [
+			{
+				"error": "The size of tensor a (268) must match the size of tensor b (267) at non-singleton dimension 1",
+				"experience": "When designing a neural network with multiple branches that will be concatenated or added together, ensure that all branches maintain consistent spatial dimensions (height and width) throughout their respective operations. Use padding in convolution and pooling layers to preserve the input dimensions, or carefully adjust stride and kernel sizes to ensure outputs are compatible for concatenation or addition."
+			}
+		],
+		"stem": [
+			{
+				"error": "The size of tensor a (268) must match the size of tensor b (267) at non-singleton dimension 1",
+				"experience": "When designing a neural network with multiple branches that will be concatenated or added together, ensure that all branches maintain consistent spatial dimensions (height and width) throughout their respective operations. Use padding in convolution and pooling layers to preserve the input dimensions, or carefully adjust stride and kernel sizes to ensure outputs are compatible for concatenation or addition."
+			}
+		],
+		"downsample": [
+			{
+				"error": "The size of tensor a (268) must match the size of tensor b (267) at non-singleton dimension 1",
+				"experience": "When designing a neural network with multiple branches that will be concatenated or added together, ensure that all branches maintain consistent spatial dimensions (height and width) throughout their respective operations. Use padding in convolution and pooling layers to preserve the input dimensions, or carefully adjust stride and kernel sizes to ensure outputs are compatible for concatenation or addition."
+			}
+		]
+	},
+	"convnext_micro2": {
+		"inspiration": "Change the activation function from GELU to ReLU in the block to check if it results in faster convergence during training.",
+		"base": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural networks using Conv2d operations with groups, ensure that the `out_channels` parameter is divisible by the `groups` parameter. This is necessary because the channels are divided among the groups, and each group processes a portion of the channels independently. If `out_channels` is not divisible by `groups`, it will result in an error. A good practice is to double-check the divisibility constraint whenever you configure grouped convolution layers."
+			}
+		],
+		"stem": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural networks using Conv2d operations with groups, ensure that the `out_channels` parameter is divisible by the `groups` parameter. This is necessary because the channels are divided among the groups, and each group processes a portion of the channels independently. If `out_channels` is not divisible by `groups`, it will result in an error. A good practice is to double-check the divisibility constraint whenever you configure grouped convolution layers."
+			}
+		],
+		"downsample": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural networks using Conv2d operations with groups, ensure that the `out_channels` parameter is divisible by the `groups` parameter. This is necessary because the channels are divided among the groups, and each group processes a portion of the channels independently. If `out_channels` is not divisible by `groups`, it will result in an error. A good practice is to double-check the divisibility constraint whenever you configure grouped convolution layers."
+			}
+		]
+	},
+	"convnext_micro4": {
+		"inspiration": "Implement a BN layer after the second permute to stabilize the learning by normalizing the feature maps at that stage.",
+		"base": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network blocks with grouped convolutions, always ensure that the `out_channels` parameter of the `Conv2d` operation is divisible by the `groups` parameter. This ensures that each group in the convolution operation receives an equal number of input channels, thus avoiding design errors."
+			}
+		],
+		"stem": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network blocks with grouped convolutions, always ensure that the `out_channels` parameter of the `Conv2d` operation is divisible by the `groups` parameter. This ensures that each group in the convolution operation receives an equal number of input channels, thus avoiding design errors."
+			}
+		],
+		"downsample": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network blocks with grouped convolutions, always ensure that the `out_channels` parameter of the `Conv2d` operation is divisible by the `groups` parameter. This ensures that each group in the convolution operation receives an equal number of input channels, thus avoiding design errors."
+			}
+		]
+	},
+	"googlenet_micro2": {
+		"inspiration": "Add a residual connection from the input to the output of the block to improve gradient flow during training.",
+		"base": [
+			{
+				"error": "The size of tensor a (267) must match the size of tensor b (268) at non-singleton dimension 1",
+				"experience": "When designing a neural network block, ensure that all operations that contribute to a concatenation or addition operation produce feature maps with consistent spatial dimensions. Pay special attention to the effect of convolutional and pooling operations on the height and width of feature maps to avoid dimension mismatches."
+			}
+		],
+		"stem": [
+			{
+				"error": "The size of tensor a (267) must match the size of tensor b (268) at non-singleton dimension 1",
+				"experience": "When designing a neural network block, ensure that all operations that contribute to a concatenation or addition operation produce feature maps with consistent spatial dimensions. Pay special attention to the effect of convolutional and pooling operations on the height and width of feature maps to avoid dimension mismatches."
+			}
+		],
+		"downsample": [
+			{
+				"error": "The size of tensor a (267) must match the size of tensor b (268) at non-singleton dimension 1",
+				"experience": "When designing a neural network block, ensure that all operations that contribute to a concatenation or addition operation produce feature maps with consistent spatial dimensions. Pay special attention to the effect of convolutional and pooling operations on the height and width of feature maps to avoid dimension mismatches."
+			}
+		]
+	},
+	"googlenet_micro7": {
+		"inspiration": "Integrate a shortcut connection from the input to the output of the block.",
+		"base": [
+			{
+				"error": "The size of tensor a (268) must match the size of tensor b (267) at non-singleton dimension 1",
+				"experience": "When designing network blocks that involve concatenation:\n\n1. Ensure that all branches produce tensors with the same spatial dimensions before concatenation.\n2. Use padding in convolution and pooling operations to maintain consistent dimensions.\n3. Carefully calculate the output dimensions after each operation to ensure compatibility.\n4. Test each branch individually to confirm that their outputs can be concatenated without dimension mismatches."
+			},
+			{
+				"error": "The size of tensor a (267) must match the size of tensor b (268) at non-singleton dimension 1",
+				"experience": "When designing neural network architectures involving multiple branches that are later concatenated, ensure that the spatial dimensions (height and width) of all branches are consistent before the concatenation operation. This can be achieved by carefully managing the parameters of convolution (kernel size, stride, and padding) and pooling operations to maintain the same spatial dimensions across different branches. Additionally, consider using padding strategies or adaptive pooling to align feature map sizes."
+			}
+		],
+		"stem": [
+			{
+				"error": "The size of tensor a (268) must match the size of tensor b (267) at non-singleton dimension 1",
+				"experience": "When designing network blocks that involve concatenation:\n\n1. Ensure that all branches produce tensors with the same spatial dimensions before concatenation.\n2. Use padding in convolution and pooling operations to maintain consistent dimensions.\n3. Carefully calculate the output dimensions after each operation to ensure compatibility.\n4. Test each branch individually to confirm that their outputs can be concatenated without dimension mismatches."
+			},
+			{
+				"error": "The size of tensor a (267) must match the size of tensor b (268) at non-singleton dimension 1",
+				"experience": "When designing neural network architectures involving multiple branches that are later concatenated, ensure that the spatial dimensions (height and width) of all branches are consistent before the concatenation operation. This can be achieved by carefully managing the parameters of convolution (kernel size, stride, and padding) and pooling operations to maintain the same spatial dimensions across different branches. Additionally, consider using padding strategies or adaptive pooling to align feature map sizes."
+			}
+		],
+		"downsample": [
+			{
+				"error": "The size of tensor a (268) must match the size of tensor b (267) at non-singleton dimension 1",
+				"experience": "When designing network blocks that involve concatenation:\n\n1. Ensure that all branches produce tensors with the same spatial dimensions before concatenation.\n2. Use padding in convolution and pooling operations to maintain consistent dimensions.\n3. Carefully calculate the output dimensions after each operation to ensure compatibility.\n4. Test each branch individually to confirm that their outputs can be concatenated without dimension mismatches."
+			},
+			{
+				"error": "The size of tensor a (267) must match the size of tensor b (268) at non-singleton dimension 1",
+				"experience": "When designing neural network architectures involving multiple branches that are later concatenated, ensure that the spatial dimensions (height and width) of all branches are consistent before the concatenation operation. This can be achieved by carefully managing the parameters of convolution (kernel size, stride, and padding) and pooling operations to maintain the same spatial dimensions across different branches. Additionally, consider using padding strategies or adaptive pooling to align feature map sizes."
+			}
+		]
+	},
+	"mobilenet_micro6": {
+		"inspiration": "Modify the second Conv2d to have groups=2, creating a grouped convolution that might help the model learn more diverse features.",
+		"base": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network blocks with grouped convolutions, ensure that the `out_channels` parameter is divisible by the `groups` parameter. This is a requirement for the proper execution of grouped convolutions. Always check the divisibility of these parameters to avoid design errors."
+			}
+		],
+		"stem": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network blocks with grouped convolutions, ensure that the `out_channels` parameter is divisible by the `groups` parameter. This is a requirement for the proper execution of grouped convolutions. Always check the divisibility of these parameters to avoid design errors."
+			}
+		],
+		"downsample": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network blocks with grouped convolutions, ensure that the `out_channels` parameter is divisible by the `groups` parameter. This is a requirement for the proper execution of grouped convolutions. Always check the divisibility of these parameters to avoid design errors."
+			}
+		]
+	},
+	"mobilenet_micro7": {
+		"inspiration": "Add an additional Conv2d layer with a very small kernel_size=1 and dilation=2 between the first BN and ReLU to introduce an additional level of feature transformation.",
+		"base": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network architectures involving grouped convolutions, ensure that the `out_channels` parameter is divisible by the `groups` parameter. This is crucial for the correct functioning of grouped convolutions. Always validate that these constraints are met to avoid design errors."
+			}
+		],
+		"stem": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network architectures involving grouped convolutions, ensure that the `out_channels` parameter is divisible by the `groups` parameter. This is crucial for the correct functioning of grouped convolutions. Always validate that these constraints are met to avoid design errors."
+			}
+		],
+		"downsample": [
+			{
+				"error": "out_channels must be divisible by groups",
+				"experience": "When designing neural network architectures involving grouped convolutions, ensure that the `out_channels` parameter is divisible by the `groups` parameter. This is crucial for the correct functioning of grouped convolutions. Always validate that these constraints are met to avoid design errors."
+			}
+		]
+	},
+	"convnext_macro5": {
+		"inspiration": "Implement squeeze-and-excitation blocks to recalibrate channel-wise feature responses by explicitly modelling interdependencies between channels.",
+		"base": [
+			{
+				"error": "When using Linear, the last dimension must be the channel dimension.",
+				"experience": "When using `Linear` layers in a neural network, ensure that the last dimension of the input tensor is the channel dimension. If necessary, use `reshape` to adjust the tensor shape before and after applying the `Linear` layer to maintain the correct dimensionality."
+			},
+			{
+				"error": "The block definition does not comply with the regulations.",
+				"experience": "When designing neural network blocks using directed acyclic graphs, ensure that each output node has only one input. If you need to combine multiple inputs, use intermediate nodes or operations that comply with the rule of single-input for output nodes. For example, you can use an `Add` operation to combine inputs, and then connect its output to the final output node."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"convnext_macro6": {
+		"inspiration": "Include feature pyramid networks within the block to build a multi-scale feature pyramid from a single scale input, enhancing the detection of objects at multiple scales.",
+		"base": [
+			{
+				"error": "Concat error: [4, 64, 32, 32],[4, 192, 16, 16]",
+				"experience": "When designing a neural network using directed acyclic graphs, always ensure that the dimensions of tensors being concatenated along a specific axis are consistent. This includes matching the height and width dimensions for convolutional feature maps. Use pooling or upsampling operations as necessary to align the dimensions before concatenation."
+			},
+			{
+				"error": "Concat error: [4, 64, 16, 16],[4, 192, 32, 32]",
+				"experience": "When designing neural networks with tensor concatenation, ensure that all tensors being concatenated along a specific axis have the same shape in all other dimensions. Use appropriate operations such as pooling, striding, or interpolation to match the dimensions before concatenating."
+			},
+			{
+				"error": "Concat error: [4, 64, 16, 16],[4, 256, 32, 32]",
+				"experience": "When using the `concat(dim)` operation, ensure that all tensors to be concatenated have the same shape in all dimensions other than the specified dimension `dim`. Specifically, for `concat(dim=1)`, the height and width of the tensors must match. Use appropriate operations like pooling, convolution, or reshaping to align the dimensions of the tensors before concatenation."
+			},
+			{
+				"error": "Concat error: [4, 64, 16, 16],[4, 320, 32, 32]",
+				"experience": "When designing neural networks using operations such as `concat`, ensure that all tensors to be concatenated have consistent shapes along all dimensions except the concatenation dimension. To achieve this:\n1. Carefully track the spatial dimensions (height and width) of tensors throughout the network.\n2. Use appropriate operations (e.g., pooling, upsampling) to ensure that tensors have matching spatial dimensions before concatenation.\n3. Verify the shapes of intermediate tensors at each step of the network design to prevent dimension mismatches."
+			},
+			{
+				"error": "Concat error: [4, 3, 112, 112],[4, 15, 224, 224]",
+				"experience": "When designing neural networks using directed acyclic graphs, ensure that all tensors being concatenated along a specific dimension have consistent sizes in all other dimensions. This often involves carefully managing stride and pooling operations to maintain consistent tensor shapes. Additionally, verify that pooling or resizing operations are correctly applied to tensors before concatenation to ensure shape compatibility."
+			},
+			{
+				"error": "AdaptiveAvgPool2d can receive only one input.",
+				"experience": "When designing neural network architectures using directed acyclic graphs, make sure that each output node (operation) receives only one input. If multiple inputs are required, consider using operations like `concat`, `Add`, or `Mul` to combine inputs before feeding them into the desired node."
+			},
+			{
+				"error": "Output shape error.",
+				"experience": "When designing neural networks using directed acyclic graphs, ensure that:\n1. All tensors being concatenated along a specific dimension have the same sizes in all other dimensions.\n2. After concatenation, the resulting tensor's dimensions should be compatible with subsequent operations. If concatenating N tensors each with C channels along the channel dimension, the resulting tensor will have N*C channels.\n3. Normalize the dimensions correctly before concatenation if necessary. For example, if tensors have different spatial dimensions (H, W), consider resizing or pooling them to a common size before concatenation."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"convnext_macro7": {
+		"inspiration": "Introduce conditional computation in the block, where parts of the network are activated based on the input, to increase model efficiency.",
+		"base": [
+			{
+				"error": "Mul shape error",
+				"experience": "When designing neural network architectures with tensor operations, ensure that the shapes of tensors align correctly according to broadcasting rules for element-wise operations. Specifically:\n1. Ensure the dimensions match or are broadcastable.\n2. Use reshaping or broadcasting techniques to align tensor shapes before element-wise operations.\n3. Verify the shapes at each step of the computational graph to prevent mismatches."
+			},
+			{
+				"error": "reshape dims error",
+				"experience": "When designing a neural network using directed acyclic graphs, ensure that the `reshape` operation correctly transforms the tensor's dimensions while maintaining the total number of elements. Always verify the shape of the tensor before and after each operation to prevent dimension mismatches."
+			},
+			{
+				"error": "The block definition does not comply with the regulations.",
+				"experience": "When designing a neural network block using the directed acyclic graph approach, ensure that each output node has only one input. If you need to combine multiple branches, use operations like `Add`, `concat`, or other appropriate operations to merge them into a single tensor before the final output."
+			},
+			{
+				"error": "The output node can have only one input.",
+				"experience": "When designing a neural network as a directed acyclic graph, ensure that each output node has only one direct input. If multiple outputs need to be combined, use an appropriate operation (like Add or Mul) to merge them into a single tensor before connecting to the output node."
+			},
+			{
+				"error": "mean() received an invalid combination of arguments - got (Tensor, keepdim=bool, dim=float), but expected one of:\n * (Tensor input, *, torch.dtype dtype)\n      didn't match because some of the keywords were incorrect: keepdim, dim\n * (Tensor input, tuple of ints dim, bool keepdim, *, torch.dtype dtype, Tensor out)\n * (Tensor input, tuple of names dim, bool keepdim, *, torch.dtype dtype, Tensor out)\n",
+				"experience": "When designing neural network blocks, ensure that function calls match the expected argument types and orders defined by the underlying framework (such as PyTorch). Carefully verify the argument syntax, especially for functions that accept multiple parameters, such as `mean`, `sum`, and `max`. This will prevent common errors related to argument mismatches and ensure that your network design is correctly implemented."
+			}
+		],
+		"stem": [
+			{
+				"error": "mean() received an invalid combination of arguments - got (Tensor, keepdim=bool, dim=float), but expected one of:\n * (Tensor input, *, torch.dtype dtype)\n      didn't match because some of the keywords were incorrect: keepdim, dim\n * (Tensor input, tuple of ints dim, bool keepdim, *, torch.dtype dtype, Tensor out)\n * (Tensor input, tuple of names dim, bool keepdim, *, torch.dtype dtype, Tensor out)\n",
+				"experience": "When designing neural network blocks, ensure that function calls match the expected argument types and orders defined by the underlying framework (such as PyTorch). Carefully verify the argument syntax, especially for functions that accept multiple parameters, such as `mean`, `sum`, and `max`. This will prevent common errors related to argument mismatches and ensure that your network design is correctly implemented."
+			}
+		],
+		"downsample": [
+			{
+				"error": "mean() received an invalid combination of arguments - got (Tensor, keepdim=bool, dim=float), but expected one of:\n * (Tensor input, *, torch.dtype dtype)\n      didn't match because some of the keywords were incorrect: keepdim, dim\n * (Tensor input, tuple of ints dim, bool keepdim, *, torch.dtype dtype, Tensor out)\n * (Tensor input, tuple of names dim, bool keepdim, *, torch.dtype dtype, Tensor out)\n",
+				"experience": "When designing neural network blocks, ensure that function calls match the expected argument types and orders defined by the underlying framework (such as PyTorch). Carefully verify the argument syntax, especially for functions that accept multiple parameters, such as `mean`, `sum`, and `max`. This will prevent common errors related to argument mismatches and ensure that your network design is correctly implemented."
+			}
+		]
+	},
+	"convnext_macro8": {
+		"inspiration": "Apply a self-attention mechanism to capture global dependencies across the input feature map, potentially enhancing feature representation.",
+		"base": [
+			{
+				"error": "The block definition does not comply with the regulations.",
+				"experience": "Ensure that each output node in your neural network block has only one input. If you need to combine multiple inputs, consider using operations like `concat` before the final output node to merge the inputs into a single tensor."
+			},
+			{
+				"error": "multiply cannot receive only one input.",
+				"experience": "When designing a neural network using directed acyclic graphs, ensure that operations requiring multiple inputs, such as `multiply`, `Add`, and `concat`, are supplied with the correct number of inputs. Each input should be properly defined and connected in the computation graph. Specifically, for operations like `multiply`, ensure that the shapes of the two input tensors conform to the matrix multiplication rules."
+			},
+			{
+				"error": "Can not multiply error",
+				"experience": "When designing a neural network, especially when using operations that involve tensor multiplication (such as multiply), ensure that the shapes of the input tensors are compatible according to matrix multiplication rules. For example, if you want to multiply two tensors, one tensor should have the shape (B, X, Y) and the other tensor should have the shape (B, Y, Z). Always verify that your tensor dimensions align correctly to avoid shape mismatches."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"googlenet_macro5": {
+		"inspiration": "Integrate attention gates before concatenation to focus the model on pertinent features across different convolution paths.",
+		"base": [
+			{
+				"error": "Mul cannot receive only one input.",
+				"experience": "When designing neural network architectures, ensure that operations requiring multiple inputs, such as `Mul` (element-wise multiplication), receive the appropriate number of inputs. Specifically, verify that each `Mul` operation gets at least two input tensors to perform the multiplication. This helps in avoiding runtime errors and ensures that the network design adheres to the expected mathematical operations."
+			},
+			{
+				"error": "The block definition does not comply with the regulations.",
+				"experience": "When designing neural network architectures using directed acyclic graphs (DAG):\n1. Ensure that the output node has only one input.\n2. Confirm that all intermediate operations, especially element-wise ones like `Mul`, adhere to the PyTorch broadcasting rules.\n3. Avoid cyclic dependencies by ensuring that each node is connected in a manner that maintains the acyclic property of the graph.\n4. Verify that the shapes of tensors are compatible for each operation, especially when chaining multiple operations together.\n5. Use clear and consistent naming and indexing to avoid confusion and maintain a clean, readable design."
+			},
+			{
+				"error": "Output shape error.",
+				"experience": "When designing a neural network using directed acyclic graphs, ensure that all tensors being concatenated have consistent shapes in all dimensions except for the concatenation dimension. Carefully track the shapes of tensors through each operation, especially after convolutions and element-wise operations, to avoid shape mismatches. Always verify that the outputs of operations like element-wise multiplication match the expected input shapes for subsequent operations."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"googlenet_macro6": {
+		"inspiration": "Introduce conditional computation in the block, where parts of the network are activated based on the input, to increase model efficiency.",
+		"base": [
+			{
+				"error": "When using Linear, the last dimension must be the channel dimension.",
+				"experience": "When designing a neural network, ensure that the input to a Linear layer has its last dimension as the channel dimension. If the input tensor has additional spatial dimensions, these should be flattened before being passed into the Linear layer. This can be achieved using a reshape operation."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"googlenet_macro8": {
+		"inspiration": "Use a hybrid dilated convolution approach to mix different dilation rates in parallel paths for enriched feature extraction.",
+		"base": [
+			{
+				"error": "Output shape error.",
+				"experience": "When designing a neural network using directed acyclic graphs, ensure that all tensors input to the `concat` operation have consistent dimensions across all axes except for the concatenation axis. Verify each tensor's shape at every step to ensure compatibility, especially when using multiple convolutional layers with different kernel sizes, strides, or dilation rates. Always double-check the final output tensor shape to meet the expected dimensions."
+			},
+			{
+				"error": "The defined node 24:BN is not used",
+				"experience": "When designing neural network architectures using directed acyclic graphs (DAGs), ensure that every defined node is utilized in the computation graph. Double-check the connections to verify that each operation's output is used in subsequent operations, avoiding redundant or unused nodes."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"googlenet_macro10": {
+		"inspiration": "Apply feature pyramid networks within the block to build multi-scale feature representations that are beneficial for various vision tasks.",
+		"base": [
+			{
+				"error": "Concat error: [4, 16, 16, 16],[4, 112, 32, 32]",
+				"experience": "When designing a neural network that involves concatenation of multiple branches or paths, ensure that all tensors being concatenated have the same spatial dimensions (height and width) before the concatenation operation. You can achieve this by ensuring that all branches undergo the same amount of down-sampling or up-sampling operations so that their spatial dimensions match. Alternatively, you can use operations like `AdaptiveAvgPool2d` or `AdaptiveMaxPool2d` to resize the tensors to a common spatial size before concatenation."
+			},
+			{
+				"error": "Concat error: [4, 16, 16, 16],[4, 160, 32, 32]",
+				"experience": "Ensure that all tensors being concatenated have the same dimensions in all axes except the concatenation axis. Specifically, when using operations like `MaxPool2d` or convolutions with a stride greater than 1, ensure that the resulting tensor dimensions are adjusted to match the other tensors in the network appropriately. For instance, use `AdaptiveAvgPool2d` or `AdaptiveMaxPool2d` to adjust the spatial dimensions (height and width) of tensors before concatenation."
+			},
+			{
+				"error": "Concat error: [4, 64, 32, 32],[4, 192, 16, 16]",
+				"experience": "When designing neural networks that involve concatenation operations, ensure that the dimensions of all tensors being concatenated (except for the concatenation dimension) are consistent. This often requires carefully managing the strides and pooling operations to maintain compatible tensor shapes. Always verify the dimensions after each operation to avoid mismatches during concatenation."
+			},
+			{
+				"error": "Concat error: [4, 64, 16, 16],[4, 256, 32, 32]",
+				"experience": "To accurately design a neural network using directed acyclic graphs, ensure that all feature maps being concatenated or added have compatible dimensions. Specifically, when concatenating along the channel dimension, the spatial dimensions (height and width) of the feature maps must be the same. This can be achieved by carefully managing the strides, kernel sizes, and pooling operations along different paths to maintain consistent spatial dimensions."
+			},
+			{
+				"error": "Concat error: [4, 0, 112, 112],[4, 4, 224, 224]",
+				"experience": "When designing a neural network using directed acyclic graphs (DAGs) and operations like concatenation, ensure that the dimensions of all tensors being concatenated, except for the concatenation dimension, are consistent. This typically involves ensuring that all tensors pass through operations that maintain or appropriately modify their spatial dimensions (height and width) and channels to match before concatenation. Use pooling, convolution with appropriate stride, or other dimension-altering operations in a controlled manner to achieve the required consistency."
+			},
+			{
+				"error": "Output shape error.",
+				"experience": "When designing a network, ensure that all tensors being concatenated have the same shape in all dimensions except the concatenation dimension. Verify that the output channels of the convolutional layers match before concatenation to avoid shape mismatches."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"mobilenet_macro10": {
+		"inspiration": "Employ a hybrid pooling strategy that combines average pooling and max pooling to capture both texture and structural information more effectively.",
+		"base": [
+			{
+				"error": "Output shape error.",
+				"experience": "When designing neural network blocks with operations like `Add`, `Mul`, or `concat`, ensure that the input tensors to these operations have matching shapes. Specifically, check that any pooling operations (such as `AvgPool2d` and `MaxPool2d`) used before an `Add` operation produce tensors with the same shape. Additionally, verify that the final output shape matches the expected output shape specified in your block definition."
+			},
+			{
+				"error": "Conv2d can receive only one input.",
+				"experience": "When designing a neural network using directed acyclic graphs, ensure that operations which can only accept a single input (like Conv2d, Linear, etc.) receive only one tensor as their input. If you need to combine multiple tensors, use operations like `Add`, `concat`, or other permissible operations to merge the tensors into a single one before passing it to such operations."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"resnet_base_macro4": {
+		"inspiration": "Insert squeeze-and-excitation blocks to recalibrate channel-wise feature responses by explicitly modelling interdependencies between channels.",
+		"base": [
+			{
+				"error": "When using Linear, the last dimension must be the channel dimension.",
+				"experience": "When using Linear layers in a convolutional neural network, ensure that the input tensor to the Linear layer has the channels as the last dimension. This typically requires reshaping the tensor from (B, C, H, W) to (B, C) after any pooling operations."
+			},
+			{
+				"error": "The block definition does not comply with the regulations.",
+				"experience": "Ensure that each output node has a single input and clearly separate different operational sequences. When designing neural networks as directed acyclic graphs, make sure each node's output is derived from exactly one preceding node, and complex sequences of operations (like pooling, reshaping, and fully connected layers) are clearly delineated and compliant with the regulations."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"resnet_base_macro10": {
+		"inspiration": "Adopt a hybrid pooling strategy combining average and max pooling to capture both texture and structural information more effectively.",
+		"base": [
+			{
+				"error": "Add shape error",
+				"experience": "When using element-wise operations like Add or Mul in neural network design, ensure that all input tensors to these operations have matching shapes. Carefully track the dimensions of tensors throughout the network, especially after operations that change tensor dimensions (e.g., pooling, convolution with stride, etc.). Additionally, consider how residual connections (skip connections) impact tensor shapes to avoid shape mismatches."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"resnet_bottle_macro5": {
+		"inspiration": "Implement squeeze-and-excitation blocks to recalibrate channel-wise feature responses by explicitly modelling interdependencies between channels.",
+		"base": [
+			{
+				"error": "reshape dims error",
+				"experience": "When designing neural network architectures, ensure that the shape of the tensor after each transformation matches the expected input shape for subsequent operations. Use the batch size dimension appropriately, especially when transitioning between different types of layers (e.g., convolutional to fully connected). This helps in maintaining compatibility and prevents shape-related errors."
+			},
+			{
+				"error": "Node reshape(1,C,1,1) is not defined.",
+				"experience": "When designing neural networks using the block definition format, ensure that all operations and their parameters strictly follow the provided definitions. For reshape operations, use the `reshape(*shape)` format to specify the new shape of the tensor accurately. This will help prevent errors and maintain consistency in the network design."
+			},
+			{
+				"error": "reshape operation's first dimension must be B.",
+				"experience": "When using the `reshape` operation, always ensure that the first dimension is B (batch size) to maintain the consistency of the tensor's shape transformations and adhere to the network design rules."
+			},
+			{
+				"error": "Trying to create tensor with negative dimension -1: [16, -1]",
+				"experience": "When designing neural network architectures that involve operations like convolutional layers and linear layers, always ensure that the output dimensions are valid integers. This can be achieved by carefully calculating and validating the dimensions at each step, especially when performing division operations. If necessary, use integer division or rounding functions to ensure that the dimensions remain valid. Additionally, always check the tensor shapes after each operation to ensure compatibility with subsequent layers."
+			}
+		],
+		"stem": [
+			{
+				"error": "Trying to create tensor with negative dimension -1: [16, -1]",
+				"experience": "When designing neural network architectures that involve operations like convolutional layers and linear layers, always ensure that the output dimensions are valid integers. This can be achieved by carefully calculating and validating the dimensions at each step, especially when performing division operations. If necessary, use integer division or rounding functions to ensure that the dimensions remain valid. Additionally, always check the tensor shapes after each operation to ensure compatibility with subsequent layers."
+			}
+		],
+		"downsample": [
+			{
+				"error": "Trying to create tensor with negative dimension -1: [16, -1]",
+				"experience": "When designing neural network architectures that involve operations like convolutional layers and linear layers, always ensure that the output dimensions are valid integers. This can be achieved by carefully calculating and validating the dimensions at each step, especially when performing division operations. If necessary, use integer division or rounding functions to ensure that the dimensions remain valid. Additionally, always check the tensor shapes after each operation to ensure compatibility with subsequent layers."
+			}
+		]
+	},
+	"resnet_bottle_macro6": {
+		"inspiration": "Apply feature pyramid networks within the block to build a multi-scale feature pyramid from a single-scale input, enhancing the detection of objects at different scales.",
+		"base": [
+			{
+				"error": "repeat sizes must numbers",
+				"experience": "When using operations such as `repeat`, ensure that all dimensions specified for repetition are integers. If the dimensions are dynamically computed from the input tensor's properties (like `H` and `W`), make sure to extract or compute these values beforehand and convert them to integers before using them in operations that require fixed numerical values."
+			},
+			{
+				"error": "Output shape error.",
+				"experience": "When designing a neural network using directed acyclic graphs, ensure that all tensors being concatenated have matching spatial dimensions. This can be achieved by carefully managing the stride and padding in convolutional layers or by using pooling/upsampling operations to align the dimensions. Always verify the output shapes at each node to prevent mismatches."
+			},
+			{
+				"error": "Concat error: [4, 64, 4, 4],[4, 128, 32, 32]",
+				"experience": "When using the `concat` operation, ensure that all tensors being concatenated have identical dimensions in all except the concatenation dimension. You may need to use pooling or other operations to adjust the dimensions to match before concatenation."
+			},
+			{
+				"error": "Concat error: [4, 64, 8, 8],[4, 128, 16, 16]",
+				"experience": "When designing neural network blocks that involve concatenation, ensure that the dimensions of the feature maps being concatenated match in all dimensions except the specified concatenation dimension. If necessary, use appropriate pooling or resizing operations to align the dimensions before concatenation."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"resnet_bottle_macro9": {
+		"inspiration": "Incorporate a non-local neural network block to capture long-range dependencies directly by computing interactions between any two positions, regardless of their positional distance.",
+		"base": [
+			{
+				"error": "The block definition does not comply with the regulations.",
+				"experience": "When designing a neural network block, ensure the following:\n1. **Single Input for Output Node**: The final output node of the block should be derived from a single input tensor after all operations have been applied. Use intermediate nodes for complex operations but ensure the final output node conforms to this rule.\n2. **Simplicity and Consistency**: Follow the standard architectural patterns for the specific block type you are designing. For a ResNet bottleneck block, adhere to the three-layer convolutional design with batch normalization and ReLU activations. Avoid incorporating operations that significantly diverge from the conventional design unless necessary.\n3. **Maintain Tensor Dimensions**: Ensure that any reshaping, permuting, or other tensor dimension transformations maintain compatibility with subsequent operations. Pay close attention to the input and output shapes at each step to avoid dimension mismatches."
+			},
+			{
+				"error": "multiply cannot receive only one input.",
+				"experience": "When designing a neural network, ensure that operations like `multiply` receive the correct number of input tensors. Each tensor should have the appropriate shape for the operation being performed. For matrix multiplication, ensure that the dimensions of the tensors align properly according to the PyTorch tensor multiplication rules. Always double-check the network's computation graph to ensure that each operation has the required number of inputs and that their shapes are compatible."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"googlenet_macro2": {
+		"inspiration": "Implement depthwise separable convolutions to reduce computational complexity while maintaining model effectiveness.",
+		"base": [
+			{
+				"error": "Output shape error.",
+				"experience": "When designing a neural network with multiple branches that merge using concatenation, it's critical to ensure that the output channels of each branch are correctly calculated and consistent with the desired output. Always verify that the concatenated result matches the expected dimensions. Additionally, be cautious with the grouping and kernel size parameters in convolutions to maintain the consistency of dimensions across different branches."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"googlenet_macro3": {
+		"inspiration": "Use dilated convolutions to increase the receptive field without increasing the number of parameters or computational cost.",
+		"base": [
+			{
+				"error": "Output shape error.",
+				"experience": "To ensure the output shape matches expectations, ensure the sum of the output channels of all paths being concatenated equals the expected number of output channels. For example, if the desired output shape is `(B, C, H, W)`, the sum of the output channels of all paths should be `C`. Also, ensure that the dimensions of the feature maps align appropriately before concatenation to avoid shape mismatches."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"googlenet_macro7": {
+		"inspiration": "Incorporate low-rank factorization of convolutional layers to decompose filters into smaller, more manageable operations.",
+		"base": [
+			{
+				"error": "Output shape error.",
+				"experience": "When designing neural networks with multiple branches that merge using concatenation or other operations, ensure that the output shapes of all branches match the expected shapes. Particularly, for concatenation, all input tensors must have the same height and width dimensions, and the concatenated tensor's channel dimension must meet the intended design requirements. Verify the output channel dimensions after concatenation to match the expected 'dim' for the output tensor."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"mobilenet_macro3": {
+		"inspiration": "Add a squeeze-and-excitation block after the depthwise separable convolution to recalibrate channel-wise feature responses by explicitly modeling interdependencies between channels.",
+		"base": [
+			{
+				"error": "When using Linear, the last dimension must be the channel dimension.",
+				"experience": "When using Linear layers in a neural network, ensure that the input tensor to the Linear layer has the channel dimension as the last dimension. You can achieve this by appropriately reshaping the tensor before feeding it into the Linear layer. For example, use the reshape operation to adjust the tensor shape to (B, ..., C) where C is the number of input channels."
+			},
+			{
+				"error": "The block definition does not comply with the regulations.",
+				"experience": "When designing a neural network block as a directed acyclic graph, ensure that each output node has only one input. If the output needs to combine results from multiple nodes, consider using operations like `Add`, `Mul`, or `concat` to merge them into a single tensor before connecting to the output node."
+			},
+			{
+				"error": "Mul shape error",
+				"experience": "When designing neural networks involving element-wise operations like `Mul`, ensure that the shapes of the tensors being multiplied are compatible according to broadcasting rules. Use operations like `reshape` or `repeat` to adjust tensor shapes as necessary before performing the element-wise operation."
+			},
+			{
+				"error": "shape '[1, 256]' is invalid for input of size 1024",
+				"experience": "When designing neural network architectures, always ensure that the total number of elements in the tensor remains consistent during reshape operations. Verify the shape transformations, especially after operations like pooling, which may alter the dimensions significantly. This helps avoid runtime errors and ensures the network behaves as expected."
+			}
+		],
+		"stem": [
+			{
+				"error": "shape '[1, 256]' is invalid for input of size 1024",
+				"experience": "When designing neural network architectures, always ensure that the total number of elements in the tensor remains consistent during reshape operations. Verify the shape transformations, especially after operations like pooling, which may alter the dimensions significantly. This helps avoid runtime errors and ensures the network behaves as expected."
+			}
+		],
+		"downsample": [
+			{
+				"error": "shape '[1, 256]' is invalid for input of size 1024",
+				"experience": "When designing neural network architectures, always ensure that the total number of elements in the tensor remains consistent during reshape operations. Verify the shape transformations, especially after operations like pooling, which may alter the dimensions significantly. This helps avoid runtime errors and ensures the network behaves as expected."
+			}
+		]
+	},
+	"mobilenet_macro8": {
+		"inspiration": "Apply low-rank factorization on convolutional layers to reduce parameters and computational complexity while maintaining performance.",
+		"base": [
+			{
+				"error": "The block definition does not comply with the regulations.",
+				"experience": "When designing a neural network block:\n1. Ensure each block has a logical sequence of operations, typically: Convolution -> Normalization -> Activation.\n2. Avoid redundant operations unless they serve a specific purpose.\n3. Apply activation functions once after the convolution or normalization operation.\n4. Ensure the output node has only one input and is the result of a valid operation like convolution, pooling, or a direct activation.\n5. Follow the directed acyclic graph structure strictly to maintain the flow and dependencies of operations."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"resnet_base_macro1": {
+		"inspiration": "Introduce spatial attention after each convolutional layer to focus on learning more relevant spatial features.",
+		"base": [
+			{
+				"error": "Mul cannot receive only one input.",
+				"experience": "Ensure that all operations which require multiple inputs, such as `Add`, `Mul`, and `concat`, are provided with the correct number of inputs. For element-wise operations like `Add` and `Mul`, you must always supply two inputs that are compatible in shape as per broadcasting rules. For operations like `concat`, make sure to provide a list of tensors that have matching dimensions except for the concatenation dimension."
+			},
+			{
+				"error": "output is not the only output node.",
+				"experience": "To design a network that fully meets the requirements, make sure that the output node has only one input by ensuring all branches of the computational graph converge into a single node before the final output. This can be achieved by using operations like `Add`, `Mul`, or concatenation (`concat(dim)`) to combine multiple branches into one before producing the final output."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"resnet_bottle_macro8": {
+		"inspiration": "Add an inception-style module to capture information at various scales concurrently within the block.",
+		"base": [
+			{
+				"error": "BN can receive only one input.",
+				"experience": "Ensure that each Batch Normalization (BN) layer in your network structure only receives a single input to meet the operational requirements. When designing complex structures with multiple paths, carefully check that no BN layer is set to receive multiple inputs by ensuring all converging paths occur before or after the BN layers."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"convnext_micro7": {
+		"inspiration": "Integrate a concatenate operation after the GELU activation, concatenating the output with a previous intermediate layer to enrich feature representation.",
+		"base": [
+			{
+				"error": "Add shape error",
+				"experience": "When designing a neural network, ensure that all tensors involved in element-wise operations (like `Add`) have compatible shapes. Specifically, for the `Add` operation, both tensors must have the same shape following broadcasting rules. Always verify the dimensional transformations and ensure consistency, especially after operations like `concat`."
+			},
+			{
+				"error": "Concat error: [4, 224, 224, 12],[4, 224, 224, 15]",
+				"experience": "When using the `concat` operation, ensure that the dimensions of the tensors being concatenated match in all dimensions except for the concatenation dimension. This means that if you want to concatenate tensors along a specific dimension, all other dimensions must have the same size. Carefully check the dimensions of the tensors before applying the `concat` operation to prevent mismatched dimension errors."
+			},
+			{
+				"error": "Concat error: [4, 3, 224, 224],[4, 227, 224, 3]",
+				"experience": "When designing neural network structures using directed acyclic graphs, ensure that all tensors being concatenated or added have compatible shapes. Specifically, for concatenation, all dimensions except the concatenation dimension must be consistent. For element-wise addition, tensors must have the same shape. Utilize operations like permute, reshape, and repeat to align tensor shapes as needed."
+			},
+			{
+				"error": "Concat error: [4, 224, 224, 12],[4, 224, 224, 236]",
+				"experience": "When designing a network, ensure that the dimensions of the tensors being concatenated match in all dimensions except the concatenation dimension. Carefully check the output dimensions of each operation and ensure they are compatible before attempting to concatenate them."
+			},
+			{
+				"error": "Concat error: [4, 224, 224, 3],[4, 224, 224, 6]",
+				"experience": "When designing neural networks using directed acyclic graphs, ensure that the dimensions of the tensors being concatenated match in all dimensions except the concatenation dimension. For element-wise operations like `Add` or `Mul`, ensure the tensors have identical shapes or are broadcastable. Always verify the tensor shapes at each step to prevent dimension mismatches."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"googlenet_micro1": {
+		"inspiration": "Replace the ReLU activation functions with GELU for potentially better non-linearity handling and smoother gradients.",
+		"base": [
+			{
+				"error": "Output shape error.",
+				"experience": "When designing a network block that involves concatenation of multiple paths, ensure that the sum of the output channels from all paths matches the specified output dimension. Carefully calculate and align the output channels from each path to ensure they sum up correctly for the concatenation operation."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"googlenet_micro3": {
+		"inspiration": "Swap the order of the BN and ReLU operations in each sub-path for potentially better normalization effects.",
+		"base": [
+			{
+				"error": "Output shape error.",
+				"experience": "When designing neural network blocks, ensure that the output dimensions of all branches match before concatenation. Verify that the sum of the channel dimensions of the concatenated tensors equals the expected output dimension. This can be achieved by carefully planning the out_channels parameter for each Conv2d operation and ensuring consistency in pooling operations."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"googlenet_micro4": {
+		"inspiration": "Cut off an additional parallel path with a 5x5 convolution from fist branch to capture larger spatial dependencies.",
+		"base": [
+			{
+				"error": "Output shape error.",
+				"experience": "When designing a neural network with operations such as `concat(dim=1)`, ensure that all input tensors to the concatenation operation have the same shape in all dimensions except for the specified dimension (dim). This can be achieved by carefully setting the output dimensions of preceding layers or by adding transformation layers to align the dimensions before concatenation."
+			},
+			{
+				"error": "concat cannot receive only one input.",
+				"experience": "When using the `concat(dim)` operation, ensure that it receives multiple input tensors to concatenate. Each input tensor should be connected to the `concat` node to avoid errors. Verify that all tensors intended for concatenation are correctly directed to the `concat` node in the computation graph."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"googlenet_micro5": {
+		"inspiration": "Modify the first convolution in each path to have a dilation of 2, enlarging the receptive field without increasing the kernel size.",
+		"base": [
+			{
+				"error": "Output shape error.",
+				"experience": "When designing a neural network block that uses concatenation, ensure that all branches produce output feature maps with compatible shapes along all dimensions except for the concatenation dimension. Pay special attention to the number of channels produced by each branch to ensure they sum up correctly when concatenated."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"googlenet_micro6": {
+		"inspiration": "Change the kernel size of the second Conv2d in each path from 3 to 5, providing a larger receptive field.",
+		"base": [
+			{
+				"error": "Output shape error.",
+				"experience": "When designing a neural network block that involves concatenation of multiple pathways, ensure that the sum of the output channels from each pathway matches the expected output dimension. Carefully calculate and align the output channels of each convolutional and pooling operation to ensure they can be concatenated correctly along the specified dimension. This alignment is crucial to avoid shape mismatches and errors during the concatenation step."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"googlenet_micro8": {
+		"inspiration": "Replace the concatenation operation with a summation to merge features across different paths more compactly and increase the width of each branch accordingly.",
+		"base": [
+			{
+				"error": "Add shape error",
+				"experience": "When designing a neural network with multiple branches that converge using operations like `Add`, `Mul`, or `concat`, ensure that the output tensors from each branch have matching shapes. This can be achieved by carefully selecting the output dimensions of convolutions and other operations in each branch."
+			},
+			{
+				"error": "sum can receive only one input.",
+				"experience": "When designing neural network structures using directed acyclic graphs, ensure that operations like `sum`, `mean`, and `max` which process input tensors along specified dimensions, are only given a single input tensor to process. For combining multiple input tensors, use operations like `concat` first and then apply the desired operation if needed."
+			},
+			{
+				"error": "The block definition does not comply with the regulations.",
+				"experience": "When designing neural network blocks using directed acyclic graphs, ensure that each node follows the constraints provided. Specifically, the output node must have only one input. Avoid chaining addition or concatenation operations that result in the final output node receiving multiple inputs. Instead, ensure that all necessary operations are completed before the final aggregation, and then feed the aggregated result into the output node."
+			},
+			{
+				"error": "node 24 error: sum operation can receive only one input.",
+				"experience": "When designing neural network blocks, ensure that operations requiring a single tensor input, such as `sum(dim)`, are not mistakenly used to combine multiple tensors. Use the `Add` or `concat(dim)` operations to combine multiple tensors appropriately. Always check the definition and requirements of each operation to ensure compatibility with the intended input."
+			},
+			{
+				"error": "node 24 error: Add operation's inputs can not Add.",
+				"experience": "When designing neural network blocks using directed acyclic graphs (DAGs), ensure that tensors being input to operations like `Add`, `Mul`, or any other element-wise operation have compatible shapes. You can achieve this by:\n1. Ensuring that the output dimensions of the preceding operations are the same or can be broadcasted together.\n2. Using operations like `Conv2d` with appropriate `out_channels` or `reshape` to align tensor shapes before performing element-wise operations.\n3. Verifying the dimensions explicitly at each step of the DAG to avoid shape mismatches.\n\nFor example, if you have multiple convolution paths that need to be added together, ensure the final convolutions in each path produce tensors with the same number of channels."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"googlenet_micro9": {
+		"inspiration": "Apply a 1x1 convolution before each 3x3 convolution to reduce the dimensionality and computational cost.",
+		"base": [
+			{
+				"error": "Output shape error.",
+				"experience": "Ensure that all branches in a neural network block produce tensors with the same shape along all dimensions except for the concatenation dimension before performing a concatenation operation. Specifically, check that the number of channels (or dimensions being concatenated) align correctly by adjusting the output channels of intermediate layers or adding necessary transformations."
+			},
+			{
+				"error": "node 1 error: Output shape must be (B,C,H,W).",
+				"experience": "When designing a neural network using directed acyclic graphs, ensure that the channel dimensions of tensors being concatenated or added match the required output dimensions. Carefully track the changes in channel dimensions through each operation, especially after concatenation or addition operations. Verify that the final output tensor has the required shape by summing or ensuring the channel dimensions correctly."
+			},
+			{
+				"error": "node 13 error: The node is not used.",
+				"experience": "When designing a neural network as a directed acyclic graph, ensure that each node (operation) is connected and contributes to the final output. This avoids unused operations and ensures a coherent and fully functional computational graph."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"googlenet_micro10": {
+		"inspiration": "Cut off a parallel branch from first branch that utilizes a dilated convolution with a rate of 4 and kernel size with 3 to capture broader context without losing resolution.",
+		"base": [
+			{
+				"error": "Output shape error.",
+				"experience": "When designing neural network blocks that involve concatenation of multiple feature maps, ensure that the sum of the concatenated feature maps' channel dimensions matches the required output channel dimension. Carefully calculate and verify the dimensions at each step to avoid mismatches and errors."
+			},
+			{
+				"error": "node 1 error: Output shape must be (B,C,H,W).",
+				"experience": "To accurately design a neural network that meets the output shape requirements, ensure that the total number of channels after any concatenation operation matches the desired output channels (`C`). This can be achieved by carefully planning the output channels of each branch and using appropriate operations to adjust the number of channels before concatenation. Additionally, always verify the dimensions after each operation to ensure they conform to the expected output shape."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"mobilenet_micro2": {
+		"inspiration": "Add a Layer Normalization (LN) after the second ReLU to stabilize the training process by normalizing across features instead of mini-batch statistics.",
+		"base": [
+			{
+				"error": "When using LN, the last dimension must be the channel dimension.",
+				"experience": "When using Layer Normalization (LN), ensure that the channel dimension is the last dimension of the input tensor by using appropriate permutation operations to reorder the tensor dimensions if necessary."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"resnet_base_micro3": {
+		"inspiration": "Insert a Linear layer between the second BN and the second ReLU to introduce a fully connected feature transformation within the block.",
+		"base": [
+			{
+				"error": "When using Linear, the last dimension must be the channel dimension.",
+				"experience": "When using the `Linear` operation in a neural network, ensure that the input tensor has the last dimension as the channel dimension. This typically means you need to flatten the spatial dimensions (H, W) into a single dimension before applying the `Linear` operation. For example, if your input tensor has the shape (B, C, H, W), you should reshape it to (B, C*H*W) before applying the `Linear` layer."
+			},
+			{
+				"error": "node 9 error: reshape operation's dim error",
+				"experience": "When designing a neural network using directed acyclic graphs, ensure that the dimensions of the tensor after each operation are compatible with the subsequent operations. Specifically, be cautious with reshaping operations after layers like fully connected layers (Linear), as the output dimensions must align correctly. Always verify that the total number of elements remains the same and matches the intended shape transformation."
+			},
+			{
+				"error": "node 8 error: reshape operation's first dimension must be B.",
+				"experience": "When using reshape operations in a neural network, always ensure that the first dimension of the reshaped tensor remains equal to `B`, which represents the batch size. This is crucial for maintaining consistency across operations and ensuring that the network can handle batches of data correctly. Additionally, be mindful of the total number of elements before and after the reshape operation to avoid dimension mismatches."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"resnet_bottle_micro3": {
+		"inspiration": "Replace the Batch Normalizations with Layer Normalizations to experiment with different normalization effects on this architecture.",
+		"base": [
+			{
+				"error": "When using LN, the last dimension must be the channel dimension.",
+				"experience": "When using Layer Normalization (LN) in a neural network design, ensure that the last dimension of the tensor is the channel dimension. For a tensor with shape (B, C, H, W), permute the tensor to (B, H, W, C) before applying LN and permute it back to (B, C, H, W) afterward. This ensures LN operates correctly on the intended dimension."
+			},
+			{
+				"error": "node 22 error: Add operation's inputs can not be Added.",
+				"experience": "When designing a neural network using directed acyclic graphs, ensure that the shapes of tensors being used in element-wise operations like `Add` or `Mul` are compatible. This means that after any transformation such as `permute`, `reshape`, or normalization, the tensor shape should be carefully managed to maintain compatibility with other tensors it will be combined with. In particular, when using `Add`, ensure that the tensors have the same shape or can be broadcasted to a common shape."
+			},
+			{
+				"error": "node 21 error: permute operation can receive only one input.",
+				"experience": "When designing neural network architectures with residual connections, ensure that operations which require a single input, such as permute, are used correctly. Specifically, the addition of residual connections should be handled at appropriate nodes using operations like Add, ensuring that each operation receives the correct number of inputs."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	},
+	"resnet_bottle_micro10": {
+		"inspiration": "Integrate a small sub-network of linear layers after the second BN to perform a mini-transform operation on features before proceeding, potentially enhancing feature interaction.",
+		"base": [
+			{
+				"error": "When using Linear, the last dimension must be the channel dimension.",
+				"experience": "When using the `Linear` operation in a neural network, ensure that the last dimension of the input tensor is the channel dimension. This can be achieved by reshaping or permuting the tensor appropriately before and after the `Linear` layer. For example, you can use `reshape` or `permute` operations to adjust the tensor dimensions as needed."
+			},
+			{
+				"error": "node 13 error: reshape operation's dim error",
+				"experience": "When designing neural network architectures involving reshape operations, ensure that the total number of elements before and after the reshape remains consistent. Verify that the dimensions you specify after the reshape match the number of elements in the input tensor. Use -1 judiciously to automatically infer one dimension, ensuring it is compatible with the total number of elements."
+			},
+			{
+				"error": "node 17 error: Add operation's inputs can not be Added.",
+				"experience": "Ensure that any tensor transformations (such as reshaping, permuting, or linear layers) within a block maintain or correctly revert the tensor dimensions to their original shape before any operations that rely on dimension compatibility (such as Add, Mul, or concat). Specifically, when using Add operations involving the input tensor, ensure that the transformed tensor is reshaped back to the original input tensor's dimensions."
+			},
+			{
+				"error": "node 15 error: Conv2d operation can receive only one input.",
+				"experience": "When designing a neural network using directed acyclic graphs, ensure that each operation node receives the correct number of inputs as specified. In particular, output nodes of operations like Conv2d, Linear, etc., should have only one input to avoid invalid configurations. Carefully check the graph structure to ensure all connections comply with the specified rules."
+			},
+			{
+				"error": "node 16 error: BN operation can receive only one input.",
+				"experience": "When designing neural network architectures using directed acyclic graphs, ensure that each operation node receives only one input. This is particularly important for operations like normalization layers (e.g., Batch Normalization) which are designed to process a single input tensor. Always check the connections to confirm that each node adheres to the rule of having only one input to avoid design errors."
+			}
+		],
+		"stem": [],
+		"downsample": []
+	}
+}

@@ -1,0 +1,211 @@
+{
+	"Decoupling the training strategies for different tasks (natural vs adversarial) to design specialized subnetworks within the backbone that focus on specific tasks.": [
+		"Introduce changes incrementally and verify each modification improves or preserves accuracy before making further alterations.",
+		"When adding new paths or layers, ensure they are effectively contributing to feature learning and consider using normalization or alignment techniques to stabilize training.",
+		"Ensure additional paths or layers meaningfully contribute to learning by validating their necessity and impact through ablation studies."
+	],
+	"Adopting a distinct queries selection mechanism across different architectures including FCN, R-CNN, and DETR to ensure the distinctness of input queries, which aids in optimization and reduces the necessity for long iterative refinement stages.": [
+		"Ensure that any added skip connections or operations do not disrupt the learning process by excessively altering the network's expected data flow."
+	],
+	"Design a kernel prediction mechanism instead of direct color prediction to enhance the ability of the model to generalize across different unseen data types, like normals or depth, which could be crucial for applications in CGI or 3D modeling.": [
+		"Ensure modifications preserve the simplicity of the residual path and avoid operations that can significantly alter gradient flow.",
+		"Ensure modifications preserve the original residual connections and avoid operations that can disproportionately scale feature maps, such as element-wise multiplication without proper normalization.",
+		"When modifying the model, ensure new operations maintain stable gradient flow and do not introduce drastic changes in feature scales."
+	],
+	"Employ progressive attention masking in the transformer encoders to manage local interactions effectively, suggesting the use of hierarchical or multi-level attention mechanisms within the visual backbone to better capture local feature dependencies.": [
+		"Ensure that any additional operations maintain the integrity of the residual connections and avoid operations that normalize or scale the output inappropriately.",
+		"Avoid drastic changes in the feature map's structure and maintain the integrity of spatial information in the next modification."
+	],
+	"Utilize an attention masking strategy to unify individual attention operations into a single one, facilitating parallel computation and improving model efficiency.": [
+		"Ensure modifications retain the original block's dimensional consistency and spatial information to maintain performance."
+	],
+	"Implement optimization-based methods for precise 3D reconstruction, which are beneficial particularly when dealing with limited training data and complex models like SMPL-X.": [
+		"Ensure the newly added paths or operations do not interfere destructively with existing paths, and validate their impact on gradient flow."
+	],
+	"Designing a Cross Resolution Feature Fusion (CReFF) module that uses motion vectors to warp and align high-resolution features to low-resolution frames, enhancing feature aggregation.": [
+		"Ensure that added layers and operations contribute to meaningful feature extraction and avoid unnecessary complexity."
+	],
+	"Utilize a Temporal-Motion Memory (TMM) module to synchronize hand motions with the overall body dynamics temporally, ensuring temporal consistency.": [
+		"Ensure the added complexity in the network is necessary and consider adding regularization techniques like dropout or batch normalization to avoid overfitting."
+	],
+	"Deploy submodular optimization to select the most discriminative and diverse concepts, ensuring effective and efficient concept selection.": [
+		"Carefully evaluate the complexity added by new layers and ensure proper initialization and regularization to maintain model performance."
+	],
+	"Development of a Mask Switch Module (MSM) that dynamically selects the optimal mask resolution for each instance to balance segmentation accuracy and computational efficiency.": [
+		"Ensure the added complexity is justified by validation performance and consider using dropout or other regularization techniques to prevent overfitting."
+	],
+	"Employ a fusion block that combines monocular and stereo network outputs to produce a final depth map, optimizing for both local detail and overall consistency.": [
+		"Ensure that additional layers or operations do not disrupt the learned features from earlier layers and maintain a balance between model complexity and performance."
+	],
+	"Design a switchable neural network architecture that can dynamically adjust its capacity based on resource limitations of the deployment platform.": [
+		"Ensure that any added skip connections or element-wise operations are properly aligned and transformed to maintain feature integrity."
+	],
+	"Utilizing a 2D projection of 3D point clouds onto multiple orthogonal planes to capture different views, enhancing feature extraction and robustness.": [
+		"Ensure changes to the network structure maintain a balance between complexity and performance and avoid overly increasing the number of parameters."
+	],
+	"Employment of spatial-temporal self-attention encoders for local and global feature extraction, suggesting a modular design for visual backbone architectures to handle different scales and dimensions of data effectively.": [
+		"Avoid adding operations that disrupt the spatial structure of feature maps in convolutional networks. Ensure modifications preserve the spatial and channel consistency of the feature maps."
+	],
+	"Implementation of diverse image transformations on exemplars while keeping the context stable to force the model to learn invariant and robust representations under varying conditions.": [
+		"When modifying the neural network structure, ensure that added complexity is justified and beneficial for feature learning rather than leading to overfitting or disrupted feature representation."
+	],
+	"Utilizing random features to dilute the auxiliary role of skip-connections in the supernet, focusing the search more on operation selection fairness.": [
+		"Ensure that any modifications to residual connections maintain the stability of feature distributions, avoiding operations that can drastically change feature scales."
+	],
+	"Combination of local frame features learning with global temporal context and motion cues for robust few-shot matching.": [
+		"When adding new layers, ensure they preserve the important spatial information and do not overly complicate the network structure."
+	],
+	"Leverage category-agnostic and large-scale training to enhance the model's generalization capabilities across different objects and scenes, avoiding the limitations of category-specific training.": [
+		"Avoid adding operations that combine raw input and intermediate results without thorough validation of their necessity and impact."
+	],
+	"Enhance the modeling of secondary effects such as shadows and indirect lighting by using a tensor-factorized representation allowing for online computation of ray integrals.": [
+		"Avoid adding operations that significantly alter the spatial or channel dimensions without proper re-training or alignment with the learned features."
+	],
+	"Task-specific optimization and parameter updating methods for different subnetworks could be adopted to improve specialization in handling distinct tasks like classification and robustness against adversarial attacks.": [
+		"Ensure modifications simplify the network structure and avoid redundant paths with similar operations to maintain effective learning."
+	],
+	"Utilize object locations to guide token sampling, enabling selective focus on relevant video segments and reducing input size.": [
+		"Ensure modifications do not overly complicate the model and maintain consistent tensor dimensions to preserve learned feature representations."
+	],
+	"Employing a multi-task approach integrating feature compactness and anomalous signal suppression tasks to improve the anomaly detection system.": [
+		"Ensure that modifications do not excessively increase the model's complexity and monitor gradient flow to avoid vanishing/exploding gradients."
+	],
+	"Use of Channel-Attention Transformer feature extractor to handle long-range pixel dependencies while preserving high-frequency information through techniques like Pixel Unshuffle.": [
+		"Introduce changes incrementally and validate each modification's impact on accuracy to isolate effective improvements."
+	],
+	"Incorporation of simple regression loss, specifically smooth-\u21131, to effectively train the model by focusing on the masked pixels, improving the precision in diverse vision tasks.": [
+		"Be cautious when adding extra layers to the output path, as it can disrupt learned feature mappings and degrade performance."
+	],
+	"Utilizing dilation max pooling to achieve a large receptive field with reduced computational overhead compared to traditional large kernel convolutions.": [
+		"Consider the impact of adding pooling layers on the spatial information and experiment with their placement to avoid losing critical details."
+	],
+	"Designing a fully convolutional approach by replacing the transformer decoder with a single ConvNeXt block to simplify the model and reduce pre-training time.": [
+		"Consider maintaining intermediate bottleneck layers and incorporating attention or pooling mechanisms to enhance feature extraction."
+	],
+	"Utilize depthwise convolutions to replace inefficient feature shifts, leveraging common convolution operations to preserve efficiency and generalizability.": [
+		"Ensure modifications maintain the model's representational capacity and avoid skip connections that bypass significant network depth."
+	],
+	"Employ a dual-branch architecture for simultaneously predicting probability volume and signed distance volume, improving the final depth map estimations.": [
+		"Ensure that additional layers or blocks are carefully integrated with proper normalization and skip connections to maintain feature scaling and gradient flow."
+	],
+	"Employ a transformer-based encoder for joint encoding of template and search region, utilizing the self-attention mechanism for capturing long-range dependencies and target-specific correspondences.": [
+		"Ensure any added layers or operations maintain appropriate dimensionality and do not excessively increase model complexity."
+	],
+	"Incorporate Local-Global Features Interaction (LGFI) module leveraging a cross-covariance attention mechanism calculated in the channel dimension to reduce computational complexity while encoding long-range global contexts.": [
+		"Ensure modifications preserve the spatial information and avoid unnecessary complexity unless it aligns with the original model design principles."
+	],
+	"Employ a softmax function in the final rendering step to blend contributions from multiple sub-spaces based on their relevance to the current view point.": [
+		"Avoid placing softmax operations before element-wise addition to preserve the original feature information and maintain gradient stability."
+	],
+	"Incorporate contrastive learning for spatial feature extraction to enhance the model's capability in handling appearance variations, which suggests using augmentation techniques and specialized layers to cope with diverse transformations.": [
+		"Ensure new layers are necessary and beneficial by validating their impact on a smaller scale before full integration and adjust training parameters accordingly."
+	],
+	"Incorporating a self-attention module post feature concatenation (original and quantized features) to refine and emphasize more relevant, quality-independent features, improving model focus and accuracy on pertinent image attributes.": [
+		"Avoid adding complex transformations that significantly alter the feature dimensions or distributions, such as concatenation and softmax, without validating their impact on feature consistency."
+	],
+	"Combining quantized and original features before feeding them into the self-attention module, which helps in preserving useful information that might be lost during the hard quantization step, thus maintaining a richer and more informative feature set for classification tasks.": [
+		"Ensure the combination of branches preserves dimensional integrity and spatial information, and avoid unnecessary complexity that might hinder model performance."
+	],
+	"Using multi-size self-attention to enable variable-sized anomalous feature learning, thus improving the model's capability to detect and localize anomalies of various sizes.": [
+		"Reduce unnecessary layers and avoid repetitive use of activation functions prone to vanishing gradients like Sigmoid."
+	],
+	"Design the DNCM with an encoder predicting a transformation matrix from a downscaled input image, facilitating adaptive and deterministic color mapping.": [
+		"Ensure added layers preserve spatial information and avoid unnecessary complexity in model structure."
+	],
+	"Utilizing orthogonal subspaces to separate shape-related and shape-erased features helps in enforcing feature diversity and independence, which can be implemented in the backbone through distinct pathways or branches.": [
+		"Ensure any added layers or connections maintain proper dimensionality and alignment with existing features to avoid feature misalignment or degradation."
+	],
+	"Incorporation of a conditional diffusion generator adapted from text-to-image models to handle image-based inputs using a content adaptor, improving the model's versatility in handling visual data.": [
+		"Ensure modifications simplify or optimize the existing structure rather than add redundant complexity."
+	],
+	"Adopting a transformer architecture that combines long- and short-term attention to retain both spatial and temporal contexts, which is crucial for decoding detailed foreground information.": [
+		"Avoid adding unnecessary transformations like reshape and softmax that can misalign tensor dimensions and destabilize training."
+	],
+	"Use of anchor-free queries to generate trajectory inspirations, which adaptively responds to different scene contexts for enhanced multimodality in predictions.": [
+		"When modifying neural networks, ensure added layers do not excessively increase complexity and monitor gradient flow to maintain stability."
+	],
+	"Adaptive prototype updating that considers label propagation can improve the estimation of class centers, leading to more accurate few-shot learning.": [
+		"Avoid adding redundant or overly complex layers that do not significantly contribute to feature representation and ensure smooth gradient flow throughout the network."
+	],
+	"Implement Spatial-Temporal Consistency Regularization by forcing consistency between temporally coherent point cloud features and corresponding image features, which might inspire a grid-based feature aggregation method in the backbone design.": [
+		"Ensure that any added layers or operations maintain the integrity of the original residual structure to avoid disrupting gradient flow."
+	],
+	"Adapting the architecture flexibly for both global and local self-attention mechanisms, allowing for a broader application scope in different transformer models.": [
+		"When modifying network structures, ensure that significant changes to feature map dimensions (like pooling) do not overly simplify or lose crucial information."
+	],
+	"Modifying the transformation between the SDF field and the density field based on unbiased rendering conditions points towards the inclusion of adaptive layers that can adjust the transformation parameters dynamically during training.": [
+		"Ensure compatibility of dimensions and avoid unnecessary spatial information reduction in the network structure."
+	],
+	"Leveraging ROI (Region of Interest) alignment for efficient correspondence mapping in RadarNet, reducing computational complexity by focusing on probable image regions for each radar point.": [
+		"Avoid adding pooling layers that reduce spatial dimensions drastically, ensuring essential spatial information is preserved."
+	],
+	"Integrate both convolutional neural networks and vision transformers within the same framework, highlighting the potential for hybrid architectures that leverage the strengths of both types of networks.": [
+		"Make incremental changes to the network architecture and validate performance at each step to understand the impact of each modification."
+	],
+	"Utilize a U-connection schema between encoder and decoder to effectively integrate multi-level visual information for enhanced interaction and feature utilization.": [
+		"Maintain the integrity of residual connections by avoiding additional transformations to the input before addition to the output."
+	],
+	"Modify the position of the global average pooling (GAP) layer post the convolutional operation to facilitate the computation of logits from CAMs, suggesting a rearrangement of layer sequences in CNN structures for efficient classification tasks.": [
+		"Ensure that the spatial dimensions are consistent when performing addition operations, and avoid unnecessary pooling that reduces spatial information."
+	],
+	"Design the backbone to accommodate various perturbation ratios and progressive style attacks, ensuring flexibility and robustness in handling diverse and challenging styles.": [
+		"Minimize changes that significantly alter the spatial dimensions or scale activations without a clear benefit to feature representation."
+	],
+	"Minimizing supervision needs by utilizing easily obtainable task labels, suggesting that backbone architectures can be designed to leverage sparse or high-level labels instead of dense annotations.": [
+		"Ensure that the additional operations (e.g., pooling, multiplication) do not significantly alter the feature map characteristics or suppress critical information."
+	],
+	"Utilizing a lightweight mask correction network to update segmentation masks iteratively, which reduces computational cost significantly from the second click.": [
+		"Ensure modifications preserve essential spatial information and maintain the balance of feature maps' dimensions."
+	],
+	"Implementing component-wise projected gradient descent (Comp-PGD) to optimize each individual perturbation within a composite attack, which ensures the most effective enhancement of the perturbation's impact on the model.": [
+		"Ensure added operations like multiplication have compatible feature scales and distributions; consider normalizing intermediate outputs."
+	],
+	"Utilize masked representation learning to encourage the learning of structural information in the feature extraction module, which can be pivotal for enhancing generalization capabilities in different domains.": [
+		"Ensure modifications preserve the tensor's spatial dimensions and feature distributions, and avoid introducing operations that could cause numerical instability."
+	],
+	"Incorporating a transformer architecture, specifically designed for both stages, can enhance feature representation and similarity measurement between query and support keypoints.": [
+		"Minimize changes to the fundamental structure, especially avoid unnecessary linear layers and reshaping operations that alter spatial information.",
+		"Minimize structural changes that disrupt the spatial correlations of feature maps, especially in convolutional models."
+	],
+	"Incorporate orientation alignment loss and contrastive descriptor loss in a self-supervised manner to robustly train the network against various photometric and geometric transformations.": [
+		"When modifying neural network structures, ensure added operations do not overly complicate residual connections and maintain effective gradient flow.",
+		"Avoid adding complex operations like multiple convolutions and element-wise multiplications without ensuring they contribute positively to feature extraction and model stability."
+	],
+	"Incorporating shallow MLPs for mapping input coordinates to RGB and SDF values, optimizing the trade-off between model complexity and real-time performance.": [
+		"Ensure modifications do not introduce redundant operations and maintain clean, direct gradient pathways to preserve effective training.",
+		"Ensure modifications simplify the network and maintain the integrity of the original computational paths."
+	],
+	"Use a positional encoding scheme for the 3D query points to effectively map them to the feature space extracted from the image, ensuring that the network learns a robust representation of landmark locations.": [
+		"Avoid unnecessary transformations that disrupt spatial relationships in the network's feature maps."
+	],
+	"Implement feature disentanglement to separate semantic-related and semantic-unrelated visual features, enhancing the semantic alignment while retaining useful classification clues.": [
+		"Ensure modifications introduce meaningful transformations and avoid redundant operations that do not contribute to feature learning."
+	],
+	"Employing attention-based mechanisms, specifically transposed cross-attention, to facilitate soft-exclusive clustering of features into discrete internal representations.": [
+		"Avoid redundant tensor permutations and ensure matrix operations preserve spatial relationships."
+	],
+	"Incorporating self-attention mechanisms within anchor points to enhance the global context awareness, aiding in overcoming occlusions and improving joint articulation detection.": [
+		"Introduce changes incrementally and validate the impact of each modification to ensure they contribute positively to the model's performance."
+	],
+	"Integrate a guidance-based feature aggregation module to enhance the feature representation by emphasizing subtle discriminative features through multi-scale feature aggregation.": [
+		"Ensure that modifications to residual connections do not disrupt the balance and information flow between the main and residual paths."
+	],
+	"Apply spectrum-aware distillation to focus on enhancing the recovery of high-frequency details, weighting the distillation loss inversely based on frequency spectrum magnitudes to prioritize rare high-frequency components.": [
+		"Carefully manage the addition of new layers and operations to avoid over-complicating the architecture and ensure proper gradient flow."
+	],
+	"Incorporation of a graph residual block in MMIBs to capture local spatial relationships.": [
+		"Ensure skip connections align with feature transformations and avoid bypassing significant processing layers."
+	],
+	"Design of a lightweight transformer decoder in the MAE architecture to efficiently reconstruct from masked tokens.": [
+		"Ensure modifications maintain the integrity of the original tensor dimensions and avoid unnecessary complexity that disrupts the model's learning process."
+	],
+	"Implement a Cross-View Fusion (CVF) module that learns and fuses features from multiple views (front, side, top) to address the challenge of view inconsistency and improve the 3D pose estimation accuracy.": [
+		"Maintain the simplicity of residual connections and avoid excessive layers or operations that increase model complexity unnecessarily."
+	],
+	"Implement adaptive prompt learning to dynamically adjust and embed task-specific and category-specific prompts into the model, improving alignment between visual and textual representations.": [
+		"Ensure that any added layers or operations are necessary and beneficial, and validate their impact on feature representation before finalizing the model structure."
+	],
+	"Efficient and Enriched Model Sampling: Introduce a model queue to dynamically manage different model states (with varying training iterations) to enrich the diversity of feature extractions, suggesting a dynamic adjustment mechanism in backbone design to accommodate varying complexities of input data.": [
+		"Ensure modifications preserve essential spatial information and avoid adding operations that overly compress feature maps."
+	]
+}

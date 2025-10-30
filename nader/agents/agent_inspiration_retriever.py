@@ -19,10 +19,10 @@ from .prompts import PROMPT_RESEARCH_REFLECTION_INSPIRATION
 from .base_agent import BaseAgent
 
 
-
+#임베딩 기반 유사도 검색형 인스피레이션 검색기 
 class InspirationRetriever():
 
-
+#컬렉션(=테이블) 생성/접속. persist_directory로 로컬에 인덱스 유지.
     def __init__(self, 
             table_name='inspirations_040611',
             db_dir='database/ChromDB/inspirations') -> None:
@@ -31,7 +31,7 @@ class InspirationRetriever():
             model='text-embedding-ada-002',
             max_retries=10)
         self.db  = Chroma(collection_name=table_name,embedding_function=self.embedding_func,persist_directory=db_dir)
-
+#db내 문서 수 
     def __len__(self):
         return self.db._collection.count()
 
@@ -50,7 +50,7 @@ class InspirationRetriever():
             id = str(id)
         return self.db.get([id])['documents'][0]
             
-
+#
     def __call__(self, query, num=10, reverse=False):
         if not reverse:
             docs = self.db.similarity_search(query,k=num,filter={'used':False})
@@ -93,7 +93,25 @@ class InspirationSamplerReflection(BaseAgent):
             self.retriever.create_table(inspirations_path)
         self.anno_reflection_path = os.path.join(log_dir,'anno_research_reflection.jsonl')
         self.anno_mog_path = os.path.join(log_dir,'mog.json')
-        
+        with open(inspirations_path,'r') as f:
+            ds = json.load(f)
+        path = os.path.join(llm_log_dir,'inspiration_label.json')
+        if not os.path.isfile(path):
+            for d in ds:
+                d['used'] = False
+            with open(path,'w') as f:
+                json.dump(ds,f,indent='\t')
+        self.insp_path = path
+
+    def load_annos(self):
+        with open(self.insp_path,'r') as f:
+            ds = json.load(f)
+        annos = []
+        for d in ds:
+            if not d['used']:
+                annos.append(d)
+        return annos
+
     def append_anno(self,anno,path):
         with open(path,'a') as f:
             f.write(json.dumps(anno)+'\n')
@@ -110,6 +128,8 @@ class InspirationSamplerReflection(BaseAgent):
     
     def load_reflections(self,key='inspiration'):
         poss,negs=[],[]
+        if not os.path.isfile(self.anno_reflection_path):
+            return poss, negs
         with open(self.anno_reflection_path,'r') as f:
             ds=f.readlines()
             ds=[json.loads(d) for d in ds]
@@ -128,6 +148,7 @@ class InspirationSamplerReflection(BaseAgent):
 
     def __call__(self, num=10, **kwargs):
         self.reflect()
+        insps_random = self.load_annos()
         poss,negs = self.load_reflections()
         insps = {}
         for pos in poss:
@@ -136,13 +157,27 @@ class InspirationSamplerReflection(BaseAgent):
         for neg in negs:
             insp = self.retriever(query=neg,num=5,reverse=True)
             insps.update(insp)
-        assert len(insps)>num,len(insps)
+        if len(insps) < num:
+            insps_random = []
+            if hasattr(self, "load_annos") and callable(self.load_annos):
+                try:
+                    insps_random = self.load_annos()  # [{id, inspiration, used...}, ...]
+                except Exception:
+                    insps_random = []
+
+            if insps_random:
+                take = min(len(insps_random), num * 3)
+                picks = np.random.choice(insps_random, size=take, replace=False)
+                for d in picks:
+                    insps[str(d['id'])] = d['inspiration']
+
+        # 4) 최종 반환 (가능한 만큼)
+        if len(insps) == 0:
+            return {}
         ids = list(insps.keys())
-        ids = np.random.choice(ids,num,replace=False)
-        res = {}
-        for id in ids:
-            res[id] = insps[id]
-        return res
+        take = min(len(ids), num)
+        pick = np.random.choice(ids, size=take, replace=False)
+        return {i: insps[i] for i in pick}
 
     def reflect(self):
         bns = self.load_block_names()

@@ -1,0 +1,6 @@
+##FPN_base##
+0:input
+1:output
+2:Conv2d(out_channels=C,kernel_size=3,stride=1,padding=1)
+0->2
+2->1
